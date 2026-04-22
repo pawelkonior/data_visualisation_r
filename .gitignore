@@ -21,6 +21,10 @@ _freeze/
 outputs/
 *.html
 
+# Published GitHub Pages site
+!docs/
+!docs/**
+
 # OS / IDE
 .DS_Store
 .idea/

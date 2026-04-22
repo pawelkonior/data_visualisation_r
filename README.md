@@ -34,7 +34,9 @@ quarto render --execute
 ```
 
 Publikacja na GitHub Pages jest automatyczna: workflow
-`.github/workflows/pages.yml` renderuje książkę po każdym pushu na `main`.
+`.github/workflows/pages.yml` publikuje katalog `docs/` po każdym pushu na
+`main`. Po zmianach w materiałach uruchom lokalnie `quarto render --execute`,
+a następnie commituj zaktualizowany katalog `docs/`.
 
 Po pierwszym udanym renderze możesz zamrozić środowisko:
 

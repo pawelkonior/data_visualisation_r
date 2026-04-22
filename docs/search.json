@@ -1,0 +1,733 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Wizualizacja danych w R",
+    "section": "",
+    "text": "0.1 Dla kogo\nTen materiał prowadzi od pierwszego wykresu do kompletnej, odtwarzalnej opowieści wizualnej w R. Pracujemy na lokalnych zbiorach danych z tego repozytorium i używamy aktualnego stosu narzędzi: R 4.5.3+, Quarto, tidyverse, ggplot2, renv i ragg.\nMateriał jest dla osób, które znają podstawy pracy z tabelami, ale chcą świadomie dobierać typ wykresu, kodować go w ggplot2, poprawiać czytelność i publikować wyniki jako HTML albo statyczne grafiki.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Wizualizacja danych w R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#efekty-uczenia",
+    "href": "index.html#efekty-uczenia",
+    "title": "Wizualizacja danych w R",
+    "section": "0.2 Efekty uczenia",
+    "text": "0.2 Efekty uczenia\nPo przejściu materiału potrafisz:\n\nzaimportować i przygotować dane do wykresu;\nrozpoznać, kiedy użyć wykresu punktowego (scatter plot), liniowego (line chart), słupkowego (bar chart), mapy ciepła (heatmap) albo małych wielokrotności (small multiples);\nbudować wykres warstwowo przez ggplot(), aes(), geom_*(), skale, podział na panele (faceting) i motywy;\npisać wykresy z dobrymi etykietami, jednostkami, podpisami i paletami przyjaznymi dla osób z zaburzeniami widzenia barw;\nformatować znaczniki osi (ticks), wartości na osiach, tytuły (titles) i etykiety (labels);\neksportować wykresy w jakości do slajdów, raportu i publikacji internetowej;\nużywać animacji, gdy pokazuje proces albo zmianę w czasie;\nprzygotować końcowy mini-projekt analityczny w Quarto.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Wizualizacja danych w R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#jak-pracować-z-materiałem",
+    "href": "index.html#jak-pracować-z-materiałem",
+    "title": "Wizualizacja danych w R",
+    "section": "0.3 Jak pracować z materiałem",
+    "text": "0.3 Jak pracować z materiałem\nKażdy rozdział ma trzy części: krótką intuicję, kod do uruchomienia oraz zadanie. Warto pisać kod samodzielnie, a nie tylko kopiować komórki. W wizualizacji danych najwięcej uczy moment, w którym wykres wygląda prawie dobrze, ale trzeba jeszcze poprawić skalę, etykietę albo agregację.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Wizualizacja danych w R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#główne-zasady",
+    "href": "index.html#główne-zasady",
+    "title": "Wizualizacja danych w R",
+    "section": "0.4 Główne zasady",
+    "text": "0.4 Główne zasady\n\nJeden wykres odpowiada na jedno pytanie.\nNajpierw porządkujemy dane, potem rysujemy.\nNie używamy setwd(), tylko ścieżek projektowych przez here::here().\nNie chowamy ważnych decyzji w przypadkowych ustawieniach domyślnych.\nKażdy wykres ma tytuł, jednostki, opis danych i sensowny tekst alternatywny.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Wizualizacja danych w R</span>"
+    ]
+  },
+  {
+    "objectID": "materials/01-setup.html",
+    "href": "materials/01-setup.html",
+    "title": "2  Start projektu",
+    "section": "",
+    "text": "2.1 Środowisko\nNa początku ustawiamy środowisko i przechodzimy przez minimalny przepływ pracy: import danych, szybką kontrolę jakości, pierwszą agregację i pierwszy wykres.\nDocelowo pracujemy w R 4.5.3 lub nowszym stabilnym wydaniu. Po zainstalowaniu R i Quarto uruchom w terminalu:\nPo pierwszym renderze projektu zapisz wersje pakietów, czyli zamroź zależności:",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Start projektu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/01-setup.html#środowisko",
+    "href": "materials/01-setup.html#środowisko",
+    "title": "2  Start projektu",
+    "section": "",
+    "text": "Rscript R/setup.R\nquarto preview\n\nrenv::init(bare = TRUE)\nrenv::snapshot()",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Start projektu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/01-setup.html#pakiety",
+    "href": "materials/01-setup.html#pakiety",
+    "title": "2  Start projektu",
+    "section": "2.2 Pakiety",
+    "text": "2.2 Pakiety\n\nlibrary(tidyverse)\nlibrary(here)\nlibrary(janitor)\n\nsource(here(\"R\", \"theme_course.R\"))\ntheme_set(theme_course())\n\nW przykładach używamy natywnego pipe |&gt;. Jest czytelny, dostępny w nowoczesnym R i nie wymaga dodatkowego operatora z pakietu.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Start projektu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/01-setup.html#import-danych",
+    "href": "materials/01-setup.html#import-danych",
+    "title": "2  Start projektu",
+    "section": "2.3 Import danych",
+    "text": "2.3 Import danych\nZaczniemy od grantów szkolnych. Plik ma pierwszą kolumnę indeksową bez znaczenia, więc usuwamy ją po imporcie.\n\ngrants &lt;- readr::read_csv(\n  here(\"datasets\", \"schoolimprovement2010grants.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  dplyr::select(-dplyr::any_of(\"x1\")) |&gt;\n  dplyr::mutate(\n    award_amount = as.numeric(award_amount),\n    model_selected = dplyr::recode(\n      model_selected,\n      Closure = \"Zamknięcie\",\n      Restart = \"Restart\",\n      Turnaround = \"Restrukturyzacja\",\n      Transformation = \"Transformacja\"\n    ),\n    region = dplyr::recode(\n      region,\n      Midwest = \"Środkowy Zachód\",\n      Northeast = \"Północny Wschód\",\n      South = \"Południe\",\n      West = \"Zachód\"\n    )\n  )\n\ndplyr::glimpse(grants)\n\nRows: 757\nColumns: 7\n$ school_name    &lt;chr&gt; \"HOGARTH KINGEEKUK MEMORIAL SCHOOL\", \"AKIACHAK SCHOOL\",…\n$ city           &lt;chr&gt; \"SAVOONGA\", \"AKIACHAK\", \"GAMBELL\", \"WASILLA\", \"AKIAK\", …\n$ state          &lt;chr&gt; \"AK\", \"AK\", \"AK\", \"AK\", \"AK\", \"AK\", \"AK\", \"AL\", \"AL\", \"…\n$ district_name  &lt;chr&gt; \"BERING STRAIT SCHOOL DISTRICT\", \"YUPIIT SCHOOL DISTRIC…\n$ model_selected &lt;chr&gt; \"Transformacja\", \"Transformacja\", \"Transformacja\", \"Tra…\n$ award_amount   &lt;dbl&gt; 471014, 520579, 449592, 641184, 399686, 697703, 427658,…\n$ region         &lt;chr&gt; \"Zachód\", \"Zachód\", \"Zachód\", \"Zachód\", \"Zachód\", \"Zach…",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Start projektu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/01-setup.html#pierwszy-wykres",
+    "href": "materials/01-setup.html#pierwszy-wykres",
+    "title": "2  Start projektu",
+    "section": "2.4 Pierwszy wykres",
+    "text": "2.4 Pierwszy wykres\n\ngrants |&gt;\n  ggplot(aes(x = award_amount)) +\n  geom_histogram(bins = 30, fill = \"#0072B2\", color = \"white\", linewidth = 0.25) +\n  scale_x_continuous(labels = scales::label_dollar()) +\n  labs(\n    title = \"Większość grantów skupia się przy niższych kwotach\",\n    subtitle = \"Pierwszy wykres zawsze zaczynamy od pytania o kształt danych\",\n    x = \"Kwota grantu\",\n    y = \"Liczba szkół\",\n    caption = \"Źródło: datasets/schoolimprovement2010grants.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 2.1: Rozkład kwot grantów szkolnych.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Start projektu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/01-setup.html#zadanie",
+    "href": "materials/01-setup.html#zadanie",
+    "title": "2  Start projektu",
+    "section": "2.5 Zadanie",
+    "text": "2.5 Zadanie\nZmień liczbę przedziałów histogramu (bins) w geom_histogram() na 10, 20 i 50. Zapisz jedną obserwację: czy zmienia się wniosek z wykresu, czy tylko jego szczegółowość?",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Start projektu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/02-grammar.html",
+    "href": "materials/02-grammar.html",
+    "title": "3  Gramatyka grafiki",
+    "section": "",
+    "text": "3.1 Dane i mapowania estetyczne (aesthetics)\nggplot2 opiera się na prostej idei: wykres składamy z danych, mapowań, geometrii, skal, statystyk, podziału na panele (faceting) i motywu. Dzięki temu zamiast pamiętać setki funkcji, uczymy się jednego spójnego języka.\nmpg_local &lt;- readr::read_csv(\n  here(\"datasets\", \"mpg.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  mutate(\n    cylinders = factor(cylinders),\n    origin = factor(\n      recode(origin, usa = \"USA\", europe = \"Europa\", japan = \"Japonia\"),\n      levels = c(\"USA\", \"Europa\", \"Japonia\")\n    )\n  )\n\ninsurance &lt;- readr::read_csv(\n  here(\"datasets\", \"insurance_premiums.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  mutate(\n    region = factor(\n      recode(\n        region,\n        Midwest = \"Środkowy Zachód\",\n        Northeast = \"Północny Wschód\",\n        South = \"Południe\",\n        West = \"Zachód\"\n      ),\n      levels = c(\"Środkowy Zachód\", \"Północny Wschód\", \"Południe\", \"Zachód\")\n    )\n  )\n\nmpg_local |&gt;\n  select(mpg, cylinders, displacement, horsepower, weight, origin) |&gt;\n  slice_head(n = 6)\nmpg_local |&gt;\n  ggplot(aes(x = weight, y = mpg, colour = cylinders)) +\n  geom_point(alpha = 0.75, size = 2.2) +\n  scale_colour_course_d(name = \"Liczba cylindrów\") +\n  labs(\n    title = \"Cięższe auta spalają więcej paliwa\",\n    subtitle = \"Kolor koduje liczbę cylindrów, czyli dodatkowy wymiar danych\",\n    x = \"Masa auta\",\n    y = \"Efektywność paliwowa (mpg)\",\n    caption = \"Źródło: datasets/mpg.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 3.1: Zależność masy samochodu i spalania.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Gramatyka grafiki</span>"
+    ]
+  },
+  {
+    "objectID": "materials/02-grammar.html#warstwa-statystyczna-statistical-layer",
+    "href": "materials/02-grammar.html#warstwa-statystyczna-statistical-layer",
+    "title": "3  Gramatyka grafiki",
+    "section": "3.2 Warstwa statystyczna (statistical layer)",
+    "text": "3.2 Warstwa statystyczna (statistical layer)\nTa sama baza danych może dostać dodatkową warstwę modelu. Na tym etapie najważniejsze jest to, że warstwy można dodawać bez przebudowy całego wykresu.\n\nmpg_local |&gt;\n  ggplot(aes(x = weight, y = mpg)) +\n  geom_point(alpha = 0.55, colour = \"#5B6770\") +\n  geom_smooth(method = \"lm\", se = TRUE, colour = \"#D55E00\", linewidth = 1) +\n  labs(\n    title = \"Warstwa trendu pomaga zobaczyć kierunek zależności\",\n    x = \"Masa auta\",\n    y = \"Efektywność paliwowa (mpg)\",\n    caption = \"Źródło: datasets/mpg.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 3.2: Punkty oraz trend liniowy.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Gramatyka grafiki</span>"
+    ]
+  },
+  {
+    "objectID": "materials/02-grammar.html#regresja-i-podział-na-panele",
+    "href": "materials/02-grammar.html#regresja-i-podział-na-panele",
+    "title": "3  Gramatyka grafiki",
+    "section": "3.3 Regresja i podział na panele",
+    "text": "3.3 Regresja i podział na panele\nW tej części budujemy dwa warianty tej samej analizy: jeden wykres z linią regresji dla całego zbioru oraz wersję podzieloną na panele. Dzięki temu widać, że w ggplot2 zmieniamy strukturę wykresu przez dodawanie warstw, a nie przez przeskakiwanie między osobnymi funkcjami.\n\ninsurance |&gt;\n  ggplot(aes(x = insurance_losses, y = premiums)) +\n  geom_point(aes(colour = region), alpha = 0.78, size = 2.4) +\n  geom_smooth(\n    data = insurance,\n    aes(x = insurance_losses, y = premiums),\n    method = \"lm\",\n    se = TRUE,\n    colour = \"#D55E00\",\n    fill = \"#F0E442\",\n    linewidth = 1,\n    inherit.aes = FALSE\n  ) +\n  scale_colour_course_d(name = \"Region USA\") +\n  scale_y_continuous(labels = scales::label_dollar()) +\n  labs(\n    title = \"Regresja jako dodatkowa warstwa, nie osobna funkcja\",\n    subtitle = \"Kolor pokazuje region, a linia streszcza relację dla całych danych\",\n    x = \"Straty ubezpieczeniowe\",\n    y = \"Składka\",\n    caption = \"Źródło: datasets/insurance_premiums.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 3.3: Regresja w ggplot2: punkty i jeden trend liniowy.\n\n\n\n\n\n\ninsurance |&gt;\n  ggplot(aes(x = insurance_losses, y = premiums)) +\n  geom_point(alpha = 0.65, colour = \"#5B6770\", size = 2.1) +\n  geom_smooth(method = \"lm\", se = FALSE, colour = \"#D55E00\", linewidth = 0.9) +\n  facet_wrap(vars(region)) +\n  scale_y_continuous(labels = scales::label_dollar()) +\n  labs(\n    title = \"Podział na panele rozdziela model na regiony\",\n    x = \"Straty ubezpieczeniowe\",\n    y = \"Składka\"\n  )\n\n\n\n\n\n\n\nRysunek 3.4: Model liniowy w osobnych panelach w ggplot2.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Gramatyka grafiki</span>"
+    ]
+  },
+  {
+    "objectID": "materials/02-grammar.html#podział-na-panele-faceting",
+    "href": "materials/02-grammar.html#podział-na-panele-faceting",
+    "title": "3  Gramatyka grafiki",
+    "section": "3.4 Podział na panele (faceting)",
+    "text": "3.4 Podział na panele (faceting)\n\nmpg_local |&gt;\n  ggplot(aes(x = horsepower, y = mpg)) +\n  geom_point(alpha = 0.6, colour = \"#0072B2\") +\n  facet_wrap(vars(origin)) +\n  labs(\n    title = \"Małe wielokrotności (small multiples) pozwalają porównywać grupy bez przeładowania kolorem\",\n    x = \"Moc\",\n    y = \"Efektywność paliwowa (mpg)\"\n  )\n\n\n\n\n\n\n\nRysunek 3.5: Ten sam układ rozbity według pochodzenia auta.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Gramatyka grafiki</span>"
+    ]
+  },
+  {
+    "objectID": "materials/02-grammar.html#zadanie",
+    "href": "materials/02-grammar.html#zadanie",
+    "title": "3  Gramatyka grafiki",
+    "section": "3.5 Zadanie",
+    "text": "3.5 Zadanie\nZbuduj wykres horsepower kontra acceleration. Najpierw użyj koloru dla cylinders, potem podziel wykres na panele przez facet_wrap(vars(cylinders)). Która wersja jest łatwiejsza do przeczytania?",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Gramatyka grafiki</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html",
+    "href": "materials/03-distributions.html",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "",
+    "text": "4.1 Histogram i wykres gęstości (density plot)\nRozkłady odpowiadają na pytania: jakie wartości są typowe, jak szeroki jest zakres i czy dane mają ogon lub obserwacje odstające. To zwykle najlepszy punkt startu, zanim zaczniemy porównywać grupy.\nfmr |&gt;\n  ggplot(aes(x = fmr_2)) +\n  geom_histogram(aes(y = after_stat(density)), bins = 35, fill = \"#56B4E9\", color = \"white\") +\n  geom_density(colour = \"#D55E00\", linewidth = 1) +\n  scale_x_continuous(labels = scales::label_dollar()) +\n  labs(\n    title = \"Histogram pokazuje masę danych, gęstość pokazuje kształt\",\n    x = \"Czynsz rynkowy: 2 sypialnie\",\n    y = \"Gęstość\",\n    caption = \"Źródło: datasets/FY18_4050_FMRs.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 4.1: Rozkład czynszu rynkowego dla mieszkań z dwiema sypialniami.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html#histogram-gęstość-i-kreski-obserwacji-rug-plot",
+    "href": "materials/03-distributions.html#histogram-gęstość-i-kreski-obserwacji-rug-plot",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "4.2 Histogram, gęstość i kreski obserwacji (rug plot)",
+    "text": "4.2 Histogram, gęstość i kreski obserwacji (rug plot)\nW R ten widok składamy jawnie z kilku warstw: histogramu, wykresu gęstości (density plot) i krótkich kresek pokazujących pojedyncze obserwacje (rug plot). Każda warstwa odpowiada na trochę inne pytanie o rozkład.\n\nschool_grants |&gt;\n  ggplot(aes(x = award_amount_m)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 20,\n    fill = \"#56B4E9\",\n    colour = \"white\",\n    alpha = 0.86\n  ) +\n  geom_density(colour = \"#D55E00\", linewidth = 1) +\n  geom_rug(alpha = 0.25, sides = \"b\") +\n  scale_x_continuous(labels = scales::label_number(suffix = \" mln\", accuracy = 0.1)) +\n  labs(\n    title = \"Histogram, gęstość i kreski obserwacji pokazują rozkład z trzech stron\",\n    x = \"Kwota grantu\",\n    y = \"Gęstość\",\n    caption = \"Źródło: datasets/schoolimprovement2010grants.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 4.2: Histogram grantów szkolnych z krzywą gęstości i kreskami obserwacji.\n\n\n\n\n\n\nfmr_one_bed &lt;- fmr |&gt;\n  filter(!is.na(fmr_1), dplyr::between(fmr_1, 300, 1500))\n\nfmr_one_bed_stats &lt;- fmr_one_bed |&gt;\n  summarise(\n    mean_rent = mean(fmr_1),\n    median_rent = median(fmr_1)\n  )\n\nfmr_one_bed |&gt;\n  ggplot(aes(x = fmr_1)) +\n  geom_rect(\n    data = fmr_one_bed_stats,\n    aes(\n      xmin = pmin(mean_rent, median_rent),\n      xmax = pmax(mean_rent, median_rent)\n    ),\n    ymin = 0,\n    ymax = Inf,\n    fill = \"#F0E442\",\n    alpha = 0.28,\n    inherit.aes = FALSE\n  ) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 30,\n    fill = \"#009E73\",\n    colour = \"white\",\n    alpha = 0.76\n  ) +\n  geom_density(colour = \"#0072B2\", linewidth = 1) +\n  geom_vline(\n    data = fmr_one_bed_stats,\n    aes(xintercept = median_rent, linetype = \"Mediana\"),\n    colour = \"#CC79A7\",\n    linewidth = 1\n  ) +\n  geom_vline(\n    data = fmr_one_bed_stats,\n    aes(xintercept = mean_rent, linetype = \"Średnia\"),\n    colour = \"#D55E00\",\n    linewidth = 1\n  ) +\n  scale_linetype_manual(values = c(\"Mediana\" = \"dashed\", \"Średnia\" = \"solid\"), name = NULL) +\n  scale_x_continuous(labels = scales::label_dollar()) +\n  labs(\n    title = \"Średnia i mediana mówią, jak mocny jest ogon rozkładu\",\n    subtitle = \"Żółty pas zaznacza różnicę między obiema miarami\",\n    x = \"Czynsz rynkowy: 1 sypialnia\",\n    y = \"Gęstość\",\n    caption = \"Źródło: datasets/FY18_4050_FMRs.csv; zakres 300-1500 USD\"\n  )\n\n\n\n\n\n\n\nRysunek 4.3: Dopracowany histogram z medianą, średnią i zaznaczoną różnicą między nimi.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html#wykres-łączony-relacja-i-rozkłady-brzegowe",
+    "href": "materials/03-distributions.html#wykres-łączony-relacja-i-rozkłady-brzegowe",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "4.3 Wykres łączony: relacja i rozkłady brzegowe",
+    "text": "4.3 Wykres łączony: relacja i rozkłady brzegowe\nTaki widok traktujemy jako kompozycję trzech elementów: głównego wykresu relacji oraz dwóch małych rozkładów brzegowych na osiach. Dzięki temu jednocześnie widać zależność między zmiennymi i kształt każdego rozkładu osobno.\n\nfmr_joint &lt;- fmr |&gt;\n  filter(\n    !is.na(fmr_1),\n    !is.na(fmr_2)\n  )\n\nrent_x_limits &lt;- c(350, 1700)\nrent_y_limits &lt;- c(400, 2100)\nrent_label &lt;- scales::label_number(prefix = \"$\", big.mark = \" \", accuracy = 1)\n\njoint_plot_theme &lt;- theme(\n  axis.title = element_text(size = 10.5),\n  axis.text = element_text(size = 9),\n  plot.margin = margin(8, 12, 8, 12)\n)\n\njoint_margin_theme &lt;- theme_void() +\n  theme(plot.margin = margin(2, 6, 2, 6))\n\nfmr_joint_visible &lt;- fmr_joint |&gt;\n  filter(\n    dplyr::between(fmr_1, rent_x_limits[1], rent_x_limits[2]),\n    dplyr::between(fmr_2, rent_y_limits[1], rent_y_limits[2])\n  )\n\njoint_scatter &lt;- fmr_joint_visible |&gt;\n  ggplot(aes(x = fmr_1, y = fmr_2)) +\n  geom_point(alpha = 0.18, size = 1.1, colour = \"#0072B2\") +\n  geom_smooth(method = \"lm\", se = FALSE, colour = \"#D55E00\", linewidth = 1) +\n  coord_cartesian(xlim = rent_x_limits, ylim = rent_y_limits, expand = FALSE) +\n  scale_x_continuous(\n    labels = rent_label,\n    breaks = seq(500, 1700, by = 300)\n  ) +\n  scale_y_continuous(\n    labels = rent_label,\n    breaks = seq(500, 2100, by = 400)\n  ) +\n  labs(\n    x = \"Czynsz za 1 sypialnię\",\n    y = \"Czynsz za 2 sypialnie\"\n  ) +\n  joint_plot_theme\n\njoint_hist_x &lt;- fmr_joint_visible |&gt;\n  ggplot(aes(x = fmr_1)) +\n  geom_histogram(bins = 26, fill = \"#8ECAE6\", colour = \"white\", linewidth = 0.2) +\n  coord_cartesian(xlim = rent_x_limits, expand = FALSE) +\n  joint_margin_theme\n\njoint_hist_y &lt;- fmr_joint_visible |&gt;\n  ggplot(aes(x = fmr_2)) +\n  geom_histogram(bins = 26, fill = \"#8ECAE6\", colour = \"white\", linewidth = 0.2) +\n  coord_flip(xlim = rent_y_limits, expand = FALSE) +\n  joint_margin_theme\n\n((joint_hist_x + plot_spacer()) /\n  (joint_scatter + joint_hist_y)) +\n  plot_layout(widths = c(5.8, 1.15), heights = c(1, 5.2)) +\n  plot_annotation(\n    title = \"Czynsze za 1 i 2 sypialnie rosną prawie liniowo\",\n    theme = theme(plot.title = element_text(face = \"bold\", size = 14, margin = margin(b = 8)))\n  )\n\n\n\n\n\n\n\nRysunek 4.4: Wykres relacji z rozkładami brzegowymi: punkty, trend i histogramy marginalne. Skrajne wartości są przycięte dla czytelności.\n\n\n\n\n\n\njoint_binned &lt;- fmr_joint_visible |&gt;\n  ggplot(aes(x = fmr_1, y = fmr_2)) +\n  geom_point(alpha = 0, size = 0, show.legend = FALSE) +\n  geom_bin_2d(bins = 30, show.legend = FALSE) +\n  coord_cartesian(xlim = rent_x_limits, ylim = rent_y_limits, expand = FALSE) +\n  scale_fill_viridis_c(\n    option = \"C\",\n    trans = \"sqrt\"\n  ) +\n  scale_x_continuous(\n    labels = rent_label,\n    breaks = seq(500, 1700, by = 300)\n  ) +\n  scale_y_continuous(\n    labels = rent_label,\n    breaks = seq(500, 2100, by = 400)\n  ) +\n  labs(\n    x = \"Czynsz za 1 sypialnię\",\n    y = \"Czynsz za 2 sypialnie\"\n  ) +\n  joint_plot_theme\n\njoint_density_x &lt;- fmr_joint_visible |&gt;\n  ggplot(aes(x = fmr_1)) +\n  geom_density(fill = \"#BFD7EA\", colour = \"#2D5F73\", alpha = 0.75, linewidth = 0.8) +\n  coord_cartesian(xlim = rent_x_limits, expand = FALSE) +\n  joint_margin_theme\n\njoint_density_y &lt;- fmr_joint_visible |&gt;\n  ggplot(aes(x = fmr_2)) +\n  geom_density(fill = \"#BFD7EA\", colour = \"#2D5F73\", alpha = 0.75, linewidth = 0.8) +\n  coord_flip(xlim = rent_y_limits, expand = FALSE) +\n  joint_margin_theme\n\n((joint_density_x + plot_spacer()) /\n  (joint_binned + joint_density_y)) +\n  plot_layout(widths = c(5.8, 1.15), heights = c(1, 5.2)) +\n  plot_annotation(\n    title = \"Najwięcej par czynszów skupia się przy niższych wartościach\",\n    theme = theme(plot.title = element_text(face = \"bold\", size = 14, margin = margin(b = 8)))\n  )\n\n\n\n\n\n\n\nRysunek 4.5: Wykres relacji z wartościami grupowanymi w przedziały: liczność par wartości i gęstości marginalne. Jaśniejsze pola oznaczają więcej obserwacji.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html#heksagony-i-histogramy-brzegowe",
+    "href": "materials/03-distributions.html#heksagony-i-histogramy-brzegowe",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "4.4 Heksagony i histogramy brzegowe",
+    "text": "4.4 Heksagony i histogramy brzegowe\nGdy punktów jest dużo albo wartości nachodzą na siebie, pojedyncze kropki mogą ukrywać zagęszczenia. Wtedy dobrym wyborem jest wykres heksagonalny (hexbin plot): płaszczyzna jest dzielona na sześciokąty, a kolor pokazuje liczbę obserwacji w każdym z nich. Histogramy brzegowe dopowiadają, jak rozkłada się każda zmienna osobno.\n\nbike_hex_limits &lt;- list(\n  x = c(0.2, 1),\n  y = c(0, 9000)\n)\n\nbike_axis_theme &lt;- theme(\n  panel.grid = element_line(colour = \"#2D2D35\", linewidth = 0.25),\n  panel.background = element_rect(fill = \"#050509\", colour = NA),\n  plot.background = element_rect(fill = \"white\", colour = NA),\n  axis.title = element_text(size = 11),\n  axis.text = element_text(size = 9),\n  plot.margin = margin(4, 6, 4, 6)\n)\n\nbike_margin_theme &lt;- theme_void() +\n  theme(plot.margin = margin(2, 6, 2, 6))\n\nbike_hex &lt;- bike_share |&gt;\n  ggplot(aes(x = hum, y = total_rentals)) +\n  geom_hex(bins = 22, colour = \"#050509\", linewidth = 0.15, show.legend = FALSE) +\n  scale_fill_viridis_c(option = \"magma\", trans = \"sqrt\") +\n  coord_cartesian(xlim = bike_hex_limits$x, ylim = bike_hex_limits$y, expand = FALSE) +\n  scale_x_continuous(labels = scales::label_number(accuracy = 0.1)) +\n  scale_y_continuous(labels = scales::label_number(big.mark = \" \")) +\n  labs(\n    x = \"Wilgotność względna (0-1)\",\n    y = \"Liczba wypożyczeń rowerów\"\n  ) +\n  bike_axis_theme\n\nbike_humidity_hist &lt;- bike_share |&gt;\n  ggplot(aes(x = hum)) +\n  geom_histogram(bins = 22, fill = \"#5E4B8B\", colour = \"white\", linewidth = 0.25) +\n  coord_cartesian(xlim = bike_hex_limits$x, expand = FALSE) +\n  bike_margin_theme\n\nbike_rentals_hist &lt;- bike_share |&gt;\n  ggplot(aes(x = total_rentals)) +\n  geom_histogram(bins = 22, fill = \"#5E4B8B\", colour = \"white\", linewidth = 0.25) +\n  coord_flip(xlim = bike_hex_limits$y, expand = FALSE) +\n  bike_margin_theme\n\n((bike_humidity_hist + plot_spacer()) /\n  (bike_hex + bike_rentals_hist)) +\n  plot_layout(widths = c(5.4, 1.05), heights = c(1, 5.2)) +\n  plot_annotation(\n    title = \"Wilgotność i liczba wypożyczeń tworzą kilka obszarów zagęszczenia\",\n    subtitle = \"Kolor heksagonu oznacza liczbę dni w danym przedziale wartości\",\n    theme = theme(\n      plot.title = element_text(face = \"bold\", size = 14, margin = margin(b = 4)),\n      plot.subtitle = element_text(size = 10, colour = \"#4A4A4A\", margin = margin(b = 8))\n    )\n  )\n\n\n\n\n\n\n\nRysunek 4.6: Wykres heksagonalny z histogramami brzegowymi dla wilgotności i liczby wypożyczeń rowerów.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html#wykres-pudełkowy-boxplot-dla-porównań",
+    "href": "materials/03-distributions.html#wykres-pudełkowy-boxplot-dla-porównań",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "4.5 Wykres pudełkowy (boxplot) dla porównań",
+    "text": "4.5 Wykres pudełkowy (boxplot) dla porównań\n\nmelb |&gt;\n  filter(!is.na(region), !is.na(price_m), price_m &lt; 5) |&gt;\n  mutate(region = forcats::fct_reorder(region, price_m, .fun = median, na.rm = TRUE)) |&gt;\n  ggplot(aes(x = price_m, y = region)) +\n  geom_boxplot(fill = \"#009E73\", alpha = 0.7, outlier_alpha = 0.25) +\n  scale_x_continuous(labels = scales::label_number(suffix = \" mln\")) +\n  labs(\n    title = \"Wykres pudełkowy dobrze porównuje typowe wartości i rozrzut\",\n    x = \"Cena domu\",\n    y = NULL,\n    caption = \"Źródło: datasets/melb_clean.csv; wykres ograniczony do cen poniżej 5 mln\"\n  )\n\n\n\n\n\n\n\nRysunek 4.7: Ceny domów w Melbourne według regionu.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html#wykres-skrzypcowy-violin-plot",
+    "href": "materials/03-distributions.html#wykres-skrzypcowy-violin-plot",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "4.6 Wykres skrzypcowy (violin plot)",
+    "text": "4.6 Wykres skrzypcowy (violin plot)\n\nmelb |&gt;\n  filter(!is.na(type), !is.na(price_m), price_m &lt; 4) |&gt;\n  ggplot(aes(x = type, y = price_m, fill = type)) +\n  geom_violin(trim = TRUE, alpha = 0.75, show.legend = FALSE) +\n  geom_boxplot(width = 0.12, outlier_alpha = 0.2, show.legend = FALSE) +\n  scale_fill_course_d() +\n  scale_y_continuous(labels = scales::label_number(suffix = \" mln\")) +\n  labs(\n    title = \"Wykres skrzypcowy łączy kształt rozkładu z porównaniem grup\",\n    x = \"Typ nieruchomości\",\n    y = \"Cena\",\n    caption = \"Źródło: datasets/melb_clean.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 4.8: Kształt rozkładu cen dla typów nieruchomości.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/03-distributions.html#zadanie",
+    "href": "materials/03-distributions.html#zadanie",
+    "title": "4  Rozkłady i obserwacje odstające",
+    "section": "4.7 Zadanie",
+    "text": "4.7 Zadanie\nDla fmr_1, fmr_2 i fmr_3 przygotuj trzy histogramy w jednym widoku. Podpowiedź: użyj pivot_longer() i podziel wynik na panele przez facet_wrap().",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Rozkłady i obserwacje odstające</span>"
+    ]
+  },
+  {
+    "objectID": "materials/04-categories.html",
+    "href": "materials/04-categories.html",
+    "title": "5  Kategorie i rankingi",
+    "section": "",
+    "text": "5.1 Wykres słupkowy (bar chart) z dobrą kolejnością\nWykresy kategorii działają najlepiej, gdy kategorie są posortowane według wartości, a liczba grup jest ograniczona do tego, co odbiorca realnie porówna.\nmedals &lt;- readr::read_csv(\n  here(\"datasets\", \"medals_by_country_2016.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  rename(country = `...1`) |&gt;\n  pivot_longer(\n    cols = c(Bronze, Gold, Silver),\n    names_to = \"medal\",\n    values_to = \"count\"\n  ) |&gt;\n  mutate(\n    medal = factor(\n      recode(medal, Gold = \"Złoto\", Silver = \"Srebro\", Bronze = \"Brąz\"),\n      levels = c(\"Złoto\", \"Srebro\", \"Brąz\")\n    ),\n    country = forcats::fct_reorder(country, count, .fun = sum)\n  )\nmedals |&gt;\n  ggplot(aes(x = count, y = country, fill = medal)) +\n  geom_col(width = 0.72) +\n  scale_fill_manual(values = c(Złoto = \"#D6A21E\", Srebro = \"#9AA3AA\", Brąz = \"#A97142\")) +\n  labs(\n    title = \"Sortowanie kategorii robi połowę pracy czytelnika\",\n    x = \"Liczba medali\",\n    y = \"Kraj\",\n    fill = \"Medal\",\n    caption = \"Źródło: datasets/medals_by_country_2016.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 5.1: Medale olimpijskie według kraju i typu medalu.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Kategorie i rankingi</span>"
+    ]
+  },
+  {
+    "objectID": "materials/04-categories.html#najważniejsze-n-kategorii-zamiast-pełnej-listy",
+    "href": "materials/04-categories.html#najważniejsze-n-kategorii-zamiast-pełnej-listy",
+    "title": "5  Kategorie i rankingi",
+    "section": "5.2 Najważniejsze N kategorii zamiast pełnej listy",
+    "text": "5.2 Najważniejsze N kategorii zamiast pełnej listy\n\nitem_labels &lt;- c(\n  Coffee = \"Kawa\",\n  Bread = \"Chleb\",\n  Tea = \"Herbata\",\n  Cake = \"Ciasto\",\n  Pastry = \"Ciastko\",\n  Sandwich = \"Kanapka\",\n  Medialuna = \"Rogalik\",\n  `Hot chocolate` = \"Gorąca czekolada\",\n  Cookies = \"Ciastka\",\n  Brownie = \"Brownie\",\n  Juice = \"Sok\",\n  Coke = \"Cola\",\n  Muffin = \"Muffin\",\n  Scone = \"Scone\",\n  Toast = \"Tost\",\n  Soup = \"Zupa\",\n  `Farm House` = \"Chleb wiejski\",\n  Croissant = \"Croissant\",\n  Truffles = \"Trufle\"\n)\n\nbakery_top &lt;- readr::read_csv(here(\"datasets\", \"bakery.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  mutate(items = recode(items, !!!item_labels)) |&gt;\n  count(items, sort = TRUE) |&gt;\n  slice_max(n, n = 10) |&gt;\n  mutate(items = forcats::fct_reorder(items, n))\n\nbakery_top |&gt;\n  ggplot(aes(x = n, y = items)) +\n  geom_col(fill = \"#0072B2\") +\n  labs(\n    title = \"Ranking dziesięciu pozycji jest czytelniejszy niż pełna lista\",\n    x = \"Liczba transakcji\",\n    y = NULL,\n    caption = \"Źródło: datasets/bakery.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 5.2: Najczęściej sprzedawane produkty w piekarni.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Kategorie i rankingi</span>"
+    ]
+  },
+  {
+    "objectID": "materials/04-categories.html#wykresy-kategoryczne-w-ggplot2",
+    "href": "materials/04-categories.html#wykresy-kategoryczne-w-ggplot2",
+    "title": "5  Kategorie i rankingi",
+    "section": "5.3 Wykresy kategoryczne w ggplot2",
+    "text": "5.3 Wykresy kategoryczne w ggplot2\nKategorie można pokazać na kilka sposobów. Pojedyncze obserwacje najlepiej widać na wykresie punktowym z losowym rozsunięciem punktów (strip plot), liczności na wykresie zliczeń (count plot), a typowe wartości na wykresie punktów ze średnimi (point plot).\n\nschool_grants |&gt;\n  mutate(model_selected = forcats::fct_reorder(model_selected, award_amount_m, median)) |&gt;\n  ggplot(aes(x = award_amount_m, y = model_selected, colour = region)) +\n  geom_jitter(width = 0, height = 0.16, alpha = 0.48, size = 1.7) +\n  scale_colour_course_d(name = \"Region USA\") +\n  scale_x_continuous(labels = scales::label_number(suffix = \" mln\", accuracy = 0.1)) +\n  labs(\n    title = \"Losowe rozsunięcie punktów (jitter) odsłania pojedyncze obserwacje\",\n    x = \"Kwota grantu\",\n    y = \"Model interwencji\",\n    caption = \"Źródło: datasets/schoolimprovement2010grants.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 5.3: Wykres punktowy z losowym rozsunięciem: każda kropka to jeden grant.\n\n\n\n\n\n\nschool_grants |&gt;\n  filter(region != \"Brak danych\") |&gt;\n  count(model_selected, region) |&gt;\n  mutate(model_selected = forcats::fct_reorder(model_selected, n, .fun = sum)) |&gt;\n  ggplot(aes(x = model_selected, y = n, fill = region)) +\n  geom_col(position = position_dodge(width = 0.75), width = 0.68) +\n  coord_flip() +\n  scale_fill_course_d(name = \"Region USA\") +\n  labs(\n    title = \"Kolor rozdziela zliczenia według regionu\",\n    x = NULL,\n    y = \"Liczba szkół\",\n    caption = \"Źródło: datasets/schoolimprovement2010grants.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 5.4: Wykres zliczeń w ggplot2: liczba szkół według modelu i regionu.\n\n\n\n\n\n\nschool_award_summary &lt;- school_grants |&gt;\n  group_by(model_selected) |&gt;\n  summarise(\n    n = n(),\n    mean_award_m = mean(award_amount_m),\n    se_award_m = sd(award_amount_m) / sqrt(n),\n    .groups = \"drop\"\n  ) |&gt;\n  mutate(\n    low = pmax(0, mean_award_m - 1.96 * se_award_m),\n    high = mean_award_m + 1.96 * se_award_m,\n    model_selected = forcats::fct_reorder(model_selected, mean_award_m)\n  )\n\nschool_award_summary |&gt;\n  ggplot(aes(x = mean_award_m, y = model_selected)) +\n  geom_segment(aes(x = low, xend = high, yend = model_selected), colour = \"#5B6770\", linewidth = 1) +\n  geom_point(aes(size = n), colour = \"#D55E00\", alpha = 0.9) +\n  scale_size_continuous(range = c(3, 6), name = \"Liczba szkół\") +\n  scale_x_continuous(labels = scales::label_number(suffix = \" mln\", accuracy = 0.1)) +\n  labs(\n    title = \"Średnia i przedział pokazują kategorię bez ukrywania niepewności\",\n    x = \"Średnia kwota grantu\",\n    y = NULL,\n    caption = \"Przedziały: średnia ± 1.96 SE; źródło: datasets/schoolimprovement2010grants.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 5.5: Wykres średnich w ggplot2: średnia kwota i przedział ufności.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Kategorie i rankingi</span>"
+    ]
+  },
+  {
+    "objectID": "materials/04-categories.html#mapa-ciepła-heatmap-kategorii",
+    "href": "materials/04-categories.html#mapa-ciepła-heatmap-kategorii",
+    "title": "5  Kategorie i rankingi",
+    "section": "5.4 Mapa ciepła (heatmap) kategorii",
+    "text": "5.4 Mapa ciepła (heatmap) kategorii\n\ndaily_show &lt;- readr::read_csv(\n  here(\"datasets\", \"daily_show_guests_cleaned.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  mutate(\n    group = tidyr::replace_na(group, \"Brak kategorii\"),\n    group = recode(\n      group,\n      Academic = \"Nauka i edukacja\",\n      Acting = \"Aktorstwo\",\n      Advocacy = \"Aktywizm\",\n      Athletics = \"Sport\",\n      Business = \"Biznes\",\n      Clergy = \"Duchowieństwo\",\n      Comedy = \"Komedia\",\n      Consultant = \"Konsulting\",\n      Government = \"Administracja\",\n      Media = \"Media\",\n      Military = \"Wojsko\",\n      Misc = \"Inne\",\n      Musician = \"Muzyka\",\n      `Political Aide` = \"Doradcy polityczni\",\n      Politician = \"Politycy\",\n      Science = \"Nauka\"\n    )\n  )\n\ndaily_show |&gt;\n  filter(year &gt;= 2000) |&gt;\n  count(year, group) |&gt;\n  mutate(group = forcats::fct_reorder(group, n, .fun = sum)) |&gt;\n  ggplot(aes(x = year, y = group, fill = n)) +\n  geom_tile(color = \"white\", linewidth = 0.2) +\n  scale_fill_viridis_c(option = \"C\", name = \"Liczba\") +\n  labs(\n    title = \"Mapa ciepła działa, gdy porównujemy czas i kategorię\",\n    x = \"Rok\",\n    y = NULL,\n    caption = \"Źródło: datasets/daily_show_guests_cleaned.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 5.6: Typy gości w Daily Show według lat.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Kategorie i rankingi</span>"
+    ]
+  },
+  {
+    "objectID": "materials/04-categories.html#zadanie",
+    "href": "materials/04-categories.html#zadanie",
+    "title": "5  Kategorie i rankingi",
+    "section": "5.5 Zadanie",
+    "text": "5.5 Zadanie\nWybierz dowolny zbiór danych z DATASETS.md, policz ranking kategorii i pokaż tylko 10 najważniejszych pozycji. Dodaj jedno zdanie: dlaczego pozostałe kategorie ukrywasz?",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Kategorie i rankingi</span>"
+    ]
+  },
+  {
+    "objectID": "materials/05-time-series.html",
+    "href": "materials/05-time-series.html",
+    "title": "6  Czas i trendy",
+    "section": "",
+    "text": "6.1 Wykres liniowy (line chart) prostego trendu\nSzereg czasowy powinien od razu pokazywać jednostkę czasu, punkt odniesienia i to, czy patrzymy na wartości bezwzględne, zmianę procentową czy indeks.\nclimate &lt;- readr::read_csv(here(\"datasets\", \"climate_change.csv\"), show_col_types = FALSE) |&gt;\n  mutate(date = lubridate::ymd(date))\n\nclimate |&gt;\n  ggplot(aes(x = date, y = co2)) +\n  geom_line(colour = \"#0072B2\", linewidth = 0.8) +\n  labs(\n    title = \"Linia jest naturalnym wyborem dla ciągłej osi czasu\",\n    x = NULL,\n    y = \"Stężenie CO₂\",\n    caption = \"Źródło: datasets/climate_change.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 6.1: CO₂ i względna temperatura w czasie.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Czas i trendy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/05-time-series.html#porównanie-serii-przez-indeks",
+    "href": "materials/05-time-series.html#porównanie-serii-przez-indeks",
+    "title": "6  Czas i trendy",
+    "section": "6.2 Porównanie serii przez indeks",
+    "text": "6.2 Porównanie serii przez indeks\nGdy serie mają różne poziomy, często lepiej pokazać indeks od wspólnego punktu startu niż surową cenę.\n\nstocks &lt;- readr::read_csv(here(\"datasets\", \"stocks_cleaned.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  select(-any_of(\"x1\")) |&gt;\n  mutate(date = lubridate::ymd(date))\n\nstocks |&gt;\n  filter(name %in% c(\"AAPL\", \"AMZN\", \"MSFT\")) |&gt;\n  arrange(name, date) |&gt;\n  group_by(name) |&gt;\n  mutate(close_index = close / first(close) * 100) |&gt;\n  ungroup() |&gt;\n  ggplot(aes(x = date, y = close_index, colour = name)) +\n  geom_line(linewidth = 0.75) +\n  scale_colour_course_d(name = \"Spółka\") +\n  labs(\n    title = \"Indeks 100 ułatwia porównanie serii o różnych poziomach\",\n    x = NULL,\n    y = \"Cena zamknięcia, indeks = 100\",\n    caption = \"Źródło: datasets/stocks_cleaned.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 6.2: Indeks cen zamknięcia dla wybranych spółek.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Czas i trendy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/05-time-series.html#agregacja-przed-wykresem-liniowym",
+    "href": "materials/05-time-series.html#agregacja-przed-wykresem-liniowym",
+    "title": "6  Czas i trendy",
+    "section": "6.3 Agregacja przed wykresem liniowym",
+    "text": "6.3 Agregacja przed wykresem liniowym\n\nbike_month &lt;- readr::read_csv(here(\"datasets\", \"bike_share.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  mutate(date = lubridate::ymd(dteday), month = floor_date(date, \"month\")) |&gt;\n  group_by(month) |&gt;\n  summarise(avg_rentals = mean(total_rentals), .groups = \"drop\")\n\nbike_month |&gt;\n  ggplot(aes(x = month, y = avg_rentals)) +\n  geom_line(colour = \"#009E73\", linewidth = 0.9) +\n  geom_point(colour = \"#009E73\", size = 1.7) +\n  labs(\n    title = \"Agregacja powinna wynikać z pytania, nie z wygody\",\n    x = NULL,\n    y = \"Średnia dzienna liczba wypożyczeń\",\n    caption = \"Źródło: datasets/bike_share.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 6.3: Średnia dzienna liczba wypożyczeń rowerów według miesiąca.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Czas i trendy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/05-time-series.html#zadanie",
+    "href": "materials/05-time-series.html#zadanie",
+    "title": "6  Czas i trendy",
+    "section": "6.4 Zadanie",
+    "text": "6.4 Zadanie\nDla stocks_cleaned.csv wybierz jedną spółkę i pokaż cenę zamknięcia. Następnie agreguj dane do miesięcznej średniej i porównaj, co zyskujesz, a co tracisz.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Czas i trendy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/06-small-multiples.html",
+    "href": "materials/06-small-multiples.html",
+    "title": "7  Małe wielokrotności",
+    "section": "",
+    "text": "7.1 Pogoda w dwóch miastach\nMałe wielokrotności (small multiples) są najlepsze wtedy, gdy chcemy porównać ten sam wzorzec w wielu grupach. Zamiast kodować wszystko kolorem, dajemy każdej grupie własny panel.\nread_weather &lt;- function(file, city) {\n  month_labels &lt;- c(\"sty\", \"lut\", \"mar\", \"kwi\", \"maj\", \"cze\", \"lip\", \"sie\", \"wrz\", \"paź\", \"lis\", \"gru\")\n\n  readr::read_csv(\n    here(\"datasets\", file),\n    na = c(\"\", \"NA\", \"-7777\"),\n    show_col_types = FALSE\n  ) |&gt;\n    janitor::clean_names() |&gt;\n    transmute(\n      city = city,\n      month_num = as.integer(date),\n      month = factor(month_labels[month_num], levels = month_labels),\n      precipitation = mly_prcp_normal,\n      avg_temp = mly_tavg_normal\n    )\n}\n\nweather &lt;- bind_rows(\n  read_weather(\"austin_weather.csv\", \"Austin\"),\n  read_weather(\"seattle_weather.csv\", \"Seattle\")\n)\nweather |&gt;\n  ggplot(aes(x = month, y = precipitation, group = city, colour = avg_temp)) +\n  geom_line(linewidth = 0.9) +\n  geom_point(size = 2) +\n  facet_wrap(vars(city), ncol = 1) +\n  scale_colour_viridis_c(option = \"D\", name = \"Śr. temp. (°F)\") +\n  labs(\n    title = \"Osobne panele ułatwiają porównanie miast\",\n    x = \"Miesiąc\",\n    y = \"Średnie miesięczne opady\",\n    caption = \"Źródło: datasets/austin_weather.csv, datasets/seattle_weather.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 7.1: Opady i temperatura w Austin oraz Seattle.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Małe wielokrotności</span>"
+    ]
+  },
+  {
+    "objectID": "materials/06-small-multiples.html#podział-na-panele-według-dwóch-zmiennych-facet-grid",
+    "href": "materials/06-small-multiples.html#podział-na-panele-według-dwóch-zmiennych-facet-grid",
+    "title": "7  Małe wielokrotności",
+    "section": "7.2 Podział na panele według dwóch zmiennych (facet grid)",
+    "text": "7.2 Podział na panele według dwóch zmiennych (facet grid)\n\ncollege &lt;- readr::read_csv(here(\"datasets\", \"college_datav3.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  filter(\n    !is.na(tuition),\n    !is.na(pctpell),\n    !is.na(degree_type),\n    !is.na(ownership),\n    ug &gt; 250\n  ) |&gt;\n  mutate(\n    ownership = recode(\n      ownership,\n      Public = \"publiczna\",\n      `Private non-profit` = \"prywatna non-profit\",\n      `Private for-profit` = \"prywatna for-profit\"\n    ),\n    degree_type = recode(\n      degree_type,\n      Graduate = \"magisterskie\",\n      Associates = \"2-letnie\",\n      Bachelors = \"licencjat\",\n      Certificate = \"certyfikat\",\n      `Non-degree` = \"bez dyplomu\"\n    )\n  )\n\ncollege |&gt;\n  ggplot(aes(x = tuition, y = pctpell)) +\n  geom_point(alpha = 0.18, colour = \"#0072B2\", size = 0.9) +\n  facet_grid(ownership ~ degree_type) +\n  scale_x_continuous(labels = scales::label_dollar(scale_cut = scales::cut_short_scale())) +\n  scale_y_continuous(labels = scales::label_percent()) +\n  labs(\n    title = \"Panele porządkują dwie zmienne grupujące\",\n    x = \"Czesne\",\n    y = \"Udział studentów Pell\",\n    caption = \"Źródło: datasets/college_datav3.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 7.2: Czesne i udział studentów Pell według typu uczelni.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Małe wielokrotności</span>"
+    ]
+  },
+  {
+    "objectID": "materials/06-small-multiples.html#zadanie",
+    "href": "materials/06-small-multiples.html#zadanie",
+    "title": "7  Małe wielokrotności",
+    "section": "7.3 Zadanie",
+    "text": "7.3 Zadanie\nWykonaj wersję wykresu uczelni z facet_wrap(vars(degree_type)), czyli z jednym podziałem na panele. Która wersja lepiej odpowiada na pytanie o różnice między typami uczelni?",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Małe wielokrotności</span>"
+    ]
+  },
+  {
+    "objectID": "materials/07-polish-export.html",
+    "href": "materials/07-polish-export.html",
+    "title": "8  Dopracowanie i eksport",
+    "section": "",
+    "text": "8.1 Etykiety i wyróżnienie\nDopracowany wykres nie oznacza dekoracyjnego wykresu. Oznacza taki, który szybko odpowiada na pytanie, ma opisane jednostki, czytelne etykiety i da się go użyć w raporcie bez ręcznego poprawiania w edytorze graficznym.\nnba &lt;- readr::read_csv(here(\"datasets\", \"nba.csv\"), show_col_types = FALSE) |&gt;\n  filter(minutes &gt; 0) |&gt;\n  mutate(\n    conference = recode(conference, East = \"Wschód\", West = \"Zachód\"),\n    points_per_minute = points / minutes\n  )\n\ntop_scorers &lt;- nba |&gt;\n  slice_max(points, n = 10)\n\np_nba &lt;- nba |&gt;\n  ggplot(aes(x = assists, y = points, colour = conference)) +\n  geom_point(alpha = 0.65, size = 2) +\n  ggrepel::geom_text_repel(\n    data = top_scorers,\n    aes(label = player),\n    size = 3,\n    min.segment.length = 0,\n    show.legend = FALSE\n  ) +\n  scale_colour_course_d(name = \"Konferencja\") +\n  labs(\n    title = \"Etykiety dodajemy tylko tam, gdzie pomagają w interpretacji\",\n    subtitle = \"Wyróżniono 10 zawodników z najwyższą liczbą punktów\",\n    x = \"Asysty\",\n    y = \"Punkty\",\n    caption = \"Źródło: datasets/nba.csv\"\n  )\n\np_nba\n\n\n\n\n\n\n\nRysunek 8.1: Zawodnicy NBA według asyst i punktów.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Dopracowanie i eksport</span>"
+    ]
+  },
+  {
+    "objectID": "materials/07-polish-export.html#eksport",
+    "href": "materials/07-polish-export.html#eksport",
+    "title": "8  Dopracowanie i eksport",
+    "section": "8.2 Eksport",
+    "text": "8.2 Eksport\nDo eksportu statycznych grafik używamy ggsave() i urządzenia ragg, które daje powtarzalne renderowanie tekstu i linii.\n\ndir.create(here(\"outputs\"), showWarnings = FALSE)\n\nggsave(\n  filename = here(\"outputs\", \"nba-points-assists.png\"),\n  plot = p_nba,\n  device = ragg::agg_png,\n  width = 8,\n  height = 5,\n  units = \"in\",\n  dpi = 300\n)",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Dopracowanie i eksport</span>"
+    ]
+  },
+  {
+    "objectID": "materials/07-polish-export.html#lista-kontroli-jakości",
+    "href": "materials/07-polish-export.html#lista-kontroli-jakości",
+    "title": "8  Dopracowanie i eksport",
+    "section": "8.3 Lista kontroli jakości",
+    "text": "8.3 Lista kontroli jakości\n\nCzy tytuł mówi wniosek, a nie tylko nazwę typu wykresu?\nCzy osie mają jednostki?\nCzy kolory mają znaczenie i są wyjaśnione legendą?\nCzy wykres działa w skali szarości albo nie opiera się wyłącznie na kolorze?\nCzy zakres osi nie ukrywa ważnej części danych?\nCzy podpis wskazuje źródło?\nCzy w Quarto dodany jest fig-alt?",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Dopracowanie i eksport</span>"
+    ]
+  },
+  {
+    "objectID": "materials/07-polish-export.html#zadanie",
+    "href": "materials/07-polish-export.html#zadanie",
+    "title": "8  Dopracowanie i eksport",
+    "section": "8.4 Zadanie",
+    "text": "8.4 Zadanie\nWróć do jednego wykresu z poprzednich rozdziałów i popraw go pod publikację: tytuł, podtytuł, osie, podpis, paleta, wielkość punktów lub szerokość linii.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Dopracowanie i eksport</span>"
+    ]
+  },
+  {
+    "objectID": "materials/08-interactive.html",
+    "href": "materials/08-interactive.html",
+    "title": "9  Interaktywność",
+    "section": "",
+    "text": "9.1 Interaktywny wykres w Plotly (ggplotly)\nInteraktywność jest dobra, gdy użytkownik ma eksplorować szczegóły. Nie powinna ratować wykresu, który w wersji statycznej nie ma jasnego pytania.\nnba_interactive &lt;- readr::read_csv(here(\"datasets\", \"nba.csv\"), show_col_types = FALSE) |&gt;\n  mutate(\n    conference = recode(conference, East = \"Wschód\", West = \"Zachód\"),\n    tooltip = paste0(\n      player,\n      \"&lt;br&gt;Drużyna: \", team,\n      \"&lt;br&gt;Punkty: \", points,\n      \"&lt;br&gt;Asysty: \", assists,\n      \"&lt;br&gt;Zbiórki: \", rebounds\n    )\n  )\n\np_interactive &lt;- nba_interactive |&gt;\n  ggplot(aes(x = assists, y = points, colour = conference, text = tooltip)) +\n  geom_point(alpha = 0.75, size = 2.4) +\n  scale_colour_course_d(name = \"Konferencja\") +\n  labs(\n    title = \"Interaktywny wykres pozwala sprawdzić szczegóły punktów\",\n    x = \"Asysty\",\n    y = \"Punkty\"\n  )\n\nplotly::ggplotly(p_interactive, tooltip = \"text\")",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Interaktywność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/08-interactive.html#interaktywna-tabela-jako-uzupełnienie",
+    "href": "materials/08-interactive.html#interaktywna-tabela-jako-uzupełnienie",
+    "title": "9  Interaktywność",
+    "section": "9.2 Interaktywna tabela jako uzupełnienie",
+    "text": "9.2 Interaktywna tabela jako uzupełnienie\n\nnba_interactive |&gt;\n  transmute(\n    Zawodnik = player,\n    Drużyna = team,\n    Konferencja = conference,\n    Punkty = points,\n    Asysty = assists,\n    Zbiórki = rebounds,\n    Przechwyty = steals,\n    Bloki = blocks\n  ) |&gt;\n  arrange(desc(Punkty)) |&gt;\n  DT::datatable(\n    rownames = FALSE,\n    options = list(\n      pageLength = 8,\n      scrollX = TRUE,\n      language = list(\n        search = \"Szukaj:\",\n        lengthMenu = \"Pokaż _MENU_ wierszy\",\n        info = \"Wiersze _START_-_END_ z _TOTAL_\",\n        infoEmpty = \"Brak wierszy\",\n        zeroRecords = \"Brak pasujących wyników\",\n        paginate = list(previous = \"Poprzednia\", `next` = \"Następna\")\n      )\n    )\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Interaktywność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/08-interactive.html#kiedy-nie-używać-interakcji",
+    "href": "materials/08-interactive.html#kiedy-nie-używać-interakcji",
+    "title": "9  Interaktywność",
+    "section": "9.3 Kiedy nie używać interakcji",
+    "text": "9.3 Kiedy nie używać interakcji\n\nGdy wykres ma trafić do slajdu albo PDF bez obsługi HTML.\nGdy podpowiedź po najechaniu (tooltip) ukrywa informację, która powinna być widoczna od razu.\nGdy liczba punktów jest tak duża, że przeglądarka zaczyna spowalniać.\nGdy odbiorca potrzebuje decyzji, a nie eksploracji.",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Interaktywność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/08-interactive.html#zadanie",
+    "href": "materials/08-interactive.html#zadanie",
+    "title": "9  Interaktywność",
+    "section": "9.4 Zadanie",
+    "text": "9.4 Zadanie\nPrzerób jeden statyczny wykres z materiału na plotly::ggplotly(). Dodaj własną podpowiedź po najechaniu (tooltip) i usuń z niej niepotrzebne pola.",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Interaktywność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/09-animations.html",
+    "href": "materials/09-animations.html",
+    "title": "10  Animacje",
+    "section": "",
+    "text": "10.1 Rozkład średnich próbek\nAnimacja jest przydatna wtedy, gdy sam ruch jest częścią wyjaśnienia. Dobrym przykładem jest rozkład średnich próbek: po jednej próbce trudno zobaczyć wzorzec, ale po wielu powtórzeniach widać, jak średnie zaczynają układać się wokół wartości oczekiwanej.\nPoniższa animacja pokazuje trzy rzeczy naraz:",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Animacje</span>"
+    ]
+  },
+  {
+    "objectID": "materials/09-animations.html#rozkład-średnich-próbek",
+    "href": "materials/09-animations.html#rozkład-średnich-próbek",
+    "title": "10  Animacje",
+    "section": "",
+    "text": "po lewej: jak rośnie rozkład średnich próbek;\npo prawej: aktualnie wylosowaną próbkę i jej średnią;\nna dole: oryginalny rozkład populacji, z której losujemy.\n\n\n  \n    \n      Pauza\n      Od początku\n      \n        Tempo\n        \n      \n      0/200 próbek",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Animacje</span>"
+    ]
+  },
+  {
+    "objectID": "materials/09-animations.html#jak-czytać-animację",
+    "href": "materials/09-animations.html#jak-czytać-animację",
+    "title": "10  Animacje",
+    "section": "10.2 Jak czytać animację",
+    "text": "10.2 Jak czytać animację\nAnimacja nie zastępuje wykresu statycznego. Ma pomóc zobaczyć proces: losowanie próbek, liczenie średniej i stopniowe budowanie nowego rozkładu. Po zatrzymaniu animacji nadal powinniśmy umieć opisać wniosek jednym zdaniem.\n\nset.seed(20260422)\n\nsample_means &lt;- map_dbl(\n  1:200,\n  \\(i) mean(runif(20, min = 0, max = 10))\n)\n\ntibble(srednia_probki = sample_means) |&gt;\n  ggplot(aes(x = srednia_probki)) +\n  geom_histogram(aes(y = after_stat(density)), bins = 30) +\n  geom_density(linewidth = 1) +\n  labs(\n    title = \"Rozkład średnich próbek skupia się wokół średniej populacji\",\n    x = \"Średnia próbki\",\n    y = \"Gęstość\"\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Animacje</span>"
+    ]
+  },
+  {
+    "objectID": "materials/09-animations.html#zadanie",
+    "href": "materials/09-animations.html#zadanie",
+    "title": "10  Animacje",
+    "section": "10.3 Zadanie",
+    "text": "10.3 Zadanie\nZmień wielkość próbki w symulacji statycznej na 5, 20 i 80. Porównaj szerokość rozkładu średnich próbek i zapisz, co dzieje się z niepewnością średniej.",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Animacje</span>"
+    ]
+  },
+  {
+    "objectID": "materials/10-colors-palettes.html",
+    "href": "materials/10-colors-palettes.html",
+    "title": "11  Kolory i palety",
+    "section": "",
+    "text": "11.1 Trzy typy palet\nKolor pomaga wtedy, gdy koduje informację. Nie powinien być ozdobą dodawaną na końcu, bo odbiorca zwykle czyta kolor jako znaczenie. W ggplot2 rozróżniamy dwa najczęstsze mapowania: colour, czyli kolor linii, punktu lub obrysu, oraz fill, czyli kolor wypełnienia słupka, kafelka albo obszaru.\nPaleta jakościowa (qualitative palette) służy do kategorii bez naturalnej kolejności. Paleta sekwencyjna (sequential palette) służy do wartości od małych do dużych. Paleta rozbieżna (diverging palette) służy do wartości wokół ważnego punktu odniesienia, na przykład zera.\npalette_examples &lt;- tibble(\n  typ = rep(\n    c(\"Jakościowa\\n(qualitative)\", \"Sekwencyjna\\n(sequential)\", \"Rozbieżna\\n(diverging)\"),\n    each = 7\n  ),\n  step = rep(1:7, times = 3),\n  colour = c(\n    \"#0072B2\", \"#D55E00\", \"#009E73\", \"#CC79A7\", \"#E69F00\", \"#56B4E9\", \"#F0E442\",\n    viridisLite::viridis(7, option = \"C\"),\n    colorRampPalette(c(\"#0072B2\", \"#F7F7F7\", \"#D55E00\"))(7)\n  )\n)\n\npalette_examples |&gt;\n  mutate(typ = factor(typ, levels = unique(typ))) |&gt;\n  ggplot(aes(x = step, y = typ, fill = colour)) +\n  geom_tile(width = 0.96, height = 0.72) +\n  scale_fill_identity() +\n  coord_equal() +\n  labs(\n    title = \"Typ palety dobieramy do typu zmiennej\",\n    x = NULL,\n    y = NULL\n  ) +\n  theme(\n    axis.text.x = element_blank(),\n    panel.grid = element_blank()\n  )\n\n\n\n\n\n\n\nRysunek 11.1: Trzy podstawowe typy palet: jakościowa, sekwencyjna i rozbieżna.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Kolory i palety</span>"
+    ]
+  },
+  {
+    "objectID": "materials/10-colors-palettes.html#wyróżnienie-jednej-kategorii",
+    "href": "materials/10-colors-palettes.html#wyróżnienie-jednej-kategorii",
+    "title": "11  Kolory i palety",
+    "section": "11.2 Wyróżnienie jednej kategorii",
+    "text": "11.2 Wyróżnienie jednej kategorii\nJeżeli wykres ma pokazać jeden najważniejszy element, resztę można wyciszyć neutralnym kolorem. To jest czytelniejsze niż użycie osobnego koloru dla każdej kategorii.\n\nitem_labels &lt;- c(\n  Coffee = \"Kawa\",\n  Bread = \"Chleb\",\n  Tea = \"Herbata\",\n  Cake = \"Ciasto\",\n  Pastry = \"Ciastko\",\n  Sandwich = \"Kanapka\",\n  Medialuna = \"Rogalik\",\n  `Hot chocolate` = \"Gorąca czekolada\",\n  Cookies = \"Ciastka\",\n  Brownie = \"Brownie\"\n)\n\nbakery_top &lt;- readr::read_csv(here(\"datasets\", \"bakery.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  mutate(items = recode(items, !!!item_labels)) |&gt;\n  count(items, sort = TRUE) |&gt;\n  slice_max(n, n = 10) |&gt;\n  mutate(\n    items = forcats::fct_reorder(items, n),\n    highlight = items == \"Kawa\"\n  )\n\nbakery_top |&gt;\n  ggplot(aes(x = n, y = items, fill = highlight)) +\n  geom_col(width = 0.72) +\n  scale_fill_manual(values = c(`FALSE` = \"#B8C1CC\", `TRUE` = \"#D55E00\"), guide = \"none\") +\n  labs(\n    title = \"Kolor powinien prowadzić wzrok do najważniejszej informacji\",\n    x = \"Liczba transakcji\",\n    y = NULL,\n    caption = \"Źródło: datasets/bakery.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 11.2: Najpopularniejszy produkt wyróżniony kolorem, pozostałe produkty wyciszone.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Kolory i palety</span>"
+    ]
+  },
+  {
+    "objectID": "materials/10-colors-palettes.html#paleta-jakościowa-dla-kilku-kategorii",
+    "href": "materials/10-colors-palettes.html#paleta-jakościowa-dla-kilku-kategorii",
+    "title": "11  Kolory i palety",
+    "section": "11.3 Paleta jakościowa dla kilku kategorii",
+    "text": "11.3 Paleta jakościowa dla kilku kategorii\nKiedy wszystkie kategorie są równie ważne, używamy palety jakościowej. Kolory powinny być od siebie wyraźnie różne, ale nie muszą tworzyć skali od jasnego do ciemnego.\n\nmedals &lt;- readr::read_csv(\n  here(\"datasets\", \"medals_by_country_2016.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  rename(country = `...1`) |&gt;\n  pivot_longer(\n    cols = c(Bronze, Gold, Silver),\n    names_to = \"medal\",\n    values_to = \"count\"\n  ) |&gt;\n  mutate(\n    medal = factor(\n      recode(medal, Gold = \"Złoto\", Silver = \"Srebro\", Bronze = \"Brąz\"),\n      levels = c(\"Złoto\", \"Srebro\", \"Brąz\")\n    ),\n    country = forcats::fct_reorder(country, count, .fun = sum)\n  )\n\nmedals |&gt;\n  ggplot(aes(x = count, y = country, fill = medal)) +\n  geom_col(width = 0.72) +\n  scale_fill_manual(\n    values = c(Złoto = \"#D6A21E\", Srebro = \"#9AA3AA\", Brąz = \"#A97142\"),\n    name = \"Medal\"\n  ) +\n  labs(\n    title = \"Paleta ręczna jest dobra, gdy kolor ma oczywiste znaczenie\",\n    x = \"Liczba medali\",\n    y = \"Kraj\",\n    caption = \"Źródło: datasets/medals_by_country_2016.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 11.3: Paleta ręczna dla typów medali.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Kolory i palety</span>"
+    ]
+  },
+  {
+    "objectID": "materials/10-colors-palettes.html#paleta-sekwencyjna-dla-natężenia",
+    "href": "materials/10-colors-palettes.html#paleta-sekwencyjna-dla-natężenia",
+    "title": "11  Kolory i palety",
+    "section": "11.4 Paleta sekwencyjna dla natężenia",
+    "text": "11.4 Paleta sekwencyjna dla natężenia\nW mapie ciepła (heatmap) kolor zwykle oznacza natężenie. Wtedy jasność i ciemność muszą mieć porządek: jasne pola oznaczają mniej, ciemne albo bardziej nasycone pola oznaczają więcej.\n\nbike_heatmap &lt;- readr::read_csv(here(\"datasets\", \"bike_share.csv\"), show_col_types = FALSE) |&gt;\n  mutate(\n    month = factor(\n      mnth,\n      levels = 1:12,\n      labels = c(\"Sty\", \"Lut\", \"Mar\", \"Kwi\", \"Maj\", \"Cze\", \"Lip\", \"Sie\", \"Wrz\", \"Paź\", \"Lis\", \"Gru\")\n    ),\n    weekday = factor(\n      weekday,\n      levels = c(1, 2, 3, 4, 5, 6, 0),\n      labels = c(\"Pon\", \"Wt\", \"Śr\", \"Czw\", \"Pt\", \"Sob\", \"Nd\")\n    )\n  ) |&gt;\n  group_by(month, weekday) |&gt;\n  summarise(avg_rentals = mean(total_rentals), .groups = \"drop\")\n\nbike_heatmap |&gt;\n  ggplot(aes(x = month, y = weekday, fill = avg_rentals)) +\n  geom_tile(colour = \"white\", linewidth = 0.25) +\n  scale_fill_viridis_c(\n    option = \"C\",\n    labels = scales::label_number(big.mark = \" \"),\n    name = \"Średnia\",\n    guide = guide_colorbar(\n      title.position = \"top\",\n      barheight = grid::unit(72, \"pt\"),\n      barwidth = grid::unit(8, \"pt\")\n    )\n  ) +\n  labs(\n    title = \"Paleta sekwencyjna pokazuje natężenie zjawiska\",\n    x = \"Miesiąc\",\n    y = NULL,\n    caption = \"Źródło: datasets/bike_share.csv\"\n  ) +\n  theme(legend.position = \"right\")\n\n\n\n\n\n\n\nRysunek 11.4: Paleta sekwencyjna dla średniej liczby wypożyczeń rowerów.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Kolory i palety</span>"
+    ]
+  },
+  {
+    "objectID": "materials/10-colors-palettes.html#paleta-rozbieżna-wokół-zera",
+    "href": "materials/10-colors-palettes.html#paleta-rozbieżna-wokół-zera",
+    "title": "11  Kolory i palety",
+    "section": "11.5 Paleta rozbieżna wokół zera",
+    "text": "11.5 Paleta rozbieżna wokół zera\nPaleta rozbieżna ma sens tylko wtedy, gdy istnieje ważny środek skali. Dla anomalii temperatury takim środkiem jest zero: wartości poniżej i powyżej zera powinny iść w przeciwnych kierunkach kolorystycznych.\n\nclimate_year &lt;- readr::read_csv(here(\"datasets\", \"climate_change.csv\"), show_col_types = FALSE) |&gt;\n  mutate(year = lubridate::year(date)) |&gt;\n  group_by(year) |&gt;\n  summarise(relative_temp = mean(relative_temp, na.rm = TRUE), .groups = \"drop\")\n\nclimate_year |&gt;\n  ggplot(aes(x = year, y = 1, fill = relative_temp)) +\n  geom_tile(height = 0.75) +\n  scale_fill_gradient2(\n    low = \"#0072B2\",\n    mid = \"#F7F7F7\",\n    high = \"#D55E00\",\n    midpoint = 0,\n    labels = scales::label_number(suffix = \"°C\", accuracy = 0.1),\n    name = \"Anomalia\"\n  ) +\n  labs(\n    title = \"Paleta rozbieżna działa wtedy, gdy środek skali coś znaczy\",\n    x = \"Rok\",\n    y = NULL,\n    caption = \"Źródło: datasets/climate_change.csv\"\n  ) +\n  theme(\n    axis.text.y = element_blank(),\n    panel.grid.major.y = element_blank(),\n    panel.grid.minor = element_blank()\n  )\n\n\n\n\n\n\n\nRysunek 11.5: Paleta rozbieżna dla średniej rocznej anomalii temperatury.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Kolory i palety</span>"
+    ]
+  },
+  {
+    "objectID": "materials/10-colors-palettes.html#zadanie",
+    "href": "materials/10-colors-palettes.html#zadanie",
+    "title": "11  Kolory i palety",
+    "section": "11.6 Zadanie",
+    "text": "11.6 Zadanie\nWybierz jeden wykres z wcześniejszych rozdziałów i przygotuj dwie wersje: pierwszą z paletą jakościową, drugą z wyróżnieniem jednej kategorii. Porównaj, która wersja szybciej prowadzi do wniosku.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Kolory i palety</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html",
+    "href": "materials/11-axes-ticks.html",
+    "title": "12  Markery, ticki i osie",
+    "section": "",
+    "text": "12.1 Markery punktów (markers)\nOś jest częścią argumentu, nie tylko ramką wokół wykresu. Znaczniki osi (ticks), format wartości, zakres i transformacja skali decydują o tym, czy odbiorca czyta dane bez zgadywania jednostek.\nKolor nie musi robić całej pracy. Kształt punktu (shape) pomaga wtedy, gdy wykres będzie drukowany, oglądany w skali szarości albo gdy kolor koduje już inną zmienną.\nmpg_local |&gt;\n  ggplot(aes(x = weight, y = mpg, shape = origin, colour = origin)) +\n  geom_point(size = 2.8, stroke = 1, alpha = 0.88) +\n  scale_shape_manual(values = c(USA = 16, Europa = 17, Japonia = 15), name = \"Pochodzenie\") +\n  scale_colour_course_d(name = \"Pochodzenie\") +\n  labs(\n    title = \"Marker może dublować kolor i poprawić czytelność\",\n    x = \"Masa auta\",\n    y = \"Efektywność paliwowa (mpg)\",\n    caption = \"Źródło: datasets/mpg.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 12.1: Kształt i kolor punktu pokazują pochodzenie samochodu.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html#znaczniki-osi-ticks-i-siatka",
+    "href": "materials/11-axes-ticks.html#znaczniki-osi-ticks-i-siatka",
+    "title": "12  Markery, ticki i osie",
+    "section": "12.2 Znaczniki osi (ticks) i siatka",
+    "text": "12.2 Znaczniki osi (ticks) i siatka\nDomyślne znaczniki osi często są poprawne, ale nie zawsze najlepsze. Warto ustawić je ręcznie, gdy pomaga to porównać wartości albo gdy jednostka ma naturalny krok.\n\nmpg_local |&gt;\n  ggplot(aes(x = weight, y = mpg)) +\n  geom_point(alpha = 0.62, colour = \"#0072B2\", size = 2.2) +\n  geom_smooth(method = \"lm\", se = FALSE, colour = \"#D55E00\", linewidth = 1) +\n  scale_x_continuous(\n    breaks = seq(1500, 5500, by = 500),\n    labels = scales::label_number(big.mark = \" \")\n  ) +\n  scale_y_continuous(\n    breaks = seq(10, 50, by = 10),\n    labels = scales::label_number(suffix = \" mpg\")\n  ) +\n  labs(\n    title = \"Ticki powinny pasować do tego, jak porównujemy wartości\",\n    x = \"Masa auta\",\n    y = \"Efektywność paliwowa\",\n    caption = \"Źródło: datasets/mpg.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 12.2: Ręcznie dobrane znaczniki osi dla masy i efektywności paliwowej.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html#format-wartości-na-osi",
+    "href": "materials/11-axes-ticks.html#format-wartości-na-osi",
+    "title": "12  Markery, ticki i osie",
+    "section": "12.3 Format wartości na osi",
+    "text": "12.3 Format wartości na osi\nEtykiety osi można zmienić bez zmieniania danych. Dane mogą pozostać w milionach, a oś może jasno dopowiedzieć jednostkę.\n\nmelb |&gt;\n  filter(!is.na(price_m), price_m &lt;= 4) |&gt;\n  ggplot(aes(x = price_m)) +\n  geom_histogram(bins = 32, fill = \"#009E73\", colour = \"white\") +\n  scale_x_continuous(\n    breaks = seq(0, 4, by = 0.5),\n    labels = scales::label_number(suffix = \" mln AUD\", accuracy = 0.1)\n  ) +\n  labs(\n    title = \"Format osi powinien podawać jednostkę bez przeładowania wykresu\",\n    x = \"Cena\",\n    y = \"Liczba nieruchomości\",\n    caption = \"Źródło: datasets/melb_clean.csv; ceny do 4 mln AUD\"\n  )\n\n\n\n\n\n\n\nRysunek 12.3: Cena nieruchomości z osią opisaną w milionach dolarów australijskich.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html#oś-daty",
+    "href": "materials/11-axes-ticks.html#oś-daty",
+    "title": "12  Markery, ticki i osie",
+    "section": "12.4 Oś daty",
+    "text": "12.4 Oś daty\nPrzy szeregach czasowych dobry krok znaczników jest ważniejszy niż pokazanie każdej możliwej daty. Zbyt gęsta oś czasu zamienia się w tekstową plamę.\n\nbike_month |&gt;\n  ggplot(aes(x = month, y = avg_rentals)) +\n  geom_line(colour = \"#0072B2\", linewidth = 0.9) +\n  geom_point(colour = \"#0072B2\", size = 1.7) +\n  scale_x_date(\n    date_breaks = \"3 months\",\n    labels = function(x) format(x, \"%Y-%m\")\n  ) +\n  scale_y_continuous(labels = scales::label_number(big.mark = \" \")) +\n  labs(\n    title = \"Na osi czasu pokazujemy tyle dat, ile da się przeczytać\",\n    x = NULL,\n    y = \"Średnia dzienna liczba wypożyczeń\",\n    caption = \"Źródło: datasets/bike_share.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 12.4: Oś daty z kwartalnymi znacznikami.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html#transformacja-skali",
+    "href": "materials/11-axes-ticks.html#transformacja-skali",
+    "title": "12  Markery, ticki i osie",
+    "section": "12.5 Transformacja skali",
+    "text": "12.5 Transformacja skali\nTransformacja osi zmienia sposób pokazania odległości między wartościami. Skala logarytmiczna (log scale) pomaga, gdy większość obserwacji jest skupiona nisko, a kilka wartości jest dużo wyższych.\n\nmelb |&gt;\n  filter(!is.na(distance), !is.na(price_m), price_m &gt; 0, price_m &lt;= 8) |&gt;\n  ggplot(aes(x = distance, y = price_m)) +\n  geom_point(alpha = 0.22, colour = \"#5B6770\", size = 1.5) +\n  scale_x_continuous(\n    breaks = seq(0, 50, by = 10),\n    labels = scales::label_number(suffix = \" km\")\n  ) +\n  scale_y_log10(\n    breaks = c(0.2, 0.5, 1, 2, 5, 8),\n    labels = scales::label_number(suffix = \" mln AUD\", accuracy = 0.1)\n  ) +\n  labs(\n    title = \"Skala logarytmiczna pokazuje proporcje, nie różnice absolutne\",\n    x = \"Odległość od centrum\",\n    y = \"Cena\",\n    caption = \"Źródło: datasets/melb_clean.csv; ceny do 8 mln AUD\"\n  )\n\n\n\n\n\n\n\nRysunek 12.5: Skala logarytmiczna dla cen nieruchomości.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html#powiększenie-bez-usuwania-danych",
+    "href": "materials/11-axes-ticks.html#powiększenie-bez-usuwania-danych",
+    "title": "12  Markery, ticki i osie",
+    "section": "12.6 Powiększenie bez usuwania danych",
+    "text": "12.6 Powiększenie bez usuwania danych\ncoord_cartesian() zmienia widoczny zakres wykresu, ale nie usuwa obserwacji przed obliczeniem geometrii i statystyk. To inna operacja niż filter(), które zmienia dane wejściowe.\n\nmelb |&gt;\n  filter(!is.na(rooms), !is.na(price_m), rooms &lt;= 6) |&gt;\n  ggplot(aes(x = rooms, y = price_m)) +\n  geom_jitter(width = 0.12, height = 0, alpha = 0.16, colour = \"#0072B2\", size = 1.2) +\n  coord_cartesian(ylim = c(0, 3)) +\n  scale_x_continuous(breaks = 1:6) +\n  scale_y_continuous(labels = scales::label_number(suffix = \" mln AUD\", accuracy = 0.1)) +\n  labs(\n    title = \"Zakres osi można zawęzić bez przepisywania danych\",\n    x = \"Liczba pokoi\",\n    y = \"Cena\",\n    caption = \"Źródło: datasets/melb_clean.csv; widok ograniczony do 3 mln AUD\"\n  )\n\n\n\n\n\n\n\nRysunek 12.6: Powiększenie zakresu osi bez usuwania obserwacji z danych.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/11-axes-ticks.html#zadanie",
+    "href": "materials/11-axes-ticks.html#zadanie",
+    "title": "12  Markery, ticki i osie",
+    "section": "12.7 Zadanie",
+    "text": "12.7 Zadanie\nWybierz wykres punktowy z wcześniejszego rozdziału. Przygotuj wersję z innymi markerami dla grup, własnymi znacznikami osi i etykietami wartości dopasowanymi do jednostki danych.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Markery, ticki i osie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html",
+    "href": "materials/12-labels-titles.html",
+    "title": "13  Etykiety i tytuły",
+    "section": "",
+    "text": "13.1 Tytuł mówi, jak czytać wykres\nTytuł (title), podtytuł (subtitle), etykiety osi (axis labels), etykiety danych (data labels), legenda (legend) i podpis (caption) są częścią wykresu. Dobry tekst nie opisuje wszystkiego, tylko usuwa najważniejsze niejasności: co jest na osiach, jaka jest jednostka, skąd są dane i jaki wniosek warto sprawdzić.\nTytuł nie musi być nazwą typu wykresu. Lepszy tytuł podpowiada, na co spojrzeć, a podtytuł dopowiada zakres danych lub sposób obliczenia.\nclimate &lt;- readr::read_csv(here(\"datasets\", \"climate_change.csv\"), show_col_types = FALSE) |&gt;\n  mutate(date = lubridate::ymd(date))\n\nclimate |&gt;\n  ggplot(aes(x = date, y = co2)) +\n  geom_line(colour = \"#0072B2\", linewidth = 0.8) +\n  scale_y_continuous(labels = scales::label_number(suffix = \" ppm\")) +\n  labs(\n    title = \"Stężenie CO₂ rośnie przez cały okres obserwacji\",\n    subtitle = \"Miesięczne pomiary od 1958 roku\",\n    x = NULL,\n    y = \"Stężenie CO₂\",\n    caption = \"Źródło: datasets/climate_change.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 13.1: Stężenie CO₂ w czasie z tytułem interpretacyjnym.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html#etykiety-osi-są-miejscem-na-jednostki",
+    "href": "materials/12-labels-titles.html#etykiety-osi-są-miejscem-na-jednostki",
+    "title": "13  Etykiety i tytuły",
+    "section": "13.2 Etykiety osi są miejscem na jednostki",
+    "text": "13.2 Etykiety osi są miejscem na jednostki\nJeżeli jednostka jest w tytule, odbiorca musi jej szukać. Jeżeli jest przy osi, jest widoczna dokładnie tam, gdzie odczytywana jest wartość.\n\nbike &lt;- readr::read_csv(here(\"datasets\", \"bike_share.csv\"), show_col_types = FALSE) |&gt;\n  mutate(\n    temp_c = temp * 41,\n    season = factor(\n      season,\n      levels = 1:4,\n      labels = c(\"Zima\", \"Wiosna\", \"Lato\", \"Jesień\")\n    )\n  )\n\nbike |&gt;\n  ggplot(aes(x = temp_c, y = total_rentals, colour = season)) +\n  geom_point(alpha = 0.68, size = 2.1) +\n  scale_colour_course_d(name = \"Sezon\") +\n  scale_x_continuous(labels = scales::label_number(suffix = \"°C\")) +\n  scale_y_continuous(labels = scales::label_number(big.mark = \" \")) +\n  labs(\n    title = \"Cieplejsze dni zwykle mają więcej wypożyczeń\",\n    subtitle = \"Temperatura jest przeskalowana do stopni Celsjusza\",\n    x = \"Temperatura\",\n    y = \"Liczba wypożyczeń rowerów\",\n    caption = \"Źródło: datasets/bike_share.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 13.2: Etykiety osi z jednostkami dla wypożyczeń rowerów.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html#bezpośrednie-etykiety-serii",
+    "href": "materials/12-labels-titles.html#bezpośrednie-etykiety-serii",
+    "title": "13  Etykiety i tytuły",
+    "section": "13.3 Bezpośrednie etykiety serii",
+    "text": "13.3 Bezpośrednie etykiety serii\nGdy na wykresie jest kilka linii, bezpośrednie etykiety (direct labels) często są czytelniejsze niż legenda. Etykieta przy końcu linii skraca drogę wzroku między kolorem a nazwą serii.\n\nstocks_index &lt;- readr::read_csv(here(\"datasets\", \"stocks_cleaned.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  select(-any_of(\"x1\")) |&gt;\n  filter(name %in% c(\"AAPL\", \"AMZN\", \"MSFT\")) |&gt;\n  arrange(name, date) |&gt;\n  group_by(name) |&gt;\n  mutate(close_index = close / first(close) * 100) |&gt;\n  ungroup()\n\nstock_ends &lt;- stocks_index |&gt;\n  group_by(name) |&gt;\n  slice_max(date, n = 1, with_ties = FALSE) |&gt;\n  ungroup()\n\nstocks_index |&gt;\n  ggplot(aes(x = date, y = close_index, colour = name)) +\n  geom_line(linewidth = 0.8) +\n  ggrepel::geom_text_repel(\n    data = stock_ends,\n    aes(label = name),\n    nudge_x = 80,\n    direction = \"y\",\n    hjust = 0,\n    segment.color = NA,\n    show.legend = FALSE\n  ) +\n  scale_colour_course_d(guide = \"none\") +\n  scale_y_continuous(labels = scales::label_number(suffix = \" pkt\")) +\n  coord_cartesian(clip = \"off\") +\n  labs(\n    title = \"Etykiety przy liniach mogą zastąpić legendę\",\n    subtitle = \"Cena zamknięcia przeliczona do indeksu 100 w pierwszym dniu obserwacji\",\n    x = NULL,\n    y = \"Indeks ceny zamknięcia\",\n    caption = \"Źródło: datasets/stocks_cleaned.csv\"\n  ) +\n  theme(plot.margin = margin(8, 48, 8, 8))\n\n\n\n\n\n\n\nRysunek 13.3: Indeks cen akcji z etykietami bezpośrednimi.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html#etykiety-punktów-tylko-dla-wybranych-obserwacji",
+    "href": "materials/12-labels-titles.html#etykiety-punktów-tylko-dla-wybranych-obserwacji",
+    "title": "13  Etykiety i tytuły",
+    "section": "13.4 Etykiety punktów tylko dla wybranych obserwacji",
+    "text": "13.4 Etykiety punktów tylko dla wybranych obserwacji\nEtykiety danych są kosztowne wizualnie. Jeżeli podpiszemy każdy punkt, wykres przestanie działać. Lepiej wybrać obserwacje, które odpowiadają na pytanie albo są ważnymi wyjątkami.\n\nnba &lt;- readr::read_csv(here(\"datasets\", \"nba.csv\"), show_col_types = FALSE) |&gt;\n  filter(minutes &gt; 0) |&gt;\n  mutate(conference = recode(conference, East = \"Wschód\", West = \"Zachód\"))\n\ntop_scorers &lt;- nba |&gt;\n  slice_max(points, n = 8)\n\nnba |&gt;\n  ggplot(aes(x = assists, y = points, colour = conference)) +\n  geom_point(alpha = 0.55, size = 2) +\n  ggrepel::geom_text_repel(\n    data = top_scorers,\n    aes(label = player),\n    size = 3,\n    min.segment.length = 0,\n    box.padding = 0.35,\n    show.legend = FALSE\n  ) +\n  scale_colour_course_d(name = \"Konferencja\") +\n  labs(\n    title = \"Etykiety danych wybieramy, a nie rozsypujemy automatycznie\",\n    subtitle = \"Podpisano 8 zawodników z największą liczbą punktów\",\n    x = \"Asysty\",\n    y = \"Punkty\",\n    caption = \"Źródło: datasets/nba.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 13.4: Wybrane etykiety punktów dla zawodników NBA.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html#podpis-i-tekst-alternatywny",
+    "href": "materials/12-labels-titles.html#podpis-i-tekst-alternatywny",
+    "title": "13  Etykiety i tytuły",
+    "section": "13.5 Podpis i tekst alternatywny",
+    "text": "13.5 Podpis i tekst alternatywny\nPodpis (caption) podaje źródło, ograniczenia albo sposób obliczenia. Tekst alternatywny (alt text) opisuje najważniejszą informację z wykresu osobie, która nie widzi obrazu. W Quarto tekst alternatywny dodajemy przez opcję fig-alt.\n\nmedals_total &lt;- readr::read_csv(\n  here(\"datasets\", \"medals_by_country_2016.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  rename(country = `...1`) |&gt;\n  mutate(total = Bronze + Gold + Silver) |&gt;\n  slice_max(total, n = 8) |&gt;\n  mutate(country = forcats::fct_reorder(country, total))\n\nmedals_total |&gt;\n  ggplot(aes(x = total, y = country)) +\n  geom_col(fill = \"#0072B2\", width = 0.72) +\n  labs(\n    title = \"Największe kraje medalowe warto pokazać jako ranking\",\n    x = \"Liczba medali\",\n    y = NULL,\n    caption = \"Źródło: datasets/medals_by_country_2016.csv; pokazano 8 krajów z największą liczbą medali\"\n  )\n\n\n\n\n\n\n\nRysunek 13.5: Przykład wykresu z podpisem i tekstem alternatywnym zapisanym w opcji chunku.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html#krótka-lista-kontroli",
+    "href": "materials/12-labels-titles.html#krótka-lista-kontroli",
+    "title": "13  Etykiety i tytuły",
+    "section": "13.6 Krótka lista kontroli",
+    "text": "13.6 Krótka lista kontroli\n\nTytuł mówi wniosek lub pytanie, nie tylko typ wykresu.\nPodtytuł podaje zakres, filtr albo metodę obliczenia.\nEtykiety osi mają jednostki.\nLegenda ma nazwę zrozumiałą poza kodem.\nPodpis wskazuje źródło danych.\nTekst alternatywny streszcza główną informację z wykresu.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/12-labels-titles.html#zadanie",
+    "href": "materials/12-labels-titles.html#zadanie",
+    "title": "13  Etykiety i tytuły",
+    "section": "13.7 Zadanie",
+    "text": "13.7 Zadanie\nWeź wykres, który już masz. Dodaj tytuł, podtytuł, kompletne etykiety osi, podpis, tekst alternatywny i dwie celowe etykiety danych. Usuń każdy tekst, który nie pomaga odczytać wykresu.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Etykiety i tytuły</span>"
+    ]
+  },
+  {
+    "objectID": "materials/13-capstone.html",
+    "href": "materials/13-capstone.html",
+    "title": "14  Projekt końcowy",
+    "section": "",
+    "text": "14.1 Założenia\nProjekt końcowy sprawdza pełny przepływ pracy: pytanie, dane, przygotowanie, wykresy, interpretacja i publikacja w Quarto.\nWybierz jeden zbiór danych z DATASETS.md i przygotuj mini-raport składający się z:",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Projekt końcowy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/13-capstone.html#założenia",
+    "href": "materials/13-capstone.html#założenia",
+    "title": "14  Projekt końcowy",
+    "section": "",
+    "text": "jednego pytania głównego;\nkrótkiego opisu danych i ograniczeń;\ndwóch wykresów eksploracyjnych;\njednego wykresu finalnego dopracowanego pod odbiorcę;\nkrótkiej interpretacji: co wiemy, czego nie wiemy, co sprawdzić dalej.",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Projekt końcowy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/13-capstone.html#proponowane-tematy",
+    "href": "materials/13-capstone.html#proponowane-tematy",
+    "title": "14  Projekt końcowy",
+    "section": "14.2 Proponowane tematy",
+    "text": "14.2 Proponowane tematy\n\nJak sezon i pogoda wpływają na wypożyczenia rowerów?\nCzy ceny nieruchomości w Melbourne różnią się między regionami?\nJak zmieniały się ceny wybranych spółek względem wspólnego punktu startu?\nKtóre grupy gości dominowały w Daily Show po 2000 roku?\nJak typ uczelni wiąże się z czesnym i udziałem studentów Pell?",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Projekt końcowy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/13-capstone.html#szablon-analizy",
+    "href": "materials/13-capstone.html#szablon-analizy",
+    "title": "14  Projekt końcowy",
+    "section": "14.3 Szablon analizy",
+    "text": "14.3 Szablon analizy\n\nlibrary(tidyverse)\nlibrary(here)\nlibrary(janitor)\n\nsource(here(\"R\", \"theme_course.R\"))\ntheme_set(theme_course())\n\ndane &lt;- readr::read_csv(here(\"datasets\", \"wybrany_plik.csv\"), show_col_types = FALSE) |&gt;\n  janitor::clean_names()\n\ndane |&gt;\n  glimpse()\n\ndane |&gt;\n  summarise(\n    liczba_wierszy = n(),\n    liczba_kolumn = ncol(dane)\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Projekt końcowy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/13-capstone.html#kryteria-oceny",
+    "href": "materials/13-capstone.html#kryteria-oceny",
+    "title": "14  Projekt końcowy",
+    "section": "14.4 Kryteria oceny",
+    "text": "14.4 Kryteria oceny\n\n\n\n\n\n\n\nKryterium\nCo oznacza dobra realizacja\n\n\n\n\nPytanie\nJest konkretne i da się na nie odpowiedzieć danymi.\n\n\nPrzygotowanie danych\nKod jest czytelny, bez ręcznych kroków poza R.\n\n\nDobór wykresu\nTyp wykresu pasuje do zmiennych i pytania.\n\n\nCzytelność\nOsie, jednostki, tytuł, legenda i podpis są kompletne.\n\n\nInterpretacja\nWnioski wynikają z wykresu i nie są nadmiernie uogólnione.\n\n\nReprodukowalność\nRaport renderuje się od zera przez quarto render.",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Projekt końcowy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/13-capstone.html#oddanie",
+    "href": "materials/13-capstone.html#oddanie",
+    "title": "14  Projekt końcowy",
+    "section": "14.5 Oddanie",
+    "text": "14.5 Oddanie\nRaport powinien być plikiem .qmd w katalogu exercises/ albo osobnym rozdziałem Quarto. Finalny wykres zapisz również jako PNG przez ggsave() z urządzeniem ragg::agg_png.",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Projekt końcowy</span>"
+    ]
+  },
+  {
+    "objectID": "materials/99-data-catalog.html",
+    "href": "materials/99-data-catalog.html",
+    "title": "Załącznik A — Katalog danych",
+    "section": "",
+    "text": "B Katalog danych\n\n\n\n\n\n\n\n\n\nPlik\nRozmiar dydaktyczny\nNajlepsze zastosowanie\nUwagi\n\n\n\n\ndatasets/mpg.csv\n399 wierszy\nwykres punktowy (scatter plot), kolor, panele (facets), trend\nDobry zbiór danych na start.\n\n\ndatasets/insurance_premiums.csv\n52 wiersze\nregresja, etykiety, regiony\nDobry do pierwszych mapowań i geom_smooth().\n\n\ndatasets/schoolimprovement2010grants.csv\n758 wierszy\nhistogramy, wykresy pudełkowe (boxplots), kategorie\nMa pierwszą kolumnę indeksową bez nazwy.\n\n\ndatasets/FY18_4050_FMRs.csv\n4770 wierszy\nrozkłady, skale, obserwacje odstające\nCzynsze rynkowe, wiele zmiennych numerycznych.\n\n\ndatasets/bike_share.csv\n731 wierszy\nszeregi czasowe, sezonowość, wykres heksagonalny (hexbin plot)\nDaty dzienne, dobra struktura.\n\n\ndatasets/climate_change.csv\n707 wierszy\nlinie, dwie serie, narracja\nDobry do osi czasu i etykiet.\n\n\ndatasets/stocks_cleaned.csv\n139501 wierszy\nszeregi czasowe i interaktywność\nWarto filtrować do jednej spółki.\n\n\ndatasets/seattle_weather.csv\n205 wierszy\nmałe wielokrotności (small multiples), brak danych\n-7777 oznacza braki.\n\n\ndatasets/austin_weather.csv\n13 wierszy\nporównanie miesięcy\n-7777 oznacza braki.\n\n\ndatasets/medals_by_country_2016.csv\n11 wierszy\nwykresy słupkowe (bar charts), zmiana układu danych\nMa pierwszą kolumnę bez nazwy.\n\n\ndatasets/summer2016.csv\n2015 wierszy\nkategorie, sport, wzrost, medal\nMa pierwszą kolumnę indeksową.\n\n\ndatasets/daily_show_guests_cleaned.csv\n2694 wiersze\nmapa ciepła (heatmap) i tabele krzyżowe\nDobry do count() i pivot_wider().\n\n\ndatasets/college_datav3.csv\n6703 wiersze\npodział na panele (faceting), wykres punktowy (scatter plot), instytucje\nDuży, dobry do późniejszych rozdziałów.\n\n\ndatasets/melb_clean.csv\n13581 wierszy\nceny, transformacje, obserwacje odstające (outliers)\nMa pierwszą kolumnę indeksową.\n\n\ndatasets/bakery.csv\n17487 wierszy\nkategorie, dni tygodnia, agregacje\nDobry do count() i rankingu.\n\n\ndatasets/nba.csv\n425 wierszy\nwykres punktowy (scatter plot), etykiety, interaktywność\nDobry do Plotly.\n\n\ndatasets/countries-of-the-world.csv\n228 wierszy\nczyszczenie nazw, geografia\nNazwy kolumn wymagają czyszczenia.\n\n\ndatasets/student-alcohol-consumption.csv\n396 wierszy\nkategorie, wykresy pudełkowe (boxplots), edukacja\nMa pierwszą kolumnę indeksową.\n\n\ndatasets/young-people-survey-responses.csv\n1011 wierszy\nankiety, skale Likerta\nMa sporo kolumn, dobre na projekt.\n\n\ndatasets/bike_v1.csv\n1237 wierszy\nimport trudniejszych danych\nWartości rozdzielone białymi znakami mimo rozszerzenia .csv.\n\n\ndatasets/bike_2.csv\n1237 wierszy\ndiagnostyka importu\nWartości rozdzielone białymi znakami, nie na początek pracy.",
+    "crumbs": [
+      "Załączniki",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Katalog danych</span>"
+    ]
+  }
+]
