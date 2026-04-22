@@ -24,6 +24,8 @@ book:
     - materials/11-axes-ticks.qmd
     - materials/12-labels-titles.qmd
     - materials/13-capstone.qmd
+    - materials/14-internet-connection.qmd
+    - materials/15-heatmap.qmd
   appendices:
     - materials/99-data-catalog.qmd
 

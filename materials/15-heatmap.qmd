@@ -1,0 +1,112 @@
+---
+title: "Wykres Heatmap"
+---
+
+Kolejnym potężnym narzędziem w arsenale wizualizacji danych jest **Heatmap** (mapa ciepła). Pozwala ona na pokazanie zagęszczenia zjawiska w czasie (lub w innej dwuwymiarowej przestrzeni) za pomocą skali kolorów. 
+
+Jako świetny przykład przeanalizujemy zbiór `tf_birthdays.csv`, który zawiera łączną liczbę osób urodzonych każdego dnia roku w Belgii. 
+
+Zbudujemy wykres inspirowany popularnymi wizualizacjami prasowymi (np. z New York Times czy narzędzia Datawrapper), na którym oś X to miesiące, oś Y to dni miesiąca, a kolor określa natężenie liczby narodzin.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(here)
+library(janitor)
+
+# Wczytujemy dedykowany styl z projektu
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przetwarzanie danych
+
+Dane wymagają lekkiego przekształcenia. Przypiszemy miesiącom polskie nazwy i ustawimy dni miesiąca w odpowiedniej kolejności (od 1 na górze do 31 na dole), aby siatka czytała się jak klasyczny kalendarz.
+
+```{r}
+#| label: data-prep
+#| message: false
+
+df_raw <- read_csv(here("datasets", "tf_birthdays.csv")) |> 
+  clean_names()
+
+# Polskie nazwy miesięcy
+miesiace <- c("Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru")
+
+df_heat <- df_raw |> 
+  select(day, month, belgium) |> 
+  mutate(
+    # Zamieniamy liczby na nazwy miesięcy (factor wymusza poprawną kolejność chronologiczną, a nie alfabetyczną)
+    month_name = factor(miesiace[month], levels = miesiace),
+    
+    # Odwracamy dni, żeby 1. dzień miesiąca był na samej górze osi Y
+    day_fct = factor(day, levels = 31:1),
+    
+    # Jeżeli zbiór ma zapisane "0" dla nieistniejących dni (np. 30 lutego), zamieniamy to na NA (brak danych), 
+    # aby uniknąć błędnego kolorowania tych kratek
+    belgium = if_else(belgium == 0, NA_real_, belgium)
+  )
+```
+
+## Wykres 
+
+Do narysowania kratek (płytek) użyjemy geometrii `geom_tile()`. Do wypełnienia kolorami skorzystamy z domyślnej skali Viridis, która jest czytelna dla osób z zaburzeniami widzenia barw i dobrze komponuje się z naszym `theme_course()`.
+
+```{r}
+#| label: plot-heatmap
+#| fig-width: 10
+#| fig-height: 8
+#| warning: false
+
+ggplot(df_heat, aes(x = month_name, y = day_fct, fill = belgium)) +
+  # geom_tile z białymi ramkami, co stworzy efekt siatki kalendarza
+  geom_tile(color = "white", linewidth = 0.8) +
+  
+  # Skala Viridis (opcja magma lub domyślna viridis). 
+  # direction = -1 sprawia, że ciemniejsze kolory to wyższe wartości.
+  scale_fill_viridis_c(
+    option = "viridis", 
+    direction = -1, 
+    na.value = "transparent", # Puste komórki (nieistniejące dni) będą przezroczyste
+    labels = scales::comma_format(big.mark = " "),
+    limits = c(29000, 34000), # Zawężamy skalę, by wykluczyć obserwacje odstające (jak 1 lipca, 1 stycznia czy 29 lutego)
+    oob = scales::squish      # Funkcja squish sprawia, że wartości poza limitem otrzymują skrajne barwy skali
+  ) +
+  
+  # Przenosimy oś X (nazwy miesięcy) na górę wykresu dla wygody czytania
+  scale_x_discrete(position = "top") +
+  
+  labs(
+    title = "Które daty urodzenia są najbardziej popularne?",
+    subtitle = "Całkowita liczba osób urodzonych danego dnia (dane dla Belgii)",
+    x = NULL,
+    y = "Dzień miesiąca",
+    fill = "Liczba urodzeń",
+    caption = "Źródło: dataset tf_birthdays.csv"
+  ) +
+  
+  # Dalsze modyfikacje estetyczne
+  theme_minimal() +
+  theme(
+    # Ukrywamy główne linie siatki, ponieważ same płytki geom_tile tworzą siatkę
+    panel.grid = element_blank(),
+    
+    # Wyróżniamy tekst osi
+    axis.text.y = element_text(size = 9, color = "#555555"),
+    axis.text.x = element_text(size = 11, face = "bold", color = "#333333"),
+    
+    # Przenosimy legendę na prawo, żeby łatwiej czytać wartości i wydłużamy jej pasek
+    legend.position = "right",
+    legend.title = element_text(face = "bold", size = 10),
+    legend.text = element_text(size = 9),
+    legend.key.height = unit(1.5, "cm"),
+    
+    # Nagłówki
+    plot.title = element_text(face = "bold", size = 18),
+    plot.subtitle = element_text(color = "#555555", size = 12, margin = margin(b = 15)),
+    plot.caption = element_text(color = "#999999", margin = margin(t = 15))
+  )
+```
