@@ -1,0 +1,373 @@
+---
+title: "Animacje"
+---
+
+Animacja jest przydatna wtedy, gdy sam ruch jest częścią wyjaśnienia. Dobrym
+przykładem jest rozkład średnich próbek: po jednej próbce trudno zobaczyć wzorzec,
+ale po wielu powtórzeniach widać, jak średnie zaczynają układać się wokół wartości
+oczekiwanej.
+
+## Rozkład średnich próbek
+
+Poniższa animacja pokazuje trzy rzeczy naraz:
+
+- po lewej: jak rośnie rozkład średnich próbek;
+- po prawej: aktualnie wylosowaną próbkę i jej średnią;
+- na dole: oryginalny rozkład populacji, z której losujemy.
+
+```{=html}
+<div class="animation-card">
+  <div id="sampling-animation" class="sampling-animation" role="group" aria-label="Animacja rozkładu średnich próbek">
+    <div class="animation-toolbar">
+      <button type="button" data-toggle>Pauza</button>
+      <button type="button" data-reset>Od początku</button>
+      <label class="animation-control">
+        Tempo
+        <input type="range" min="60" max="450" value="150" step="10" data-speed>
+      </label>
+      <span class="animation-status" data-status>0/200 próbek</span>
+    </div>
+    <canvas class="sampling-canvas" aria-label="Animacja rozkładu średnich próbek, aktualnej próbki i populacji"></canvas>
+  </div>
+</div>
+
+<script>
+(() => {
+  const root = document.getElementById("sampling-animation");
+  if (!root) return;
+
+  const canvas = root.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  const toggleButton = root.querySelector("[data-toggle]");
+  const resetButton = root.querySelector("[data-reset]");
+  const speedInput = root.querySelector("[data-speed]");
+  const status = root.querySelector("[data-status]");
+
+  const config = {
+    sampleSize: 20,
+    maxSamples: 200,
+    bins: 30,
+    meanBins: 34,
+    xMin: 0,
+    xMax: 10
+  };
+
+  let seed = 20260422;
+  let running = true;
+  let sampleIndex = 0;
+  let sampleMeans = [];
+  let currentSample = [];
+  let lastTick = 0;
+  let population = [];
+
+  function random() {
+    seed = (1664525 * seed + 1013904223) >>> 0;
+    return seed / 4294967296;
+  }
+
+  function resetSeed() {
+    seed = 20260422;
+  }
+
+  function makePopulation() {
+    population = Array.from({ length: 6000 }, () => random() * 10);
+  }
+
+  function drawSample() {
+    currentSample = Array.from({ length: config.sampleSize }, () => random() * 10);
+    const mean = currentSample.reduce((sum, value) => sum + value, 0) / currentSample.length;
+    sampleMeans.push(mean);
+    sampleIndex = sampleMeans.length;
+  }
+
+  function histogram(values, bins, xMin, xMax) {
+    const counts = Array.from({ length: bins }, () => 0);
+    const width = (xMax - xMin) / bins;
+    values.forEach((value) => {
+      const clamped = Math.max(xMin, Math.min(xMax - 1e-9, value));
+      const index = Math.floor((clamped - xMin) / width);
+      counts[index] += 1;
+    });
+    const total = Math.max(values.length, 1);
+    return counts.map((count, index) => ({
+      x0: xMin + index * width,
+      x1: xMin + (index + 1) * width,
+      density: count / total / width,
+      count
+    }));
+  }
+
+  function normalDensity(x, mean, sd) {
+    return Math.exp(-0.5 * ((x - mean) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI));
+  }
+
+  function xScale(panel, value) {
+    return panel.x + (value - config.xMin) / (config.xMax - config.xMin) * panel.w;
+  }
+
+  function yScale(panel, value, yMax) {
+    return panel.y + panel.h - value / yMax * panel.h;
+  }
+
+  function line(ctx, x1, y1, x2, y2, color = "#26313b", width = 1) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  function drawAxes(panel, yMax, xLabel, yLabel, xTicks, yTicks) {
+    ctx.strokeStyle = "#26313b";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(panel.x, panel.y, panel.w, panel.h);
+
+    ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.fillStyle = "#26313b";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+
+    xTicks.forEach((tick) => {
+      const x = xScale(panel, tick);
+      line(ctx, x, panel.y + panel.h, x, panel.y + panel.h + 6);
+      ctx.fillText(String(tick), x, panel.y + panel.h + 10);
+    });
+
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    yTicks.forEach((tick) => {
+      const y = yScale(panel, tick, yMax);
+      line(ctx, panel.x - 6, y, panel.x, y);
+      ctx.fillText(tick.toFixed(tick < 1 ? 2 : 1), panel.x - 10, y);
+    });
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(xLabel, panel.x + panel.w / 2, panel.y + panel.h + 34);
+
+    ctx.save();
+    ctx.translate(panel.x - 54, panel.y + panel.h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textBaseline = "middle";
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+
+  function drawTitle(text, panel, line2 = "") {
+    ctx.fillStyle = "#111";
+    ctx.font = "18px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(text, panel.x + panel.w / 2, panel.y - 30);
+    if (line2) {
+      ctx.font = "16px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText(line2, panel.x + panel.w / 2, panel.y - 8);
+    }
+  }
+
+  function drawHistogram(panel, bars, yMax, fill, stroke) {
+    bars.forEach((bar) => {
+      const x0 = xScale(panel, bar.x0);
+      const x1 = xScale(panel, bar.x1);
+      const y = yScale(panel, bar.density, yMax);
+      const height = panel.y + panel.h - y;
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1;
+      ctx.fillRect(x0, y, Math.max(1, x1 - x0), height);
+      ctx.strokeRect(x0, y, Math.max(1, x1 - x0), height);
+    });
+  }
+
+  function drawNormalCurve(panel, yMax) {
+    const sd = Math.sqrt((100 / 12) / config.sampleSize);
+    ctx.strokeStyle = "#e31a1c";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    for (let i = 0; i <= 220; i += 1) {
+      const xValue = config.xMin + (config.xMax - config.xMin) * i / 220;
+      const x = xScale(panel, xValue);
+      const y = yScale(panel, normalDensity(xValue, 5, sd), yMax);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#111";
+    ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.fillText("N(5.00, 0.65²)", panel.x + panel.w - 90, panel.y + 18);
+  }
+
+  function drawMeanMarker(panel, mean) {
+    const x = xScale(panel, mean);
+    ctx.strokeStyle = "#1f4fff";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    line(ctx, x, panel.y, x, panel.y + panel.h, "#1f4fff", 2);
+    ctx.setLineDash([]);
+
+    const labelX = Math.min(panel.x + panel.w - 86, x + 34);
+    const labelY = panel.y + 14;
+    ctx.strokeStyle = "#1f4fff";
+    ctx.fillStyle = "#f7f8ff";
+    ctx.lineWidth = 1;
+    ctx.fillRect(labelX, labelY, 76, 46);
+    ctx.strokeRect(labelX, labelY, 76, 46);
+
+    ctx.fillStyle = "#26313b";
+    ctx.font = "13px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("Średnia", labelX + 8, labelY + 6);
+    ctx.fillText(mean.toFixed(2), labelX + 8, labelY + 25);
+
+    ctx.strokeStyle = "#1f4fff";
+    ctx.fillStyle = "#1f4fff";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(labelX + 4, labelY + 42);
+    ctx.lineTo(x + 5, panel.y + 65);
+    ctx.stroke();
+  }
+
+  function drawFrame() {
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, width, height);
+
+    const outerX = 66;
+    const gap = Math.max(44, width * 0.05);
+    const topY = 78;
+    const topH = Math.max(230, height * 0.32);
+    const bottomY = topY + topH + 92;
+    const bottomH = Math.max(210, height - bottomY - 82);
+    const panelW = (width - 2 * outerX - gap) / 2;
+
+    const leftPanel = { x: outerX, y: topY, w: panelW, h: topH };
+    const rightPanel = { x: outerX + panelW + gap, y: topY, w: panelW, h: topH };
+    const bottomPanel = { x: outerX, y: bottomY, w: width - 2 * outerX, h: bottomH };
+
+    const meanText = `(próbek: ${sampleIndex}/${config.maxSamples})`;
+    drawTitle("Rozkład średnich próbek", leftPanel, meanText);
+    drawTitle("Rozkład aktualnej próbki", rightPanel);
+    drawTitle("Oryginalny rozkład populacji", bottomPanel);
+
+    drawAxes(leftPanel, 1, "Średnia próbki", "Gęstość", [0, 2, 4, 6, 8, 10], [0, 0.2, 0.4, 0.6, 0.8, 1]);
+    drawAxes(rightPanel, 1, "Wartość próbki", "Gęstość", [0, 2, 4, 6, 8, 10], [0, 0.2, 0.4, 0.6, 0.8, 1]);
+    drawAxes(bottomPanel, 0.25, "Wartość", "Gęstość", [0, 2, 4, 6, 8, 10], [0, 0.05, 0.1, 0.15, 0.2, 0.25]);
+
+    const meanBars = histogram(sampleMeans, config.meanBins, config.xMin, config.xMax);
+    const sampleBars = histogram(currentSample, config.bins, config.xMin, config.xMax);
+    const populationBars = histogram(population, config.bins, config.xMin, config.xMax);
+
+    drawHistogram(leftPanel, meanBars, 1, "rgba(173, 191, 118, 0.68)", "#26313b");
+    drawNormalCurve(leftPanel, 1);
+
+    drawHistogram(rightPanel, sampleBars, 1, "rgba(244, 154, 154, 0.78)", "#26313b");
+    const currentMean = currentSample.reduce((sum, value) => sum + value, 0) / Math.max(currentSample.length, 1);
+    drawMeanMarker(rightPanel, currentMean);
+
+    drawHistogram(bottomPanel, populationBars, 0.25, "rgba(166, 215, 228, 0.78)", "#26313b");
+
+    const progress = Math.round(sampleIndex / config.maxSamples * 100);
+    ctx.fillStyle = "#26313b";
+    ctx.font = "15px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(`Postęp: ${progress}%`, width / 2, height - 18);
+    status.textContent = `${sampleIndex}/${config.maxSamples} próbek`;
+  }
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawFrame();
+  }
+
+  function resetAnimation() {
+    resetSeed();
+    sampleIndex = 0;
+    sampleMeans = [];
+    currentSample = [];
+    makePopulation();
+    drawSample();
+    drawFrame();
+  }
+
+  function tick(timestamp) {
+    const interval = Number(speedInput.value);
+    if (running && timestamp - lastTick >= interval) {
+      if (sampleIndex >= config.maxSamples) {
+        running = false;
+    toggleButton.textContent = "Start";
+      } else {
+        drawSample();
+        drawFrame();
+      }
+      lastTick = timestamp;
+    }
+    window.requestAnimationFrame(tick);
+  }
+
+  toggleButton.addEventListener("click", () => {
+    running = !running;
+    toggleButton.textContent = running ? "Pauza" : "Start";
+  });
+
+  resetButton.addEventListener("click", () => {
+    running = true;
+    toggleButton.textContent = "Pauza";
+    resetAnimation();
+  });
+
+  speedInput.addEventListener("input", drawFrame);
+  window.addEventListener("resize", resize);
+
+  resetAnimation();
+  resize();
+  window.requestAnimationFrame(tick);
+})();
+</script>
+```
+
+## Jak czytać animację
+
+Animacja nie zastępuje wykresu statycznego. Ma pomóc zobaczyć proces: losowanie
+próbek, liczenie średniej i stopniowe budowanie nowego rozkładu. Po zatrzymaniu
+animacji nadal powinniśmy umieć opisać wniosek jednym zdaniem.
+
+```{r}
+#| label: sampling-static-code
+#| eval: false
+set.seed(20260422)
+
+sample_means <- map_dbl(
+  1:200,
+  \(i) mean(runif(20, min = 0, max = 10))
+)
+
+tibble(srednia_probki = sample_means) |>
+  ggplot(aes(x = srednia_probki)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 30) +
+  geom_density(linewidth = 1) +
+  labs(
+    title = "Rozkład średnich próbek skupia się wokół średniej populacji",
+    x = "Średnia próbki",
+    y = "Gęstość"
+  )
+```
+
+## Zadanie
+
+Zmień wielkość próbki w symulacji statycznej na 5, 20 i 80. Porównaj szerokość
+rozkładu średnich próbek i zapisz, co dzieje się z niepewnością średniej.

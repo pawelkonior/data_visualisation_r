@@ -1,0 +1,34 @@
+Package: data.visualisation.course
+Type: Project
+Title: Kurs Wizualizacji Danych w R
+Version: 0.1.0
+Authors@R:
+    person("Paweł", "Konior", role = c("aut", "cre"))
+Description: Samodzielne materiały Quarto do nauki wizualizacji danych w R.
+License: MIT
+Encoding: UTF-8
+Depends:
+    R (>= 4.5.3)
+Imports:
+    cli,
+    dplyr,
+    DT,
+    forcats,
+    ggplot2 (>= 4.0.3),
+    ggrepel,
+    here,
+    htmlwidgets,
+    janitor,
+    lubridate,
+    patchwork,
+    plotly,
+    purrr,
+    quarto,
+    ragg,
+    readr,
+    renv,
+    scales,
+    styler,
+    tibble,
+    tidyr,
+    viridisLite

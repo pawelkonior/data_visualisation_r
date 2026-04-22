@@ -1,0 +1,66 @@
+---
+title: "Projekt końcowy"
+---
+
+Projekt końcowy sprawdza pełny przepływ pracy: pytanie, dane, przygotowanie,
+wykresy, interpretacja i publikacja w Quarto.
+
+## Założenia
+
+Wybierz jeden zbiór danych z `DATASETS.md` i przygotuj mini-raport składający się z:
+
+- jednego pytania głównego;
+- krótkiego opisu danych i ograniczeń;
+- dwóch wykresów eksploracyjnych;
+- jednego wykresu finalnego dopracowanego pod odbiorcę;
+- krótkiej interpretacji: co wiemy, czego nie wiemy, co sprawdzić dalej.
+
+## Proponowane tematy
+
+- Jak sezon i pogoda wpływają na wypożyczenia rowerów?
+- Czy ceny nieruchomości w Melbourne różnią się między regionami?
+- Jak zmieniały się ceny wybranych spółek względem wspólnego punktu startu?
+- Które grupy gości dominowały w Daily Show po 2000 roku?
+- Jak typ uczelni wiąże się z czesnym i udziałem studentów Pell?
+
+## Szablon analizy
+
+```{r}
+#| label: capstone-template
+#| eval: false
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+
+dane <- readr::read_csv(here("datasets", "wybrany_plik.csv"), show_col_types = FALSE) |>
+  janitor::clean_names()
+
+dane |>
+  glimpse()
+
+dane |>
+  summarise(
+    liczba_wierszy = n(),
+    liczba_kolumn = ncol(dane)
+  )
+```
+
+## Kryteria oceny
+
+| Kryterium | Co oznacza dobra realizacja |
+|---|---|
+| Pytanie | Jest konkretne i da się na nie odpowiedzieć danymi. |
+| Przygotowanie danych | Kod jest czytelny, bez ręcznych kroków poza R. |
+| Dobór wykresu | Typ wykresu pasuje do zmiennych i pytania. |
+| Czytelność | Osie, jednostki, tytuł, legenda i podpis są kompletne. |
+| Interpretacja | Wnioski wynikają z wykresu i nie są nadmiernie uogólnione. |
+| Reprodukowalność | Raport renderuje się od zera przez `quarto render`. |
+
+## Oddanie
+
+Raport powinien być plikiem `.qmd` w katalogu `exercises/` albo osobnym rozdziałem
+Quarto. Finalny wykres zapisz również jako PNG przez `ggsave()` z urządzeniem
+`ragg::agg_png`.

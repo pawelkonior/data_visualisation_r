@@ -1,0 +1,29 @@
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# renv local state
+renv/library/
+renv/staging/
+renv/python/
+
+# Quarto output and caches
+.quarto/
+_site/
+_freeze/
+*_files/
+.quarto_ipynb
+**/*.quarto_ipynb
+
+# Generated exports
+outputs/
+*.html
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+/.quarto/

@@ -1,0 +1,49 @@
+project:
+  type: book
+  output-dir: _site
+
+lang: pl
+
+book:
+  title: "Wizualizacja danych w R"
+  subtitle: "Praktyczny kurs oparty na ggplot2, tidyverse i Quarto"
+  author: "Paweł Konior"
+  date: today
+  chapters:
+    - index.qmd
+    - materials/01-setup.qmd
+    - materials/02-grammar.qmd
+    - materials/03-distributions.qmd
+    - materials/04-categories.qmd
+    - materials/05-time-series.qmd
+    - materials/06-small-multiples.qmd
+    - materials/07-polish-export.qmd
+    - materials/08-interactive.qmd
+    - materials/09-animations.qmd
+    - materials/10-capstone.qmd
+  appendices:
+    - materials/99-data-catalog.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles/course.css
+    toc: false
+    page-layout: full
+    number-sections: true
+    code-copy: true
+    code-tools: false
+    df-print: paged
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: false
+
+knitr:
+  opts_chunk:
+    fig.width: 9.5
+    fig.height: 5.7
+    dpi: 144
+    dev: ragg_png

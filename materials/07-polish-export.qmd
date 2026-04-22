@@ -1,0 +1,91 @@
+---
+title: "Dopracowanie i eksport"
+---
+
+Dopracowany wykres nie oznacza dekoracyjnego wykresu. Oznacza taki, który szybko
+odpowiada na pytanie, ma opisane jednostki, czytelne etykiety i da się go użyć w
+raporcie bez ręcznego poprawiania w edytorze graficznym.
+
+```{r}
+#| label: setup-07
+library(tidyverse)
+library(here)
+library(ggrepel)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Etykiety i wyróżnienie
+
+```{r}
+#| label: fig-nba-labels
+#| fig-cap: "Zawodnicy NBA według asyst i punktów."
+#| fig-alt: "Wykres punktowy pokazuje relację asyst i punktów. Najlepsi strzelcy są wyróżnieni etykietami."
+nba <- readr::read_csv(here("datasets", "nba.csv"), show_col_types = FALSE) |>
+  filter(minutes > 0) |>
+  mutate(
+    conference = recode(conference, East = "Wschód", West = "Zachód"),
+    points_per_minute = points / minutes
+  )
+
+top_scorers <- nba |>
+  slice_max(points, n = 10)
+
+p_nba <- nba |>
+  ggplot(aes(x = assists, y = points, colour = conference)) +
+  geom_point(alpha = 0.65, size = 2) +
+  ggrepel::geom_text_repel(
+    data = top_scorers,
+    aes(label = player),
+    size = 3,
+    min.segment.length = 0,
+    show.legend = FALSE
+  ) +
+  scale_colour_course_d(name = "Konferencja") +
+  labs(
+    title = "Etykiety dodajemy tylko tam, gdzie pomagają w interpretacji",
+    subtitle = "Wyróżniono 10 zawodników z najwyższą liczbą punktów",
+    x = "Asysty",
+    y = "Punkty",
+    caption = "Źródło: datasets/nba.csv"
+  )
+
+p_nba
+```
+
+## Eksport
+
+Do eksportu statycznych grafik używamy `ggsave()` i urządzenia `ragg`, które daje
+powtarzalne renderowanie tekstu i linii.
+
+```{r}
+#| label: export-example
+#| eval: false
+dir.create(here("outputs"), showWarnings = FALSE)
+
+ggsave(
+  filename = here("outputs", "nba-points-assists.png"),
+  plot = p_nba,
+  device = ragg::agg_png,
+  width = 8,
+  height = 5,
+  units = "in",
+  dpi = 300
+)
+```
+
+## Lista kontroli jakości
+
+- Czy tytuł mówi wniosek, a nie tylko nazwę typu wykresu?
+- Czy osie mają jednostki?
+- Czy kolory mają znaczenie i są wyjaśnione legendą?
+- Czy wykres działa w skali szarości albo nie opiera się wyłącznie na kolorze?
+- Czy zakres osi nie ukrywa ważnej części danych?
+- Czy podpis wskazuje źródło?
+- Czy w Quarto dodany jest `fig-alt`?
+
+## Zadanie
+
+Wróć do jednego wykresu z poprzednich rozdziałów i popraw go pod publikację: tytuł,
+podtytuł, osie, podpis, paleta, wielkość punktów lub szerokość linii.

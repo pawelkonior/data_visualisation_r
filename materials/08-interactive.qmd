@@ -1,0 +1,92 @@
+---
+title: "Interaktywność"
+---
+
+Interaktywność jest dobra, gdy użytkownik ma eksplorować szczegóły. Nie powinna
+ratować wykresu, który w wersji statycznej nie ma jasnego pytania.
+
+```{r}
+#| label: setup-08
+library(tidyverse)
+library(here)
+library(plotly)
+library(DT)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Interaktywny wykres w Plotly (`ggplotly`)
+
+```{r}
+#| label: interactive-nba
+nba_interactive <- readr::read_csv(here("datasets", "nba.csv"), show_col_types = FALSE) |>
+  mutate(
+    conference = recode(conference, East = "Wschód", West = "Zachód"),
+    tooltip = paste0(
+      player,
+      "<br>Drużyna: ", team,
+      "<br>Punkty: ", points,
+      "<br>Asysty: ", assists,
+      "<br>Zbiórki: ", rebounds
+    )
+  )
+
+p_interactive <- nba_interactive |>
+  ggplot(aes(x = assists, y = points, colour = conference, text = tooltip)) +
+  geom_point(alpha = 0.75, size = 2.4) +
+  scale_colour_course_d(name = "Konferencja") +
+  labs(
+    title = "Interaktywny wykres pozwala sprawdzić szczegóły punktów",
+    x = "Asysty",
+    y = "Punkty"
+  )
+
+plotly::ggplotly(p_interactive, tooltip = "text")
+```
+
+## Interaktywna tabela jako uzupełnienie
+
+```{r}
+#| label: table-nba
+nba_interactive |>
+  transmute(
+    Zawodnik = player,
+    Drużyna = team,
+    Konferencja = conference,
+    Punkty = points,
+    Asysty = assists,
+    Zbiórki = rebounds,
+    Przechwyty = steals,
+    Bloki = blocks
+  ) |>
+  arrange(desc(Punkty)) |>
+  DT::datatable(
+    rownames = FALSE,
+    options = list(
+      pageLength = 8,
+      scrollX = TRUE,
+      language = list(
+        search = "Szukaj:",
+        lengthMenu = "Pokaż _MENU_ wierszy",
+        info = "Wiersze _START_-_END_ z _TOTAL_",
+        infoEmpty = "Brak wierszy",
+        zeroRecords = "Brak pasujących wyników",
+        paginate = list(previous = "Poprzednia", `next` = "Następna")
+      )
+    )
+  )
+```
+
+## Kiedy nie używać interakcji
+
+- Gdy wykres ma trafić do slajdu albo PDF bez obsługi HTML.
+- Gdy podpowiedź po najechaniu (tooltip) ukrywa informację, która powinna być
+  widoczna od razu.
+- Gdy liczba punktów jest tak duża, że przeglądarka zaczyna spowalniać.
+- Gdy odbiorca potrzebuje decyzji, a nie eksploracji.
+
+## Zadanie
+
+Przerób jeden statyczny wykres z materiału na `plotly::ggplotly()`. Dodaj własną
+podpowiedź po najechaniu (tooltip) i usuń z niej niepotrzebne pola.

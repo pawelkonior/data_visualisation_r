@@ -1,0 +1,97 @@
+---
+title: "Start projektu"
+---
+
+Na początku ustawiamy środowisko i przechodzimy przez minimalny przepływ pracy:
+import danych, szybką kontrolę jakości, pierwszą agregację i pierwszy wykres.
+
+## Środowisko
+
+Docelowo pracujemy w R 4.5.3 lub nowszym stabilnym wydaniu. Po zainstalowaniu R
+i Quarto uruchom w terminalu:
+
+```bash
+Rscript R/setup.R
+quarto preview
+```
+
+Po pierwszym renderze projektu zapisz wersje pakietów, czyli zamroź zależności:
+
+```r
+renv::init(bare = TRUE)
+renv::snapshot()
+```
+
+## Pakiety
+
+```{r}
+#| label: setup-01
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+W przykładach używamy natywnego pipe `|>`. Jest czytelny, dostępny w nowoczesnym R i
+nie wymaga dodatkowego operatora z pakietu.
+
+## Import danych
+
+Zaczniemy od grantów szkolnych. Plik ma pierwszą kolumnę indeksową bez znaczenia,
+więc usuwamy ją po imporcie.
+
+```{r}
+#| label: import-grants
+grants <- readr::read_csv(
+  here("datasets", "schoolimprovement2010grants.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  dplyr::select(-dplyr::any_of("x1")) |>
+  dplyr::mutate(
+    award_amount = as.numeric(award_amount),
+    model_selected = dplyr::recode(
+      model_selected,
+      Closure = "Zamknięcie",
+      Restart = "Restart",
+      Turnaround = "Restrukturyzacja",
+      Transformation = "Transformacja"
+    ),
+    region = dplyr::recode(
+      region,
+      Midwest = "Środkowy Zachód",
+      Northeast = "Północny Wschód",
+      South = "Południe",
+      West = "Zachód"
+    )
+  )
+
+dplyr::glimpse(grants)
+```
+
+## Pierwszy wykres
+
+```{r}
+#| label: fig-first-histogram
+#| fig-cap: "Rozkład kwot grantów szkolnych."
+#| fig-alt: "Histogram pokazuje, że większość grantów ma niższe kwoty, a tylko kilka obserwacji znajduje się w prawym ogonie rozkładu."
+grants |>
+  ggplot(aes(x = award_amount)) +
+  geom_histogram(bins = 30, fill = "#0072B2", color = "white", linewidth = 0.25) +
+  scale_x_continuous(labels = scales::label_dollar()) +
+  labs(
+    title = "Większość grantów skupia się przy niższych kwotach",
+    subtitle = "Pierwszy wykres zawsze zaczynamy od pytania o kształt danych",
+    x = "Kwota grantu",
+    y = "Liczba szkół",
+    caption = "Źródło: datasets/schoolimprovement2010grants.csv"
+  )
+```
+
+## Zadanie
+
+Zmień liczbę przedziałów histogramu (bins) w `geom_histogram()` na 10, 20 i 50.
+Zapisz jedną obserwację: czy zmienia się wniosek z wykresu, czy tylko jego
+szczegółowość?

@@ -1,0 +1,55 @@
+---
+title: "Wizualizacja danych w R"
+---
+
+Ten materiał prowadzi od pierwszego wykresu do kompletnej, odtwarzalnej opowieści
+wizualnej w R. Pracujemy na lokalnych zbiorach danych z tego repozytorium i
+używamy aktualnego stosu narzędzi: R 4.5.3+, Quarto, tidyverse, ggplot2, renv i
+ragg.
+
+## Dla kogo
+
+Materiał jest dla osób, które znają podstawy pracy z tabelami, ale chcą świadomie
+dobierać typ wykresu, kodować go w `ggplot2`, poprawiać czytelność i publikować
+wyniki jako HTML albo statyczne grafiki.
+
+## Efekty uczenia
+
+Po przejściu materiału potrafisz:
+
+- zaimportować i przygotować dane do wykresu;
+- rozpoznać, kiedy użyć wykresu punktowego (scatter plot), liniowego (line chart),
+  słupkowego (bar chart), mapy ciepła (heatmap) albo małych wielokrotności
+  (small multiples);
+- budować wykres warstwowo przez `ggplot()`, `aes()`, `geom_*()`, skale, podział
+  na panele (faceting) i motywy;
+- pisać wykresy z dobrymi etykietami, jednostkami, podpisami i paletami
+  przyjaznymi dla osób z zaburzeniami widzenia barw;
+- eksportować wykresy w jakości do slajdów, raportu i publikacji internetowej;
+- używać animacji, gdy pokazuje proces albo zmianę w czasie;
+- przygotować końcowy mini-projekt analityczny w Quarto.
+
+## Jak pracować z materiałem
+
+Każdy rozdział ma trzy części: krótką intuicję, kod do uruchomienia oraz zadanie.
+Warto pisać kod samodzielnie, a nie tylko kopiować komórki. W wizualizacji danych
+najwięcej uczy moment, w którym wykres wygląda prawie dobrze, ale trzeba jeszcze
+poprawić skalę, etykietę albo agregację.
+
+```{r}
+#| label: setup-index
+#| include: false
+library(tidyverse)
+library(here)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Główne zasady
+
+- Jeden wykres odpowiada na jedno pytanie.
+- Najpierw porządkujemy dane, potem rysujemy.
+- Nie używamy `setwd()`, tylko ścieżek projektowych przez `here::here()`.
+- Nie chowamy ważnych decyzji w przypadkowych ustawieniach domyślnych.
+- Każdy wykres ma tytuł, jednostki, opis danych i sensowny tekst alternatywny.
