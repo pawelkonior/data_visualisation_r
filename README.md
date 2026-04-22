@@ -4,6 +4,9 @@ To repozytorium zawiera samodzielny kurs wizualizacji danych w R. Materiały są
 przygotowane jako książka Quarto: można je czytać rozdział po rozdziale,
 uruchamiać kod lokalnie i renderować do strony HTML.
 
+Wersja opublikowana przez GitHub Pages będzie dostępna pod adresem:
+<https://pawelkonior.github.io/data_visualisation_r/>.
+
 Kurs prowadzi od podstaw gramatyki wykresów w `ggplot2`, przez rozkłady, kategorie,
 szeregi czasowe, małe wielokrotności (small multiples), eksport, interaktywność,
 animacje, kolory, osie oraz etykiety, aż do końcowego mini-projektu.
@@ -29,6 +32,9 @@ Pełny render materiałów:
 ```bash
 quarto render --execute
 ```
+
+Publikacja na GitHub Pages jest automatyczna: workflow
+`.github/workflows/pages.yml` renderuje książkę po każdym pushu na `main`.
 
 Po pierwszym udanym renderze możesz zamrozić środowisko:
 

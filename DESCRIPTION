@@ -32,4 +32,5 @@ Imports:
     styler,
     tibble,
     tidyr,
+    tidyverse,
     viridisLite
