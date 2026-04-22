@@ -92,15 +92,16 @@ mpg_local |>
   )
 ```
 
-## Seaborn: regresja i panele (faceting)
+## Regresja i podział na panele
 
-W bibliotece `seaborn` często pojawiają się funkcje `regplot()` i `lmplot()`.
-W `ggplot2` składamy je z tych samych klocków: punktów, warstwy trendu i
-podziału na panele.
+W tej części budujemy dwa warianty tej samej analizy: jeden wykres z linią
+regresji dla całego zbioru oraz wersję podzieloną na panele. Dzięki temu widać,
+że w `ggplot2` zmieniamy strukturę wykresu przez dodawanie warstw, a nie przez
+przeskakiwanie między osobnymi funkcjami.
 
 ```{r}
-#| label: fig-insurance-regplot
-#| fig-cap: "Odpowiednik `regplot()` z seaborn: punkty i jeden trend liniowy."
+#| label: fig-insurance-regression
+#| fig-cap: "Regresja w `ggplot2`: punkty i jeden trend liniowy."
 #| fig-alt: "Wykres punktowy pokazuje zależność między stratami ubezpieczeniowymi i składkami. Pomarańczowa linia regresji rośnie wraz ze stratami."
 insurance |>
   ggplot(aes(x = insurance_losses, y = premiums)) +
@@ -127,8 +128,8 @@ insurance |>
 ```
 
 ```{r}
-#| label: fig-insurance-lmplot
-#| fig-cap: "Odpowiednik `lmplot()` z seaborn: model liniowy w osobnych panelach."
+#| label: fig-insurance-panel-models
+#| fig-cap: "Model liniowy w osobnych panelach w `ggplot2`."
 #| fig-alt: "Cztery panele pokazują tę samą zależność osobno dla regionów USA."
 insurance |>
   ggplot(aes(x = insurance_losses, y = premiums)) +

@@ -135,16 +135,16 @@ bakery_top |>
   )
 ```
 
-## Seaborn: wykresy kategoryczne
+## Wykresy kategoryczne w `ggplot2`
 
-`stripplot()`, `countplot()` i `pointplot()` z `seaborn` mają bezpośrednie
-odpowiedniki w gramatyce `ggplot2`: wykres punktowy z losowym rozsunięciem
-punktów (strip plot), wykres zliczeń (count plot) i wykres punktów ze średnimi
+Kategorie można pokazać na kilka sposobów. Pojedyncze obserwacje najlepiej widać
+na wykresie punktowym z losowym rozsunięciem punktów (strip plot), liczności na
+wykresie zliczeń (count plot), a typowe wartości na wykresie punktów ze średnimi
 (point plot).
 
 ```{r}
-#| label: fig-school-stripplot
-#| fig-cap: "Odpowiednik `stripplot()` z seaborn: każda kropka to jeden grant."
+#| label: fig-school-jitter
+#| fig-cap: "Wykres punktowy z losowym rozsunięciem: każda kropka to jeden grant."
 #| fig-alt: "Wykres punktowy z losowym rozsunięciem pokazuje kwoty grantów w czterech modelach interwencji. Transformacja ma najwięcej obserwacji."
 school_grants |>
   mutate(model_selected = forcats::fct_reorder(model_selected, award_amount_m, median)) |>
@@ -161,8 +161,8 @@ school_grants |>
 ```
 
 ```{r}
-#| label: fig-school-countplot
-#| fig-cap: "Odpowiednik `countplot()` z seaborn: liczba szkół według modelu i regionu."
+#| label: fig-school-counts
+#| fig-cap: "Wykres zliczeń w `ggplot2`: liczba szkół według modelu i regionu."
 #| fig-alt: "Zgrupowane słupki pokazują, że model Transformacja dominuje we wszystkich regionach."
 school_grants |>
   filter(region != "Brak danych") |>
@@ -181,8 +181,8 @@ school_grants |>
 ```
 
 ```{r}
-#| label: fig-school-pointplot
-#| fig-cap: "Odpowiednik `pointplot()` z seaborn: średnia kwota i przedział ufności."
+#| label: fig-school-means
+#| fig-cap: "Wykres średnich w `ggplot2`: średnia kwota i przedział ufności."
 #| fig-alt: "Punkty pokazują średnie kwoty grantów dla modeli interwencji, a poziome linie pokazują przybliżone 95-procentowe przedziały ufności."
 school_award_summary <- school_grants |>
   group_by(model_selected) |>

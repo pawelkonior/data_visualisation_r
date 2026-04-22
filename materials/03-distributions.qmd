@@ -82,12 +82,11 @@ fmr |>
   )
 ```
 
-## Seaborn: histogram, gęstość i kreski obserwacji (rug plot)
+## Histogram, gęstość i kreski obserwacji (rug plot)
 
-Ten sam efekt, który w `seaborn` często robi `histplot(..., kde = TRUE)` albo
-`displot(kind = "kde", rug = TRUE)`, w `ggplot2` powstaje przez dołożenie warstw:
-histogramu, wykresu gęstości (density plot) i krótkich kresek pokazujących
-pojedyncze obserwacje (rug plot).
+W R ten widok składamy jawnie z kilku warstw: histogramu, wykresu gęstości
+(density plot) i krótkich kresek pokazujących pojedyncze obserwacje (rug plot).
+Każda warstwa odpowiada na trochę inne pytanie o rozkład.
 
 ```{r}
 #| label: fig-school-awards-hist
@@ -171,17 +170,17 @@ fmr_one_bed |>
   )
 ```
 
-## Seaborn: wykres łączony (`jointplot()`)
+## Wykres łączony: relacja i rozkłady brzegowe
 
-`jointplot()` łączy dwie perspektywy: relację między zmiennymi w środku oraz
-rozkłady brzegowe na osiach. W R najczytelniej złożyć taki widok z panelu
-głównego i dwóch małych rozkładów brzegowych.
+Taki widok traktujemy jako kompozycję trzech elementów: głównego wykresu relacji
+oraz dwóch małych rozkładów brzegowych na osiach. Dzięki temu jednocześnie widać
+zależność między zmiennymi i kształt każdego rozkładu osobno.
 
 ```{r}
-#| label: fig-fmr-jointplot-scatter
+#| label: fig-fmr-joint-scatter
 #| fig-width: 8.4
 #| fig-height: 7.0
-#| fig-cap: "Odpowiednik seabornowego `jointplot()` (joint plot): punkty, trend i histogramy marginalne. Skrajne wartości są przycięte dla czytelności."
+#| fig-cap: "Wykres relacji z rozkładami brzegowymi: punkty, trend i histogramy marginalne. Skrajne wartości są przycięte dla czytelności."
 #| fig-alt: "Centralny wykres punktowy pokazuje silną dodatnią zależność między czynszem dla mieszkań z jedną i dwiema sypialniami. Na górze i po prawej są histogramy obu zmiennych."
 fmr_joint <- fmr |>
   filter(
@@ -249,10 +248,10 @@ joint_hist_y <- fmr_joint_visible |>
 ```
 
 ```{r}
-#| label: fig-fmr-jointplot-binned
+#| label: fig-fmr-joint-binned
 #| fig-width: 8.4
 #| fig-height: 7.0
-#| fig-cap: "Odpowiednik `jointplot(kind = 'hist')`: liczność par wartości i gęstości marginalne. Jaśniejsze pola oznaczają więcej obserwacji."
+#| fig-cap: "Wykres relacji z wartościami grupowanymi w przedziały: liczność par wartości i gęstości marginalne. Jaśniejsze pola oznaczają więcej obserwacji."
 #| fig-alt: "Centralna mapa kafelkowa pokazuje największe zagęszczenie przy niższych czynszach, z ukośnym pasem zależności między mieszkaniami z jedną i dwiema sypialniami. Marginalne krzywe gęstości pokazują prawostronne ogony obu zmiennych."
 joint_binned <- fmr_joint_visible |>
   ggplot(aes(x = fmr_1, y = fmr_2)) +
