@@ -5,6 +5,7 @@ required_packages <- c(
   "forcats",
   "ggplot2",
   "ggrepel",
+  "hexbin",
   "here",
   "htmlwidgets",
   "janitor",

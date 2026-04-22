@@ -6,7 +6,7 @@
 | `datasets/insurance_premiums.csv` | 52 wiersze | regresja, etykiety, regiony | Dobry do pierwszych mapowań i `geom_smooth()`. |
 | `datasets/schoolimprovement2010grants.csv` | 758 wierszy | histogramy, wykresy pudełkowe (boxplots), kategorie | Ma pierwszą kolumnę indeksową bez nazwy. |
 | `datasets/FY18_4050_FMRs.csv` | 4770 wierszy | rozkłady, skale, obserwacje odstające | Czynsze rynkowe, wiele zmiennych numerycznych. |
-| `datasets/bike_share.csv` | 732 wiersze | szeregi czasowe, sezonowość, regresja | Daty dzienne, dobra struktura. |
+| `datasets/bike_share.csv` | 731 wierszy | szeregi czasowe, sezonowość, wykres heksagonalny (hexbin plot) | Daty dzienne, dobra struktura. |
 | `datasets/climate_change.csv` | 707 wierszy | linie, dwie serie, narracja | Dobry do osi czasu i etykiet. |
 | `datasets/stocks_cleaned.csv` | 139501 wierszy | szeregi czasowe i interaktywność | Warto filtrować do jednej spółki. |
 | `datasets/seattle_weather.csv` | 205 wierszy | małe wielokrotności (small multiples), brak danych | `-7777` oznacza braki. |

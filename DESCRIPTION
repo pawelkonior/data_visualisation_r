@@ -16,6 +16,7 @@ Imports:
     forcats,
     ggplot2 (>= 4.0.3),
     ggrepel,
+    hexbin,
     here,
     htmlwidgets,
     janitor,
