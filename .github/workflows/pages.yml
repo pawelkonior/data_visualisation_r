@@ -30,24 +30,12 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Install Linux system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libcurl4-openssl-dev \
-            libfontconfig1-dev \
-            libfreetype6-dev \
-            libfribidi-dev \
-            libgit2-dev \
-            libharfbuzz-dev \
-            libjpeg-dev \
-            libpng-dev \
-            libssl-dev \
-            libtiff5-dev \
-            libxml2-dev
-
       - name: Install R dependencies
-        run: Rscript R/setup.R
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          extra-packages: |
+            any::tidyverse
 
       - name: Render Quarto book
         run: quarto render --execute --no-cache
