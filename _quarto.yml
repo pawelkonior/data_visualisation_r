@@ -20,7 +20,10 @@ book:
     - materials/07-polish-export.qmd
     - materials/08-interactive.qmd
     - materials/09-animations.qmd
-    - materials/10-capstone.qmd
+    - materials/10-colors-palettes.qmd
+    - materials/11-axes-ticks.qmd
+    - materials/12-labels-titles.qmd
+    - materials/13-capstone.qmd
   appendices:
     - materials/99-data-catalog.qmd
 

@@ -5,8 +5,8 @@ przygotowane jako książka Quarto: można je czytać rozdział po rozdziale,
 uruchamiać kod lokalnie i renderować do strony HTML.
 
 Kurs prowadzi od podstaw gramatyki wykresów w `ggplot2`, przez rozkłady, kategorie,
-szeregi czasowe, małe wielokrotności (small multiples), eksport, interaktywność i
-animacje, aż do końcowego mini-projektu.
+szeregi czasowe, małe wielokrotności (small multiples), eksport, interaktywność,
+animacje, kolory, osie oraz etykiety, aż do końcowego mini-projektu.
 
 ## Wymagania
 

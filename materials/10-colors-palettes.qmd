@@ -1,0 +1,241 @@
+---
+title: "Kolory i palety"
+---
+
+Kolor pomaga wtedy, gdy koduje informację. Nie powinien być ozdobą dodawaną na
+końcu, bo odbiorca zwykle czyta kolor jako znaczenie. W `ggplot2` rozróżniamy
+dwa najczęstsze mapowania: `colour`, czyli kolor linii, punktu lub obrysu, oraz
+`fill`, czyli kolor wypełnienia słupka, kafelka albo obszaru.
+
+```{r}
+#| label: setup-10
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Trzy typy palet
+
+Paleta jakościowa (qualitative palette) służy do kategorii bez naturalnej
+kolejności. Paleta sekwencyjna (sequential palette) służy do wartości od małych
+do dużych. Paleta rozbieżna (diverging palette) służy do wartości wokół ważnego
+punktu odniesienia, na przykład zera.
+
+```{r}
+#| label: fig-palette-types
+#| fig-cap: "Trzy podstawowe typy palet: jakościowa, sekwencyjna i rozbieżna."
+#| fig-alt: "Trzy poziome paski pokazują przykłady palety jakościowej dla kategorii, sekwencyjnej dla natężenia i rozbieżnej wokół zera."
+palette_examples <- tibble(
+  typ = rep(
+    c("Jakościowa\n(qualitative)", "Sekwencyjna\n(sequential)", "Rozbieżna\n(diverging)"),
+    each = 7
+  ),
+  step = rep(1:7, times = 3),
+  colour = c(
+    "#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#F0E442",
+    viridisLite::viridis(7, option = "C"),
+    colorRampPalette(c("#0072B2", "#F7F7F7", "#D55E00"))(7)
+  )
+)
+
+palette_examples |>
+  mutate(typ = factor(typ, levels = unique(typ))) |>
+  ggplot(aes(x = step, y = typ, fill = colour)) +
+  geom_tile(width = 0.96, height = 0.72) +
+  scale_fill_identity() +
+  coord_equal() +
+  labs(
+    title = "Typ palety dobieramy do typu zmiennej",
+    x = NULL,
+    y = NULL
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+## Wyróżnienie jednej kategorii
+
+Jeżeli wykres ma pokazać jeden najważniejszy element, resztę można wyciszyć
+neutralnym kolorem. To jest czytelniejsze niż użycie osobnego koloru dla każdej
+kategorii.
+
+```{r}
+#| label: fig-colour-highlight
+#| fig-cap: "Najpopularniejszy produkt wyróżniony kolorem, pozostałe produkty wyciszone."
+#| fig-alt: "Poziomy wykres słupkowy pokazuje dziesięć najpopularniejszych produktów w piekarni. Kawa jest wyróżniona pomarańczowym kolorem, a pozostałe słupki są szare."
+item_labels <- c(
+  Coffee = "Kawa",
+  Bread = "Chleb",
+  Tea = "Herbata",
+  Cake = "Ciasto",
+  Pastry = "Ciastko",
+  Sandwich = "Kanapka",
+  Medialuna = "Rogalik",
+  `Hot chocolate` = "Gorąca czekolada",
+  Cookies = "Ciastka",
+  Brownie = "Brownie"
+)
+
+bakery_top <- readr::read_csv(here("datasets", "bakery.csv"), show_col_types = FALSE) |>
+  janitor::clean_names() |>
+  mutate(items = recode(items, !!!item_labels)) |>
+  count(items, sort = TRUE) |>
+  slice_max(n, n = 10) |>
+  mutate(
+    items = forcats::fct_reorder(items, n),
+    highlight = items == "Kawa"
+  )
+
+bakery_top |>
+  ggplot(aes(x = n, y = items, fill = highlight)) +
+  geom_col(width = 0.72) +
+  scale_fill_manual(values = c(`FALSE` = "#B8C1CC", `TRUE` = "#D55E00"), guide = "none") +
+  labs(
+    title = "Kolor powinien prowadzić wzrok do najważniejszej informacji",
+    x = "Liczba transakcji",
+    y = NULL,
+    caption = "Źródło: datasets/bakery.csv"
+  )
+```
+
+## Paleta jakościowa dla kilku kategorii
+
+Kiedy wszystkie kategorie są równie ważne, używamy palety jakościowej. Kolory
+powinny być od siebie wyraźnie różne, ale nie muszą tworzyć skali od jasnego do
+ciemnego.
+
+```{r}
+#| label: fig-colour-discrete-medals
+#| fig-cap: "Paleta ręczna dla typów medali."
+#| fig-alt: "Skumulowany wykres słupkowy pokazuje liczbę medali według kraju. Złoto, srebro i brąz mają kolory zgodne ze znaczeniem kategorii."
+medals <- readr::read_csv(
+  here("datasets", "medals_by_country_2016.csv"),
+  show_col_types = FALSE
+) |>
+  rename(country = `...1`) |>
+  pivot_longer(
+    cols = c(Bronze, Gold, Silver),
+    names_to = "medal",
+    values_to = "count"
+  ) |>
+  mutate(
+    medal = factor(
+      recode(medal, Gold = "Złoto", Silver = "Srebro", Bronze = "Brąz"),
+      levels = c("Złoto", "Srebro", "Brąz")
+    ),
+    country = forcats::fct_reorder(country, count, .fun = sum)
+  )
+
+medals |>
+  ggplot(aes(x = count, y = country, fill = medal)) +
+  geom_col(width = 0.72) +
+  scale_fill_manual(
+    values = c(Złoto = "#D6A21E", Srebro = "#9AA3AA", Brąz = "#A97142"),
+    name = "Medal"
+  ) +
+  labs(
+    title = "Paleta ręczna jest dobra, gdy kolor ma oczywiste znaczenie",
+    x = "Liczba medali",
+    y = "Kraj",
+    caption = "Źródło: datasets/medals_by_country_2016.csv"
+  )
+```
+
+## Paleta sekwencyjna dla natężenia
+
+W mapie ciepła (heatmap) kolor zwykle oznacza natężenie. Wtedy jasność i ciemność
+muszą mieć porządek: jasne pola oznaczają mniej, ciemne albo bardziej nasycone
+pola oznaczają więcej.
+
+```{r}
+#| label: fig-colour-sequential-heatmap
+#| fig-cap: "Paleta sekwencyjna dla średniej liczby wypożyczeń rowerów."
+#| fig-alt: "Mapa ciepła pokazuje średnią dzienną liczbę wypożyczeń według miesiąca i dnia tygodnia. Wyższe wartości są widoczne głównie w cieplejszych miesiącach."
+bike_heatmap <- readr::read_csv(here("datasets", "bike_share.csv"), show_col_types = FALSE) |>
+  mutate(
+    month = factor(
+      mnth,
+      levels = 1:12,
+      labels = c("Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru")
+    ),
+    weekday = factor(
+      weekday,
+      levels = c(1, 2, 3, 4, 5, 6, 0),
+      labels = c("Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd")
+    )
+  ) |>
+  group_by(month, weekday) |>
+  summarise(avg_rentals = mean(total_rentals), .groups = "drop")
+
+bike_heatmap |>
+  ggplot(aes(x = month, y = weekday, fill = avg_rentals)) +
+  geom_tile(colour = "white", linewidth = 0.25) +
+  scale_fill_viridis_c(
+    option = "C",
+    labels = scales::label_number(big.mark = " "),
+    name = "Średnia",
+    guide = guide_colorbar(
+      title.position = "top",
+      barheight = grid::unit(72, "pt"),
+      barwidth = grid::unit(8, "pt")
+    )
+  ) +
+  labs(
+    title = "Paleta sekwencyjna pokazuje natężenie zjawiska",
+    x = "Miesiąc",
+    y = NULL,
+    caption = "Źródło: datasets/bike_share.csv"
+  ) +
+  theme(legend.position = "right")
+```
+
+## Paleta rozbieżna wokół zera
+
+Paleta rozbieżna ma sens tylko wtedy, gdy istnieje ważny środek skali. Dla
+anomalii temperatury takim środkiem jest zero: wartości poniżej i powyżej zera
+powinny iść w przeciwnych kierunkach kolorystycznych.
+
+```{r}
+#| label: fig-colour-diverging-temperature
+#| fig-cap: "Paleta rozbieżna dla średniej rocznej anomalii temperatury."
+#| fig-alt: "Pasek kafelków pokazuje kolejne lata. Wcześniejsze lata są częściej niebieskie lub jasne, a późniejsze coraz częściej pomarańczowe."
+climate_year <- readr::read_csv(here("datasets", "climate_change.csv"), show_col_types = FALSE) |>
+  mutate(year = lubridate::year(date)) |>
+  group_by(year) |>
+  summarise(relative_temp = mean(relative_temp, na.rm = TRUE), .groups = "drop")
+
+climate_year |>
+  ggplot(aes(x = year, y = 1, fill = relative_temp)) +
+  geom_tile(height = 0.75) +
+  scale_fill_gradient2(
+    low = "#0072B2",
+    mid = "#F7F7F7",
+    high = "#D55E00",
+    midpoint = 0,
+    labels = scales::label_number(suffix = "°C", accuracy = 0.1),
+    name = "Anomalia"
+  ) +
+  labs(
+    title = "Paleta rozbieżna działa wtedy, gdy środek skali coś znaczy",
+    x = "Rok",
+    y = NULL,
+    caption = "Źródło: datasets/climate_change.csv"
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+```
+
+## Zadanie
+
+Wybierz jeden wykres z wcześniejszych rozdziałów i przygotuj dwie wersje:
+pierwszą z paletą jakościową, drugą z wyróżnieniem jednej kategorii. Porównaj,
+która wersja szybciej prowadzi do wniosku.

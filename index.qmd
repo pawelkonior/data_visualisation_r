@@ -25,6 +25,8 @@ Po przejściu materiału potrafisz:
   na panele (faceting) i motywy;
 - pisać wykresy z dobrymi etykietami, jednostkami, podpisami i paletami
   przyjaznymi dla osób z zaburzeniami widzenia barw;
+- formatować znaczniki osi (ticks), wartości na osiach, tytuły (titles) i
+  etykiety (labels);
 - eksportować wykresy w jakości do slajdów, raportu i publikacji internetowej;
 - używać animacji, gdy pokazuje proces albo zmianę w czasie;
 - przygotować końcowy mini-projekt analityczny w Quarto.
