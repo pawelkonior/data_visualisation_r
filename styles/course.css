@@ -1,0 +1,121 @@
+:root {
+  --course-ink: #26313b;
+  --course-muted: #61707f;
+  --course-rule: #e3e8ed;
+  --course-accent: #0072b2;
+}
+
+body {
+  color: var(--course-ink);
+}
+
+main.content {
+  max-width: 1080px;
+}
+
+#quarto-margin-sidebar {
+  display: none;
+}
+
+.sidebar-title {
+  color: var(--course-ink);
+}
+
+.callout {
+  border-radius: 6px;
+}
+
+.cell-output-display {
+  margin-top: 0.75rem;
+}
+
+.cell-output-display img,
+.quarto-figure img {
+  height: auto;
+  max-width: 100%;
+}
+
+.quarto-figure {
+  margin-block: 1.4rem 1.8rem;
+}
+
+figcaption,
+.figure-caption {
+  color: var(--course-muted);
+  font-size: 0.92rem;
+}
+
+code {
+  color: #174a7c;
+}
+
+.animation-card {
+  border: 1px solid var(--course-rule);
+  border-radius: 8px;
+  margin-block: 1.25rem 1.75rem;
+  padding: 0.9rem;
+  background: #fff;
+}
+
+.animation-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.animation-toolbar button {
+  background: var(--course-accent);
+  border: 1px solid var(--course-accent);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  min-width: 7rem;
+  padding: 0.38rem 0.7rem;
+}
+
+.animation-toolbar button + button {
+  background: #fff;
+  color: var(--course-accent);
+}
+
+.animation-control {
+  align-items: center;
+  color: var(--course-muted);
+  display: inline-flex;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.animation-control input {
+  inline-size: min(10rem, 42vw);
+}
+
+.animation-status {
+  color: var(--course-muted);
+  margin-left: auto;
+}
+
+.sampling-canvas {
+  aspect-ratio: 16 / 9.8;
+  display: block;
+  inline-size: 100%;
+  min-block-size: 520px;
+}
+
+@media (max-width: 720px) {
+  .animation-card {
+    padding: 0.65rem;
+  }
+
+  .animation-status {
+    margin-left: 0;
+  }
+
+  .sampling-canvas {
+    min-block-size: 620px;
+  }
+}
