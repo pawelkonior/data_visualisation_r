@@ -35,12 +35,13 @@ quarto render --execute
 
 Strona jest wyrenderowana w katalogu `docs/`. GitHub Pages publikuje gotowy HTML
 z workflow `.github/workflows/pages.yml`, więc nie renderuje projektu ani nie
-stawia środowiska na runnerze. W ustawieniach repozytorium GitHub Pages wybierz
-źródło `GitHub Actions`.
+stawia środowiska na runnerze. Workflow synchronizuje zawartość `docs/` na gałąź
+`gh-pages`. W ustawieniach repozytorium GitHub Pages wybierz źródło
+`Deploy from a branch`, gałąź `gh-pages` i katalog `/`.
 
 Po zmianach w materiałach uruchom lokalnie `quarto render --execute`, a następnie
 commituj zaktualizowany katalog `docs/` i wypchnij zmiany na gałąź `main`.
-Workflow opublikuje zawartość `docs/` automatycznie.
+Workflow opublikuje zawartość `docs/` automatycznie na `gh-pages`.
 
 Po pierwszym udanym renderze możesz zamrozić środowisko:
 

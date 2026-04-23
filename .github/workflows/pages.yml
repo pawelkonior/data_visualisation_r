@@ -6,37 +6,37 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  contents: write
 
 concurrency:
-  group: pages
+  group: gh-pages
   cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload rendered HTML
-        uses: actions/upload-pages-artifact@v4
         with:
-          path: docs
+          fetch-depth: 0
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish docs to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git worktree add -B gh-pages /tmp/gh-pages origin/gh-pages
+          rsync -av --delete --exclude '.git' docs/ /tmp/gh-pages/
+          touch /tmp/gh-pages/.nojekyll
+          cd /tmp/gh-pages
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to publish"
+            exit 0
+          fi
+
+          git add --all
+          git commit -m "Deploy GitHub Pages from ${GITHUB_SHA}"
+          git push origin HEAD:gh-pages
