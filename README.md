@@ -33,13 +33,14 @@ Pełny render materiałów:
 quarto render --execute
 ```
 
-Strona jest wyrenderowana w katalogu `docs/` oraz wypchnięta na gałąź
-`gh-pages`. W ustawieniach repozytorium GitHub Pages wybierz źródło
-`Deploy from a branch`, gałąź `gh-pages` i katalog `/`.
+Strona jest wyrenderowana w katalogu `docs/`. GitHub Pages publikuje gotowy HTML
+z workflow `.github/workflows/pages.yml`, więc nie renderuje projektu ani nie
+stawia środowiska na runnerze. W ustawieniach repozytorium GitHub Pages wybierz
+źródło `GitHub Actions`.
 
 Po zmianach w materiałach uruchom lokalnie `quarto render --execute`, a następnie
-commituj zaktualizowany katalog `docs/` i ponownie wypchnij zawartość na
-`gh-pages`.
+commituj zaktualizowany katalog `docs/` i wypchnij zmiany na gałąź `main`.
+Workflow opublikuje zawartość `docs/` automatycznie.
 
 Po pierwszym udanym renderze możesz zamrozić środowisko:
 
