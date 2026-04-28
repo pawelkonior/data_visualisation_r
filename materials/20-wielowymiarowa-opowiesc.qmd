@@ -1,0 +1,155 @@
+---
+title: "Wielowymiarowa opowieść"
+---
+
+Najmocniejsze wykresy nie pokazują jednego wymiaru naraz. Potrafią połączyć kilka
+zmiennych w jedną scenę, która daje zarówno kontekst, jak i emocjonalny ciężar
+faktów. Zamiast budować dashboard z sześciu osobnych paneli, spróbujmy opowiedzieć
+jedną zwartą historię na jednym wykresie.
+
+```{r}
+#| label: setup-20
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Użyjemy `countries-of-the-world.csv`. Na osi X pokażemy PKB per capita, na osi Y
+śmiertelność niemowląt, rozmiar punktu przypiszemy populacji, a kolorem wyróżnimy
+dwa regiony, które opowiadają szczególnie wyraźny kontrast: Europę Zachodnią i
+Afrykę Subsaharyjską.
+
+```{r}
+#| label: data-prep-20
+countries <- readr::read_csv(
+  here("datasets", "countries-of-the-world.csv"),
+  show_col_types = FALSE,
+  locale = readr::locale(decimal_mark = ",")
+) |>
+  janitor::clean_names() |>
+  mutate(
+    across(where(is.character), stringr::str_trim),
+    story_region = case_when(
+      region == "SUB-SAHARAN AFRICA" ~ "Afryka Subsaharyjska",
+      region == "WESTERN EUROPE" ~ "Europa Zachodnia",
+      TRUE ~ "Pozostałe regiony"
+    )
+  ) |>
+  filter(
+    !is.na(gdp_per_capita),
+    !is.na(infant_mortality_per_1000_births),
+    !is.na(population),
+    gdp_per_capita > 0
+  )
+
+median_gdp <- median(countries$gdp_per_capita, na.rm = TRUE)
+median_infant <- median(countries$infant_mortality_per_1000_births, na.rm = TRUE)
+
+label_countries <- countries |>
+  filter(country %in% c("China", "India", "United States", "Japan", "Germany", "Nigeria")) |>
+  mutate(
+    label_x = case_when(
+      country == "China" ~ gdp_per_capita * 1.08,
+      country == "India" ~ gdp_per_capita * 1.08,
+      country == "United States" ~ gdp_per_capita * 1.08,
+      country == "Japan" ~ gdp_per_capita * 1.12,
+      country == "Germany" ~ gdp_per_capita * 1.12,
+      country == "Nigeria" ~ gdp_per_capita * 1.15,
+      TRUE ~ gdp_per_capita * 1.1
+    ),
+    label_y = infant_mortality_per_1000_births + case_when(
+      country == "China" ~ 2.5,
+      country == "India" ~ 2.5,
+      country == "United States" ~ 2,
+      country == "Japan" ~ 0.8,
+      country == "Germany" ~ -0.8,
+      country == "Nigeria" ~ 2.5,
+      TRUE ~ 1
+    )
+  )
+```
+
+## Jeden wykres, kilka warstw znaczenia
+
+Na tym wykresie czytamy kilka rzeczy równocześnie: zamożność, ryzyko zdrowotne,
+skalę populacji i kontrast regionalny. To właśnie ten moment, w którym wykres
+przestaje być dekoracją, a zaczyna być nośnikiem opowieści.
+
+```{r}
+#| label: fig-bubble-countries
+#| fig-cap: "Wykres bąbelkowy łączy zamożność, śmiertelność niemowląt, wielkość populacji i kontekst regionalny."
+#| fig-alt: "Na wykresie bąbelkowym o osi poziomej dla PKB per capita i pionowej dla śmiertelności niemowląt widać, że kraje Europy Zachodniej skupiają się przy niskiej śmiertelności i wysokim PKB, a wiele krajów Afryki Subsaharyjskiej znajduje się po przeciwnej stronie wykresu. Rozmiar bąbla oznacza populację."
+ggplot(countries, aes(x = gdp_per_capita, y = infant_mortality_per_1000_births)) +
+  geom_vline(xintercept = median_gdp, linetype = "dashed", color = "#b7c0c8", linewidth = 0.45) +
+  geom_hline(yintercept = median_infant, linetype = "dashed", color = "#b7c0c8", linewidth = 0.45) +
+  geom_point(
+    aes(size = population, fill = story_region),
+    shape = 21,
+    color = "white",
+    stroke = 0.25,
+    alpha = 0.88
+  ) +
+  geom_segment(
+    data = label_countries,
+    aes(xend = label_x, yend = label_y),
+    color = "#7a8691",
+    linewidth = 0.35
+  ) +
+  geom_text(
+    data = label_countries,
+    aes(x = label_x, y = label_y, label = country),
+    hjust = 0,
+    size = 3.4
+  ) +
+  scale_x_log10(
+    labels = scales::label_number(big.mark = " "),
+    expand = expansion(mult = c(0.02, 0.32))
+  ) +
+  scale_y_continuous(
+    labels = scales::label_number(accuracy = 1),
+    expand = expansion(mult = c(0.02, 0.08))
+  ) +
+  scale_size_area(
+    max_size = 18,
+    breaks = c(1e7, 1e8, 1e9),
+    labels = c("10 mln", "100 mln", "1 mld")
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Afryka Subsaharyjska" = "#C44E52",
+      "Europa Zachodnia" = "#4C78A8",
+      "Pozostałe regiony" = "#B8C0C8"
+    )
+  ) +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Bogactwo, zdrowie i skala populacji układają się w jedną historię",
+    subtitle = "Europa Zachodnia i Afryka Subsaharyjska tworzą wyraźny kontrast, ale największe kraje świata rozciągają cały wykres",
+    x = "PKB per capita (USD, skala logarytmiczna)",
+    y = "Śmiertelność niemowląt na 1000 urodzeń",
+    size = "Populacja",
+    fill = "Region opowieści",
+    caption = "Źródło: datasets/countries-of-the-world.csv"
+  ) +
+  theme(
+    legend.position = "right",
+    plot.margin = margin(10, 90, 10, 10)
+  )
+```
+
+## So what?
+
+W jednym obrazie widzimy zależność, skalę problemu i kontrast regionalny. To już
+nie jest tylko odczyt statystyki. To wykres, który pomaga zrozumieć, gdzie liczby
+stają się realnym ciężarem społecznym.
+
+## Zadanie
+
+Zmień opowieść, nie zmieniając danych: zamiast śmiertelności niemowląt pokaż
+`literacy_percent` albo `birthrate`, zostawiając wielkość punktów jako populację.
+Sprawdź, jak inny wybór osi zmienia emocjonalny i analityczny wydźwięk wykresu.

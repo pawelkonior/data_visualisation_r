@@ -26,6 +26,11 @@ book:
     - materials/13-capstone.qmd
     - materials/14-internet-connection.qmd
     - materials/15-heatmap.qmd
+    - materials/16-fundamenty-percepcji.qmd
+    - materials/17-architektura-czasu.qmd
+    - materials/18-detektywistyka.qmd
+    - materials/19-poza-srednia.qmd
+    - materials/20-wielowymiarowa-opowiesc.qmd
   appendices:
     - materials/99-data-catalog.qmd
 

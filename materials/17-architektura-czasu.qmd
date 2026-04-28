@@ -1,0 +1,144 @@
+---
+title: "Architektura czasu"
+---
+
+Na osi czasu najłatwiej przesadzić z liczbą komunikatów. Kilka kolorowych linii
+na jednym wykresie szybko zamienia się w spaghetti chart, w którym legenda staje
+się dodatkową przeszkodą. Celem nie jest pokazanie wszystkiego naraz, tylko
+pokierowanie wzrokiem odbiorcy.
+
+```{r}
+#| label: setup-17
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Wybierzemy siedem spółek technologicznych z `stocks_cleaned.csv` i przeliczymy
+ich ceny zamknięcia do wspólnego indeksu startowego równego 100. Dzięki temu
+nie porównujemy poziomów cen, tylko tempo wzrostu od tego samego punktu.
+
+```{r}
+#| label: data-prep-17
+tech_stocks <- readr::read_csv(
+  here("datasets", "stocks_cleaned.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  select(-any_of("x1")) |>
+  filter(name %in% c("AAPL", "AMZN", "FB", "GOOG", "MSFT", "NFLX", "NVDA")) |>
+  arrange(name, date) |>
+  group_by(name) |>
+  mutate(close_index = close / first(close) * 100) |>
+  ungroup() |>
+  mutate(
+    focus = if_else(name == "NVDA", "NVDA", "Pozostałe spółki")
+  )
+
+highlight_end <- tech_stocks |>
+  filter(name == "NVDA") |>
+  slice_max(date, n = 1, with_ties = FALSE) |>
+  mutate(
+    label_date = date + 120,
+    label_text = paste0("NVDA: ", round(close_index), " pkt")
+  )
+```
+
+## Chaos: każda linia chce być najważniejsza
+
+Jeżeli każdej serii damy własny kolor i osobną pozycję w legendzie, zmuszamy oko
+do ciągłego skakania między wykresem a podpisami.
+
+```{r}
+#| label: fig-time-spaghetti
+#| fig-cap: "Wielokolorowy wykres wieloseryjny szybko staje się męczący do czytania."
+#| fig-alt: "Siedem linii przedstawia indeks cen akcji kilku spółek technologicznych. Każda ma inny kolor, przez co wykres jest gęsty i wymaga częstego korzystania z legendy."
+ggplot(tech_stocks, aes(x = date, y = close_index, color = name)) +
+  geom_line(linewidth = 0.9, alpha = 0.95) +
+  scale_y_continuous(labels = scales::label_number(accuracy = 1)) +
+  labs(
+    title = "Gdy każda seria krzyczy, żadna nie prowadzi narracji",
+    subtitle = "Indeks 100 w pierwszym dniu obserwacji",
+    x = NULL,
+    y = "Indeks ceny zamknięcia",
+    color = "Spółka",
+    caption = "Źródło: datasets/stocks_cleaned.csv"
+  )
+```
+
+## Naprawa: morze szarości i jeden punkt zapalny
+
+Teraz zostawiamy tło w szarości, a tylko jedną serię wyróżniamy kolorem i
+bezpośrednią etykietą. Taki zabieg zamienia bazę danych w krótką opowieść o
+wyjątkowym trendzie.
+
+```{r}
+#| label: fig-time-highlight
+#| fig-cap: "Wyróżnienie jednej serii i usunięcie legendy skraca drogę wzroku do najważniejszego trendu."
+#| fig-alt: "Kilka szarych linii pokazuje przebieg indeksów spółek technologicznych, a linia NVDA jest zaznaczona intensywnym kolorem i podpisana przy końcu wykresu. Widać, że NVDA rosła znacznie szybciej niż pozostałe serie."
+ggplot(tech_stocks, aes(x = date, y = close_index, group = name)) +
+  geom_line(
+    data = filter(tech_stocks, name != "NVDA"),
+    color = "#c7ced6",
+    linewidth = 0.85,
+    alpha = 0.9
+  ) +
+  geom_line(
+    data = filter(tech_stocks, name == "NVDA"),
+    color = "#D55E00",
+    linewidth = 1.3
+  ) +
+  geom_point(
+    data = highlight_end,
+    color = "#D55E00",
+    size = 2.8
+  ) +
+  geom_segment(
+    data = highlight_end,
+    aes(x = date, xend = label_date, y = close_index, yend = close_index),
+    color = "#D55E00",
+    linewidth = 0.45
+  ) +
+  geom_text(
+    data = highlight_end,
+    aes(x = label_date, y = close_index, label = label_text),
+    hjust = 0,
+    vjust = -0.2,
+    color = "#D55E00",
+    size = 3.8,
+    fontface = "bold"
+  ) +
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y",
+    expand = expansion(mult = c(0.01, 0.14))
+  ) +
+  scale_y_continuous(labels = scales::label_number(accuracy = 1)) +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Narracja czasu działa lepiej, gdy wybierasz bohatera",
+    subtitle = "Szare tło daje kontekst, a wyróżniona linia pokazuje wyjątkowy wzrost NVDA",
+    x = NULL,
+    y = "Indeks ceny zamknięcia",
+    caption = "Źródło: datasets/stocks_cleaned.csv; pokazano wybrane spółki technologiczne"
+  ) +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(8, 70, 8, 8)
+  )
+```
+
+## So what?
+
+Chronologia sama z siebie nie opowiada historii. Dopiero świadome zarządzanie
+uwagą sprawia, że odbiorca wie, gdzie patrzeć i jaki trend warto zapamiętać.
+
+## Zadanie
+
+Wybierz inną spółkę z `stocks_cleaned.csv`, zrób z niej nowy punkt zapalny i
+sprawdź, jak zmienia się sens wykresu po zamianie bohatera opowieści.

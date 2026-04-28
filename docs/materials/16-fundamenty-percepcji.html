@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Załącznik A — Katalog danych – Wizualizacja danych w R</title>
+<title>17&nbsp; Fundamenty percepcji – Wizualizacja danych w R</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -33,7 +68,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../materials/20-wielowymiarowa-opowiesc.html" rel="prev">
+<link href="../materials/17-architektura-czasu.html" rel="next">
+<link href="../materials/15-heatmap.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -71,6 +107,10 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Szukaj"
   }
 }</script>
+<link href="../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+
+<script src="../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
 
 
 <link rel="stylesheet" href="../styles/course.css">
@@ -85,7 +125,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Przełącz pasek boczny" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../materials/99-data-catalog.html">Załączniki</a></li><li class="breadcrumb-item"><a href="../materials/99-data-catalog.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Katalog danych</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../materials/16-fundamenty-percepcji.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Fundamenty percepcji</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Przełącz pasek boczny" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Szukaj" onclick="window.quartoOpenSearch();">
@@ -208,7 +248,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../materials/16-fundamenty-percepcji.html" class="sidebar-item-text sidebar-link">
+  <a href="../materials/16-fundamenty-percepcji.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Fundamenty percepcji</span></span></a>
   </div>
 </li>
@@ -247,7 +287,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../materials/99-data-catalog.html" class="sidebar-item-text sidebar-link active">
+  <a href="../materials/99-data-catalog.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Katalog danych</span></span></a>
   </div>
 </li>
@@ -262,9 +302,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content column-page-right" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../materials/99-data-catalog.html">Załączniki</a></li><li class="breadcrumb-item"><a href="../materials/99-data-catalog.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Katalog danych</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Załącznik A — Katalog danych</h1>
+<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Fundamenty percepcji</span></h1>
 </div>
 
 
@@ -281,152 +321,123 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="katalog-danych" class="level1" data-number="B">
-<h1 data-number="B"><span class="header-section-number">B</span> Katalog danych</h1>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 23%">
-<col style="width: 30%">
-<col style="width: 23%">
-<col style="width: 23%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Plik</th>
-<th style="text-align: right;">Rozmiar dydaktyczny</th>
-<th>Najlepsze zastosowanie</th>
-<th>Uwagi</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>datasets/mpg.csv</code></td>
-<td style="text-align: right;">399 wierszy</td>
-<td>wykres punktowy (scatter plot), kolor, panele (facets), trend</td>
-<td>Dobry zbiór danych na start.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/insurance_premiums.csv</code></td>
-<td style="text-align: right;">52 wiersze</td>
-<td>regresja, etykiety, regiony</td>
-<td>Dobry do pierwszych mapowań i <code>geom_smooth()</code>.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/schoolimprovement2010grants.csv</code></td>
-<td style="text-align: right;">758 wierszy</td>
-<td>histogramy, wykresy pudełkowe (boxplots), kategorie</td>
-<td>Ma pierwszą kolumnę indeksową bez nazwy.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/FY18_4050_FMRs.csv</code></td>
-<td style="text-align: right;">4770 wierszy</td>
-<td>rozkłady, skale, obserwacje odstające</td>
-<td>Czynsze rynkowe, wiele zmiennych numerycznych.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/bike_share.csv</code></td>
-<td style="text-align: right;">731 wierszy</td>
-<td>szeregi czasowe, sezonowość, wykres heksagonalny (hexbin plot)</td>
-<td>Daty dzienne, dobra struktura.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/climate_change.csv</code></td>
-<td style="text-align: right;">707 wierszy</td>
-<td>linie, dwie serie, narracja</td>
-<td>Dobry do osi czasu i etykiet.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/stocks_cleaned.csv</code></td>
-<td style="text-align: right;">139501 wierszy</td>
-<td>szeregi czasowe i interaktywność</td>
-<td>Warto filtrować do jednej spółki.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/seattle_weather.csv</code></td>
-<td style="text-align: right;">205 wierszy</td>
-<td>małe wielokrotności (small multiples), brak danych</td>
-<td><code>-7777</code> oznacza braki.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/austin_weather.csv</code></td>
-<td style="text-align: right;">13 wierszy</td>
-<td>porównanie miesięcy</td>
-<td><code>-7777</code> oznacza braki.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/medals_by_country_2016.csv</code></td>
-<td style="text-align: right;">11 wierszy</td>
-<td>wykresy słupkowe (bar charts), zmiana układu danych</td>
-<td>Ma pierwszą kolumnę bez nazwy.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/summer2016.csv</code></td>
-<td style="text-align: right;">2015 wierszy</td>
-<td>kategorie, sport, wzrost, medal</td>
-<td>Ma pierwszą kolumnę indeksową.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/daily_show_guests_cleaned.csv</code></td>
-<td style="text-align: right;">2694 wiersze</td>
-<td>mapa ciepła (heatmap) i tabele krzyżowe</td>
-<td>Dobry do <code>count()</code> i <code>pivot_wider()</code>.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/college_datav3.csv</code></td>
-<td style="text-align: right;">6703 wiersze</td>
-<td>podział na panele (faceting), wykres punktowy (scatter plot), instytucje</td>
-<td>Duży, dobry do późniejszych rozdziałów.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/melb_clean.csv</code></td>
-<td style="text-align: right;">13581 wierszy</td>
-<td>ceny, transformacje, obserwacje odstające (outliers)</td>
-<td>Ma pierwszą kolumnę indeksową.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/bakery.csv</code></td>
-<td style="text-align: right;">17487 wierszy</td>
-<td>kategorie, dni tygodnia, agregacje</td>
-<td>Dobry do <code>count()</code> i rankingu.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/nba.csv</code></td>
-<td style="text-align: right;">425 wierszy</td>
-<td>wykres punktowy (scatter plot), etykiety, interaktywność</td>
-<td>Dobry do Plotly.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/countries-of-the-world.csv</code></td>
-<td style="text-align: right;">228 wierszy</td>
-<td>czyszczenie nazw, geografia</td>
-<td>Nazwy kolumn wymagają czyszczenia.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/student-alcohol-consumption.csv</code></td>
-<td style="text-align: right;">396 wierszy</td>
-<td>kategorie, wykresy pudełkowe (boxplots), edukacja</td>
-<td>Ma pierwszą kolumnę indeksową.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/young-people-survey-responses.csv</code></td>
-<td style="text-align: right;">1011 wierszy</td>
-<td>ankiety, skale Likerta</td>
-<td>Ma sporo kolumn, dobre na projekt.</td>
-</tr>
-<tr class="even">
-<td><code>datasets/bike_v1.csv</code></td>
-<td style="text-align: right;">1237 wierszy</td>
-<td>import trudniejszych danych</td>
-<td>Wartości rozdzielone białymi znakami mimo rozszerzenia <code>.csv</code>.</td>
-</tr>
-<tr class="odd">
-<td><code>datasets/bike_2.csv</code></td>
-<td style="text-align: right;">1237 wierszy</td>
-<td>diagnostyka importu</td>
-<td>Wartości rozdzielone białymi znakami, nie na początek pracy.</td>
-</tr>
-</tbody>
-</table>
+<p>Wizualizacja nie jest konkursem na najbardziej efektowny kształt. Jeżeli odbiorca ma porównać wielkości, najbezpieczniej jest dać mu <strong>wspólną oś i długość</strong>, a nie kąt i pole. Na prostym przykładzie z medalami olimpijskimi zobaczymy, dlaczego wykres kołowy szybko traci czytelność i jak naprawić go rankingiem słupkowym.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"theme_course.R"</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_course</span>())</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="przygotowanie-danych" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="przygotowanie-danych"><span class="header-section-number">17.1</span> Przygotowanie danych</h2>
+<p>Skorzystamy z pliku <code>medals_by_country_2016.csv</code>. Policzymy łączną liczbę medali, zostawimy sześć krajów z najwyższym wynikiem i połączymy resztę w kategorię <code>Pozostałe</code>. To dokładnie ten moment, w którym pie chart wydaje się kuszący.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>medals <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">here</span>(<span class="st">"datasets"</span>, <span class="st">"medals_by_country_2016.csv"</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">country =</span> <span class="st">`</span><span class="at">...1</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> Bronze <span class="sc">+</span> Gold <span class="sc">+</span> Silver) <span class="sc">|&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>medals_pie <span class="ot">&lt;-</span> medals <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    medals <span class="sc">|&gt;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">slice</span>(<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">country =</span> <span class="st">"Pozostałe"</span>, <span class="at">total =</span> <span class="fu">sum</span>(total))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">share =</span> total <span class="sc">/</span> <span class="fu">sum</span>(total),</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(country, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, scales<span class="sc">::</span><span class="fu">percent</span>(share, <span class="at">accuracy =</span> <span class="dv">1</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>medals_bar <span class="ot">&lt;-</span> medals_pie <span class="sc">|&gt;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country =</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(country, total))</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="wersja-która-utrudnia-porównanie" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="wersja-która-utrudnia-porównanie"><span class="header-section-number">17.2</span> Wersja, która utrudnia porównanie</h2>
+<p>Sam fakt, że pie chart da się narysować, nie oznacza jeszcze, że jest dobrym pomysłem. Przy sześciu-siedmiu kategoriach odbiorca musi porównywać kąty i pola, a nie długości. Gdybyśmy dodali do tego perspektywę 3D, efekt byłby jeszcze gorszy.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(medals_pie, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> total, <span class="at">fill =</span> country)) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_polar</span>(<span class="at">theta =</span> <span class="st">"y"</span>) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>(<span class="at">option =</span> <span class="st">"D"</span>, <span class="at">end =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Pie chart szybko traci precyzję odczytu"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Sześć krajów z największą liczbą medali oraz jedna kategoria zbiorcza"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Kraj"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Źródło: datasets/medals_by_country_2016.csv"</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-pie-medals" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Wykres kołowy przedstawia udziały sześciu krajów i kategorii Pozostałe w łącznej liczbie medali. Widać dominację Stanów Zjednoczonych, ale różnice między pozostałymi krajami trudno ocenić dokładnie.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pie-medals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="16-fundamenty-percepcji_files/figure-html/fig-pie-medals-1.png" class="img-fluid figure-img" alt="Wykres kołowy przedstawia udziały sześciu krajów i kategorii Pozostałe w łącznej liczbie medali. Widać dominację Stanów Zjednoczonych, ale różnice między pozostałymi krajami trudno ocenić dokładnie." width="1368">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pie-medals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Rysunek&nbsp;17.1: Wykres kołowy pokazuje udział medali, ale utrudnia precyzyjne porównanie sąsiadujących kategorii.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="naprawa-ranking-słupkowy" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="naprawa-ranking-słupkowy"><span class="header-section-number">17.3</span> Naprawa: ranking słupkowy</h2>
+<p>Ten sam komunikat da się pokazać czytelniej. Na wspólnej osi od razu widać nie tylko lidera, ale też różnice między Niemcami, Wielką Brytanią, Rosją i Chinami.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(medals_bar, <span class="fu">aes</span>(<span class="at">x =</span> total, <span class="at">y =</span> country)) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#0072B2"</span>, <span class="at">width =</span> <span class="fl">0.72</span>) <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> scales<span class="sc">::</span><span class="fu">comma</span>(total)),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.15</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">3.6</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_comma</span>(<span class="at">big.mark =</span> <span class="st">" "</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.12</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">"off"</span>) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Długość wygrywa z kątem, gdy liczy się porównanie"</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Ten sam zbiór danych zamieniony z geometrii kołowej na liniową"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Łączna liczba medali"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Źródło: datasets/medals_by_country_2016.csv"</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-bar-medals" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Poziomy wykres słupkowy pokazuje ranking krajów według liczby medali. Stany Zjednoczone są wyraźnie pierwsze, a pozostałe kraje można łatwo porównać względem wspólnej osi.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-medals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="16-fundamenty-percepcji_files/figure-html/fig-bar-medals-1.png" class="img-fluid figure-img" alt="Poziomy wykres słupkowy pokazuje ranking krajów według liczby medali. Stany Zjednoczone są wyraźnie pierwsze, a pozostałe kraje można łatwo porównać względem wspólnej osi." width="1368">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-medals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Rysunek&nbsp;17.2: Poziomy wykres słupkowy pozwala szybciej i dokładniej porównać liczbę medali.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="so-what" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="so-what"><span class="header-section-number">17.4</span> So what?</h2>
+<p>To nie jest poprawka kosmetyczna. Zmieniliśmy wykres z takiego, który wymaga mentalnej gimnastyki, na taki, który szanuje czas odbiorcy i pozwala odczytać hierarchię niemal natychmiast.</p>
+</section>
+<section id="zadanie" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="zadanie"><span class="header-section-number">17.5</span> Zadanie</h2>
+<p>Zrób tę samą operację dla innego podziału kategorii z repozytorium. Najpierw narysuj wersję mniej czytelną, a potem przerób ją na ranking słupkowy z sortowaniem przez <code>forcats::fct_reorder()</code>.</p>
 
 
 </section>
@@ -834,11 +845,14 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation column-page-right">
   <div class="nav-page nav-page-previous">
-      <a href="../materials/20-wielowymiarowa-opowiesc.html" class="pagination-link" aria-label="Wielowymiarowa opowieść">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Wielowymiarowa opowieść</span></span>
+      <a href="../materials/15-heatmap.html" class="pagination-link" aria-label="Wykres Heatmap">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Wykres Heatmap</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../materials/17-architektura-czasu.html" class="pagination-link" aria-label="Architektura czasu">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Architektura czasu</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

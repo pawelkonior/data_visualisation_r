@@ -1,0 +1,122 @@
+---
+title: "Fundamenty percepcji"
+---
+
+Wizualizacja nie jest konkursem na najbardziej efektowny kształt. Jeżeli odbiorca
+ma porównać wielkości, najbezpieczniej jest dać mu **wspólną oś i długość**, a nie
+kąt i pole. Na prostym przykładzie z medalami olimpijskimi zobaczymy, dlaczego
+wykres kołowy szybko traci czytelność i jak naprawić go rankingiem słupkowym.
+
+```{r}
+#| label: setup-16
+library(tidyverse)
+library(here)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Skorzystamy z pliku `medals_by_country_2016.csv`. Policzymy łączną liczbę medali,
+zostawimy sześć krajów z najwyższym wynikiem i połączymy resztę w kategorię
+`Pozostałe`. To dokładnie ten moment, w którym pie chart wydaje się kuszący.
+
+```{r}
+#| label: data-prep-16
+medals <- readr::read_csv(
+  here("datasets", "medals_by_country_2016.csv"),
+  show_col_types = FALSE
+) |>
+  rename(country = `...1`) |>
+  mutate(total = Bronze + Gold + Silver) |>
+  arrange(desc(total))
+
+medals_pie <- medals |>
+  slice_head(n = 6) |>
+  bind_rows(
+    medals |>
+      slice(-(1:6)) |>
+      summarise(country = "Pozostałe", total = sum(total))
+  ) |>
+  mutate(
+    share = total / sum(total),
+    label = paste0(country, "\n", scales::percent(share, accuracy = 1))
+  )
+
+medals_bar <- medals_pie |>
+  mutate(country = forcats::fct_reorder(country, total))
+```
+
+## Wersja, która utrudnia porównanie
+
+Sam fakt, że pie chart da się narysować, nie oznacza jeszcze, że jest dobrym
+pomysłem. Przy sześciu-siedmiu kategoriach odbiorca musi porównywać kąty i pola,
+a nie długości. Gdybyśmy dodali do tego perspektywę 3D, efekt byłby jeszcze gorszy.
+
+```{r}
+#| label: fig-pie-medals
+#| fig-cap: "Wykres kołowy pokazuje udział medali, ale utrudnia precyzyjne porównanie sąsiadujących kategorii."
+#| fig-alt: "Wykres kołowy przedstawia udziały sześciu krajów i kategorii Pozostałe w łącznej liczbie medali. Widać dominację Stanów Zjednoczonych, ale różnice między pozostałymi krajami trudno ocenić dokładnie."
+ggplot(medals_pie, aes(x = "", y = total, fill = country)) +
+  geom_col(width = 1, color = "white", linewidth = 0.8) +
+  coord_polar(theta = "y") +
+  scale_fill_viridis_d(option = "D", end = 0.9) +
+  labs(
+    title = "Pie chart szybko traci precyzję odczytu",
+    subtitle = "Sześć krajów z największą liczbą medali oraz jedna kategoria zbiorcza",
+    fill = "Kraj",
+    caption = "Źródło: datasets/medals_by_country_2016.csv"
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+## Naprawa: ranking słupkowy
+
+Ten sam komunikat da się pokazać czytelniej. Na wspólnej osi od razu widać nie
+tylko lidera, ale też różnice między Niemcami, Wielką Brytanią, Rosją i Chinami.
+
+```{r}
+#| label: fig-bar-medals
+#| fig-cap: "Poziomy wykres słupkowy pozwala szybciej i dokładniej porównać liczbę medali."
+#| fig-alt: "Poziomy wykres słupkowy pokazuje ranking krajów według liczby medali. Stany Zjednoczone są wyraźnie pierwsze, a pozostałe kraje można łatwo porównać względem wspólnej osi."
+ggplot(medals_bar, aes(x = total, y = country)) +
+  geom_col(fill = "#0072B2", width = 0.72) +
+  geom_text(
+    aes(label = scales::comma(total)),
+    hjust = -0.15,
+    size = 3.6
+  ) +
+  scale_x_continuous(
+    labels = scales::label_comma(big.mark = " "),
+    expand = expansion(mult = c(0, 0.12))
+  ) +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Długość wygrywa z kątem, gdy liczy się porównanie",
+    subtitle = "Ten sam zbiór danych zamieniony z geometrii kołowej na liniową",
+    x = "Łączna liczba medali",
+    y = NULL,
+    caption = "Źródło: datasets/medals_by_country_2016.csv"
+  ) +
+  theme(
+    panel.grid.major.y = element_blank()
+  )
+```
+
+## So what?
+
+To nie jest poprawka kosmetyczna. Zmieniliśmy wykres z takiego, który wymaga
+mentalnej gimnastyki, na taki, który szanuje czas odbiorcy i pozwala odczytać
+hierarchię niemal natychmiast.
+
+## Zadanie
+
+Zrób tę samą operację dla innego podziału kategorii z repozytorium. Najpierw
+narysuj wersję mniej czytelną, a potem przerób ją na ranking słupkowy z sortowaniem
+przez `forcats::fct_reorder()`.
