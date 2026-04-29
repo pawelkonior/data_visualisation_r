@@ -1009,5 +1009,325 @@
     "crumbs": [
       "<span class='chapter-number'>21</span>  <span class='chapter-title'>Wielowymiarowa opowieść</span>"
     ]
+  },
+  {
+    "objectID": "materials/21-ewolucja-wizualizacji.html",
+    "href": "materials/21-ewolucja-wizualizacji.html",
+    "title": "22  Ewolucja wizualizacji",
+    "section": "",
+    "text": "22.1 Przygotowanie danych\nWizualizacja zaczyna się tam, gdzie przestajemy traktować tabelę jako cel sam w sobie. Surowe rekordy są jeszcze tylko zapisem zdarzeń. Dopiero wybór osi, koloru i układu zamienia je w kod, który nasz układ wzrokowy potrafi czytać niemal natychmiast.\nNa zbiorze bakery.csv pokażemy prostą drogę: od wielu pojedynczych transakcji do syntetycznego obrazu rytmu sprzedaży. Interesuje nas łączna sprzedaż według typu dnia i pory dnia.\nbakery_grid &lt;- readr::read_csv(\n  here(\"datasets\", \"bakery.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  count(day_type, day_time, wt = sales, name = \"sales_total\") |&gt;\n  mutate(\n    day_type = factor(day_type, levels = c(\"Weekday\", \"Weekend\")),\n    day_time = factor(day_time, levels = c(\"Morning\", \"Afternoon\", \"Evening\", \"Night\")),\n    sales_label = scales::label_number(accuracy = 1, big.mark = \" \")(sales_total)\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Ewolucja wizualizacji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/21-ewolucja-wizualizacji.html#surowa-tabela-jeszcze-nie-buduje-obrazu",
+    "href": "materials/21-ewolucja-wizualizacji.html#surowa-tabela-jeszcze-nie-buduje-obrazu",
+    "title": "22  Ewolucja wizualizacji",
+    "section": "22.2 Surowa tabela jeszcze nie buduje obrazu",
+    "text": "22.2 Surowa tabela jeszcze nie buduje obrazu\nTabela jest poprawna i potrzebna, ale odbiorca musi ją dopiero mentalnie przetworzyć. To dobry moment, by przypomnieć sobie, że wykres jest systemem znaków, który ma skrócić tę pracę.\n\n\n\nTabela 22.1: Podsumowanie sprzedaży w piekarni według typu dnia i pory dnia.\n\n\nbakery_grid |&gt;\n  mutate(\n    day_type = recode(day_type, Weekday = \"Dzień roboczy\", Weekend = \"Weekend\"),\n    day_time = recode(day_time, Morning = \"Rano\", Afternoon = \"Popołudnie\", Evening = \"Wieczór\", Night = \"Noc\")\n  ) |&gt;\n  select(`Typ dnia` = day_type, `Pora dnia` = day_time, `Sprzedaż` = sales_total) |&gt;\n  knitr::kable(digits = 1, caption = \"Podsumowanie sprzedaży w piekarni według typu dnia i pory dnia.\")\n\n\n\nTyp dnia\nPora dnia\nSprzedaż\n\n\n\n\nDzień roboczy\nPopołudnie\n12940.5\n\n\nDzień roboczy\nWieczór\n522.8\n\n\nDzień roboczy\nRano\n8982.9\n\n\nDzień roboczy\nNoc\n2.4\n\n\nWeekend\nPopołudnie\n7261.6\n\n\nWeekend\nWieczór\n161.2\n\n\nWeekend\nRano\n5374.2\n\n\nWeekend\nNoc\n3.8",
+    "crumbs": [
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Ewolucja wizualizacji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/21-ewolucja-wizualizacji.html#kod-wizualny-przyspiesza-rozumienie",
+    "href": "materials/21-ewolucja-wizualizacji.html#kod-wizualny-przyspiesza-rozumienie",
+    "title": "22  Ewolucja wizualizacji",
+    "section": "22.3 Kod wizualny przyspiesza rozumienie",
+    "text": "22.3 Kod wizualny przyspiesza rozumienie\nTen sam komunikat da się zapisać jako siatkę barw i liczb. W jednej chwili widać, że piekarnia zarabia głównie rano i po południu, a godziny nocne są praktycznie martwe.\n\nggplot(bakery_grid, aes(x = day_type, y = day_time, fill = sales_total)) +\n  geom_tile(color = \"white\", linewidth = 1.2, width = 0.96, height = 0.96) +\n  geom_text(aes(label = sales_label), size = 4, color = \"white\", fontface = \"bold\") +\n  scale_fill_viridis_c(option = \"C\", end = 0.92, guide = \"none\") +\n  labs(\n    title = \"Wizualizacja działa jak algorytm kompresji informacji\",\n    subtitle = \"Zamiast czytać osiem wartości po kolei, odbiorca od razu widzi rytm sprzedaży\",\n    x = NULL,\n    y = NULL,\n    caption = \"Źródło: datasets/bakery.csv\"\n  ) +\n  theme(\n    panel.grid = element_blank(),\n    axis.text.x = element_text(face = \"bold\"),\n    axis.text.y = element_text(face = \"bold\")\n  )\n\n\n\n\n\n\n\nRysunek 22.1: Mapa ciepła zamienia tabelę sprzedaży w szybki do odczytu kod wizualny.",
+    "crumbs": [
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Ewolucja wizualizacji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/21-ewolucja-wizualizacji.html#so-what",
+    "href": "materials/21-ewolucja-wizualizacji.html#so-what",
+    "title": "22  Ewolucja wizualizacji",
+    "section": "22.4 So what?",
+    "text": "22.4 So what?\nEwolucja wizualizacji to przejście od dosłownego zapisu do abstrakcyjnego kodu. Dobra grafika nie ozdabia tabeli. Ona przejmuje część pracy poznawczej za odbiorcę.",
+    "crumbs": [
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Ewolucja wizualizacji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/21-ewolucja-wizualizacji.html#zadanie",
+    "href": "materials/21-ewolucja-wizualizacji.html#zadanie",
+    "title": "22  Ewolucja wizualizacji",
+    "section": "22.5 Zadanie",
+    "text": "22.5 Zadanie\nWeź inny zbiór transakcyjny albo kategoryczny z repozytorium i spróbuj przejść tę samą drogę: od tabeli agregatów do prostego układu wizualnego, który da się zrozumieć szybciej niż tekst.",
+    "crumbs": [
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Ewolucja wizualizacji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/22-architektura-dowodu.html",
+    "href": "materials/22-architektura-dowodu.html",
+    "title": "23  Architektura dowodu",
+    "section": "",
+    "text": "23.1 Przygotowanie danych\nW rękach analityka wykres może pełnić dwie role jednocześnie: być narzędziem badawczym i narzędziem perswazji. John Snow używał mapy, by zawęzić źródło problemu. Florence Nightingale używała koloru i pola, by wymusić reakcję polityczną.\nNie mamy tu danych epidemiologicznych, ale mamy dwa zbiory pogodowe: seattle_weather.csv i austin_weather.csv. Zestawimy miesięczne normy opadów, żeby zobaczyć, jak ten sam fakt można pokazać bardziej neutralnie albo bardziej perswazyjnie.\nweather_compare &lt;- bind_rows(\n  readr::read_csv(here(\"datasets\", \"seattle_weather.csv\"), show_col_types = FALSE) |&gt;\n    janitor::clean_names() |&gt;\n    transmute(\n      city = \"Seattle\",\n      month = as.integer(date),\n      precipitation = mly_prcp_normal\n    ),\n  readr::read_csv(here(\"datasets\", \"austin_weather.csv\"), show_col_types = FALSE) |&gt;\n    janitor::clean_names() |&gt;\n    transmute(\n      city = \"Austin\",\n      month = as.integer(date),\n      precipitation = mly_prcp_normal\n    )\n) |&gt;\n  mutate(\n    month_label = factor(month.abb[month], levels = month.abb),\n    precipitation_area = sqrt(precipitation)\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>Architektura dowodu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/22-architektura-dowodu.html#dowód-analityczny-spokojne-porównanie",
+    "href": "materials/22-architektura-dowodu.html#dowód-analityczny-spokojne-porównanie",
+    "title": "23  Architektura dowodu",
+    "section": "23.2 Dowód analityczny: spokojne porównanie",
+    "text": "23.2 Dowód analityczny: spokojne porównanie\nNa zwykłym wykresie liniowym dane są czytelne i łatwo porównać rytm sezonowy. Widać, że Seattle ma wyraźniejszy jesienno-zimowy pik opadów niż Austin.\n\nggplot(weather_compare, aes(x = month_label, y = precipitation, group = city, color = city)) +\n  geom_line(linewidth = 1) +\n  geom_point(size = 2.4) +\n  scale_color_manual(values = c(\"Seattle\" = \"#2C7FB8\", \"Austin\" = \"#D95F02\")) +\n  labs(\n    title = \"Najpierw wykres może po prostu porównywać\",\n    subtitle = \"Miesięczne normy opadów w dwóch miastach\",\n    x = NULL,\n    y = \"Opady (cale)\",\n    color = \"Miasto\",\n    caption = \"Źródło: datasets/seattle_weather.csv oraz datasets/austin_weather.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 23.1: Wykres liniowy dobrze sprawdza się jako spokojne narzędzie porównawcze.",
+    "crumbs": [
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>Architektura dowodu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/22-architektura-dowodu.html#dowód-perswazyjny-forma-zarządza-uwagą",
+    "href": "materials/22-architektura-dowodu.html#dowód-perswazyjny-forma-zarządza-uwagą",
+    "title": "23  Architektura dowodu",
+    "section": "23.3 Dowód perswazyjny: forma zarządza uwagą",
+    "text": "23.3 Dowód perswazyjny: forma zarządza uwagą\nWykres inspirowany Nightingale nie jest już tylko neutralnym zapisem. Ta forma bardziej eksponuje sezonowość, bo wzrost pola wizualnie wzmacnia różnice między miesiącami o małych i dużych opadach.\n\nggplot(weather_compare, aes(x = month_label, y = precipitation_area, fill = city)) +\n  geom_col(color = \"white\", linewidth = 0.9, width = 1) +\n  coord_polar() +\n  facet_wrap(~ city) +\n  scale_fill_manual(values = c(\"Seattle\" = \"#2C7FB8\", \"Austin\" = \"#D95F02\"), guide = \"none\") +\n  labs(\n    title = \"Forma wykresu może zamieniać informację w argument\",\n    subtitle = \"Promień jest skalowany pierwiastkiem z opadów, aby pole sektorów lepiej odpowiadało wielkości danych\",\n    x = NULL,\n    y = NULL,\n    caption = \"Źródło: datasets/seattle_weather.csv oraz datasets/austin_weather.csv\"\n  ) +\n  theme(\n    axis.text.y = element_blank(),\n    axis.ticks = element_blank(),\n    panel.grid = element_blank(),\n    strip.text = element_text(face = \"bold\", size = 12)\n  )\n\n\n\n\n\n\n\nRysunek 23.2: Wykres polarny inspirowany Nightingale wzmacnia sezonowy rytm opadów przez użycie pola i koloru.",
+    "crumbs": [
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>Architektura dowodu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/22-architektura-dowodu.html#so-what",
+    "href": "materials/22-architektura-dowodu.html#so-what",
+    "title": "23  Architektura dowodu",
+    "section": "23.4 So what?",
+    "text": "23.4 So what?\nArchitektura dowodu polega na świadomym wyborze formy. Czasem potrzebujesz wykresu, który pomaga badać świat. Czasem takiego, który pomaga przekonać innych, że świat wymaga reakcji.",
+    "crumbs": [
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>Architektura dowodu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/22-architektura-dowodu.html#zadanie",
+    "href": "materials/22-architektura-dowodu.html#zadanie",
+    "title": "23  Architektura dowodu",
+    "section": "23.5 Zadanie",
+    "text": "23.5 Zadanie\nWeź jedną prostą serię czasową z repozytorium i pokaż ją w dwóch wersjach: analitycznej i perswazyjnej. Potem zapisz, która forma lepiej służy odkrywaniu, a która lepiej służy przekonywaniu.",
+    "crumbs": [
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>Architektura dowodu</span>"
+    ]
+  },
+  {
+    "objectID": "materials/23-zlozonosc-vs-klarownosc.html",
+    "href": "materials/23-zlozonosc-vs-klarownosc.html",
+    "title": "24  Złożoność vs. klarowność",
+    "section": "",
+    "text": "24.1 Przygotowanie danych\nGęsty wykres nie musi być zły. Minard udowodnił, że nawet wiele wymiarów naraz może pozostać czytelne, jeśli każdy kanał wizualny ma jedną pracę i nie konkuruje z innymi bez potrzeby.\nNa danych z summer2016.csv wybierzemy sześć sportów o wyraźnie różnych profilach fizycznych. To dobry materiał do wykresu wielowymiarowego: wysokość i masa na osiach, wiek jako rozmiar punktu, a płeć jako kolor.\nselected_sports &lt;- c(\"Athletics\", \"Basketball\", \"Gymnastics\", \"Rowing\", \"Swimming\", \"Volleyball\")\n\nolympians &lt;- readr::read_csv(\n  here(\"datasets\", \"summer2016.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  filter(\n    sport %in% selected_sports,\n    !is.na(height),\n    !is.na(weight),\n    !is.na(age)\n  ) |&gt;\n  mutate(\n    sex = recode(sex, F = \"Kobiety\", M = \"Mężczyźni\"),\n    sport = factor(sport, levels = selected_sports)\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>Złożoność vs. klarowność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/23-zlozonosc-vs-klarownosc.html#złożoność-bez-kontroli-szybko-staje-się-szumem",
+    "href": "materials/23-zlozonosc-vs-klarownosc.html#złożoność-bez-kontroli-szybko-staje-się-szumem",
+    "title": "24  Złożoność vs. klarowność",
+    "section": "24.2 Złożoność bez kontroli szybko staje się szumem",
+    "text": "24.2 Złożoność bez kontroli szybko staje się szumem\nW jednej płaszczyźnie próbujemy tu pokazać zbyt wiele rzeczy naraz. Wykres nie jest jeszcze bezużyteczny, ale wymaga coraz większego wysiłku, bo wszystkie sporty rywalizują o uwagę w tym samym miejscu.\n\nggplot(olympians, aes(x = height, y = weight, color = sport, shape = sex, size = age)) +\n  geom_point(alpha = 0.72) +\n  scale_color_viridis_d(option = \"D\", end = 0.9) +\n  scale_size_continuous(range = c(1.5, 7)) +\n  labs(\n    title = \"Wielowymiarowość bez hierarchii łatwo przeciąża wykres\",\n    subtitle = \"Sześć sportów, dwie płcie i wiek zakodowany rozmiarem punktu\",\n    x = \"Wzrost (cm)\",\n    y = \"Masa ciała (kg)\",\n    color = \"Sport\",\n    shape = \"Płeć\",\n    size = \"Wiek\",\n    caption = \"Źródło: datasets/summer2016.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 24.1: Zbyt wiele kategorii w jednej ramie utrudnia odczyt mimo poprawnych danych.",
+    "crumbs": [
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>Złożoność vs. klarowność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/23-zlozonosc-vs-klarownosc.html#klarowność-rośnie-gdy-rozdzielisz-role",
+    "href": "materials/23-zlozonosc-vs-klarownosc.html#klarowność-rośnie-gdy-rozdzielisz-role",
+    "title": "24  Złożoność vs. klarowność",
+    "section": "24.3 Klarowność rośnie, gdy rozdzielisz role",
+    "text": "24.3 Klarowność rośnie, gdy rozdzielisz role\nTeraz ten sam problem rozwiązujemy inaczej: sport dostaje własny panel, a w każdej ramce zostają już tylko płeć, wiek i relacja między wzrostem a wagą. Dzięki temu złożoność nie znika, ale staje się zarządzalna.\n\nggplot(olympians, aes(x = height, y = weight, color = sex, size = age)) +\n  geom_point(alpha = 0.72) +\n  facet_wrap(~ sport, ncol = 3) +\n  scale_color_manual(values = c(\"Kobiety\" = \"#C44E52\", \"Mężczyźni\" = \"#4C78A8\")) +\n  scale_size_continuous(range = c(1.4, 6)) +\n  labs(\n    title = \"Złożony wykres działa, gdy każdy kanał ma jedną funkcję\",\n    subtitle = \"Sport został rozdzielony do paneli, więc kolor i rozmiar mogą pełnić prostsze role\",\n    x = \"Wzrost (cm)\",\n    y = \"Masa ciała (kg)\",\n    color = \"Płeć\",\n    size = \"Wiek\",\n    caption = \"Źródło: datasets/summer2016.csv\"\n  ) +\n  theme(\n    legend.position = \"right\"\n  )\n\n\n\n\n\n\n\nRysunek 24.2: Podział na panele pozwala utrzymać wielowymiarowość bez utraty czytelności.",
+    "crumbs": [
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>Złożoność vs. klarowność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/23-zlozonosc-vs-klarownosc.html#so-what",
+    "href": "materials/23-zlozonosc-vs-klarownosc.html#so-what",
+    "title": "24  Złożoność vs. klarowność",
+    "section": "24.4 So what?",
+    "text": "24.4 So what?\nKlarowność nie wymaga upraszczania do jednego wymiaru. Wymaga dyscypliny w tym, który kanał pokazuje co i ile rzeczy dzieje się naraz w jednej ramie.",
+    "crumbs": [
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>Złożoność vs. klarowność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/23-zlozonosc-vs-klarownosc.html#zadanie",
+    "href": "materials/23-zlozonosc-vs-klarownosc.html#zadanie",
+    "title": "24  Złożoność vs. klarowność",
+    "section": "24.5 Zadanie",
+    "text": "24.5 Zadanie\nWybierz inny wielowymiarowy zbiór z repozytorium, na przykład college_datav3.csv albo nba.csv, i spróbuj przejść od wersji przeciążonej do takiej, w której złożoność jest nadal obecna, ale już nie dezorientuje.",
+    "crumbs": [
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>Złożoność vs. klarowność</span>"
+    ]
+  },
+  {
+    "objectID": "materials/24-psychologia-percepcji.html",
+    "href": "materials/24-psychologia-percepcji.html",
+    "title": "25  Psychologia percepcji",
+    "section": "",
+    "text": "25.1 Statystyka opisowa nie pokazuje całego rozkładu\nStatystyka opisowa jest potrzebna, ale sama w sobie nie wystarcza. Gdy patrzymy tylko na jedną liczbę, łatwo przeoczyć rozkład. Gdy używamy złej geometrii, łatwo przesadzić z efektem wizualnym. To właśnie tu spotykają się lekcje Anscombe’a i Tuftego.\nNa rynku nieruchomości średnie i mediany są wygodne, ale bardzo szybko ukrywają to, co naprawdę ważne: szerokość rozrzutu i obecność drogich obserwacji skrajnych.\nmelbourne_regions &lt;- readr::read_csv(\n  here(\"datasets\", \"melb_clean.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  filter(region %in% c(\"Southern\", \"Eastern\", \"Northern\", \"Western\", \"South-Eastern\")) |&gt;\n  select(region, price) |&gt;\n  drop_na(price)\n\nmelbourne_summary &lt;- melbourne_regions |&gt;\n  group_by(region) |&gt;\n  summarise(\n    mediana = median(price),\n    srednia = mean(price),\n    iqr = IQR(price),\n    .groups = \"drop\"\n  ) |&gt;\n  arrange(desc(mediana))\nTabela 25.1: Wybrane statystyki cen nieruchomości według regionu Melbourne.\n\n\nmelbourne_summary |&gt;\n  mutate(across(c(mediana, srednia, iqr), ~ round(.x, 0))) |&gt;\n  knitr::kable(caption = \"Wybrane statystyki cen nieruchomości według regionu Melbourne.\")\n\n\n\nregion\nmediana\nsrednia\niqr\n\n\n\n\nSouthern\n1250000\n1372963\n1040000\n\n\nEastern\n1010000\n1104080\n554000\n\n\nSouth-Eastern\n850000\n922944\n402750\n\n\nNorthern\n806250\n898171\n500000\n\n\nWestern\n793000\n866421\n430000",
+    "crumbs": [
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>Psychologia percepcji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/24-psychologia-percepcji.html#dopiero-wykres-ujawnia-kształt-i-ryzyko",
+    "href": "materials/24-psychologia-percepcji.html#dopiero-wykres-ujawnia-kształt-i-ryzyko",
+    "title": "25  Psychologia percepcji",
+    "section": "25.2 Dopiero wykres ujawnia kształt i ryzyko",
+    "text": "25.2 Dopiero wykres ujawnia kształt i ryzyko\nPo przejściu na boxplot widzimy to, czego tabela nie pokazuje: skrajne obserwacje i bardzo różną szerokość rozkładów między regionami.\n\nggplot(\n  melbourne_regions |&gt; mutate(region = forcats::fct_reorder(region, price, .fun = median)),\n  aes(x = price, y = region)\n) +\n  geom_boxplot(fill = \"#6C9A8B\", alpha = 0.85, outlier.alpha = 0.18) +\n  scale_x_continuous(labels = scales::label_number(big.mark = \" \")) +\n  labs(\n    title = \"Jedna liczba nie zastąpi obrazu rozkładu\",\n    subtitle = \"Ceny nieruchomości mają różną zmienność i skrajne obserwacje w zależności od regionu\",\n    x = \"Cena\",\n    y = NULL,\n    caption = \"Źródło: datasets/melb_clean.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 25.1: Boxplot odsłania rozrzut i obserwacje skrajne, których nie widać w samej tabeli statystyk.",
+    "crumbs": [
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>Psychologia percepcji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/24-psychologia-percepcji.html#lie-factor-bar-chart-nie-może-oszukiwać-osią",
+    "href": "materials/24-psychologia-percepcji.html#lie-factor-bar-chart-nie-może-oszukiwać-osią",
+    "title": "25  Psychologia percepcji",
+    "section": "25.3 Lie factor: bar chart nie może oszukiwać osią",
+    "text": "25.3 Lie factor: bar chart nie może oszukiwać osią\nNa danych z college_datav3.csv policzymy medianę czesnego według typu własności. Najpierw pokażemy wersję z uciętą osią Y, która dramatyzuje różnice.\n\ncollege_tuition &lt;- readr::read_csv(\n  here(\"datasets\", \"college_datav3.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  group_by(ownership) |&gt;\n  summarise(median_tuition = median(tuition, na.rm = TRUE), .groups = \"drop\") |&gt;\n  mutate(ownership = forcats::fct_reorder(ownership, median_tuition))\n\n\nggplot(college_tuition, aes(x = ownership, y = median_tuition)) +\n  geom_col(fill = \"#C44E52\", width = 0.72) +\n  geom_text(aes(label = round(median_tuition)), vjust = -0.5, size = 3.6) +\n  coord_cartesian(ylim = c(7000, 22000)) +\n  labs(\n    title = \"Ta wersja przesadza z różnicami przez uciętą oś\",\n    subtitle = \"Bar chart wymaga zera, bo długość słupka jest nośnikiem porównania\",\n    x = NULL,\n    y = \"Mediana czesnego\",\n    caption = \"Źródło: datasets/college_datav3.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 25.2: Ucięta oś Y wzmacnia różnice wizualne bardziej, niż wynika to z danych.",
+    "crumbs": [
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>Psychologia percepcji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/24-psychologia-percepcji.html#naprawa-użyj-pozycji-zamiast-długości",
+    "href": "materials/24-psychologia-percepcji.html#naprawa-użyj-pozycji-zamiast-długości",
+    "title": "25  Psychologia percepcji",
+    "section": "25.4 Naprawa: użyj pozycji zamiast długości",
+    "text": "25.4 Naprawa: użyj pozycji zamiast długości\nJeżeli chcemy skupić się na różnicach bez startu od zera, lepszym wyborem jest wykres punktowy. Tu odbiorca porównuje pozycję na wspólnej osi, a nie długość.\n\nggplot(college_tuition, aes(x = median_tuition, y = ownership)) +\n  geom_segment(\n    aes(x = min(median_tuition), xend = median_tuition, yend = ownership),\n    color = \"#d6dde3\",\n    linewidth = 1.1\n  ) +\n  geom_point(size = 4, color = \"#0072B2\") +\n  scale_x_continuous(labels = scales::label_number(big.mark = \" \")) +\n  labs(\n    title = \"Ta sama informacja może być jednocześnie precyzyjna i uczciwa\",\n    subtitle = \"Pozycja na osi zastępuje długość słupka, więc nie potrzebujemy sztucznego zera\",\n    x = \"Mediana czesnego\",\n    y = NULL,\n    caption = \"Źródło: datasets/college_datav3.csv\"\n  ) +\n  theme(\n    panel.grid.major.y = element_blank()\n  )\n\n\n\n\n\n\n\nRysunek 25.3: Wykres punktowy pozwala pokazać różnice bez wprowadzania wizualnego kłamstwa.",
+    "crumbs": [
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>Psychologia percepcji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/24-psychologia-percepcji.html#so-what",
+    "href": "materials/24-psychologia-percepcji.html#so-what",
+    "title": "25  Psychologia percepcji",
+    "section": "25.5 So what?",
+    "text": "25.5 So what?\nPsychologia percepcji zaczyna się od pokory. Odbiorca nie widzi danych, tylko ich graficzną interpretację. Jeśli wybierzesz zły kanał albo złą skalę, podmienisz analizę na złudzenie.",
+    "crumbs": [
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>Psychologia percepcji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/24-psychologia-percepcji.html#zadanie",
+    "href": "materials/24-psychologia-percepcji.html#zadanie",
+    "title": "25  Psychologia percepcji",
+    "section": "25.6 Zadanie",
+    "text": "25.6 Zadanie\nZnajdź w swoich materiałach jeden wykres, który opiera się na pojedynczej statystyce albo przesadnie eksponuje różnice. Przerób go tak, by lepiej pokazywał rozkład lub używał uczciwszego kanału wizualnego.",
+    "crumbs": [
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>Psychologia percepcji</span>"
+    ]
+  },
+  {
+    "objectID": "materials/25-nowoczesny-storytelling.html",
+    "href": "materials/25-nowoczesny-storytelling.html",
+    "title": "26  Nowoczesny storytelling",
+    "section": "",
+    "text": "26.1 Przygotowanie danych\nStorytelling nie oznacza dopisywania anegdoty do gotowego wykresu. To projektowanie całego przepływu uwagi: od kontekstu, przez dowód, po działanie. Dobrze widać to na danych o gościach programu The Daily Show.\nNajpierw policzymy udziały najważniejszych grup gości w czasie. Interesuje nas szczególnie przejście od dominacji aktorów do silniejszej obecności mediów i polityki.\ndaily_show &lt;- readr::read_csv(\n  here(\"datasets\", \"daily_show_guests_cleaned.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  mutate(group = replace_na(group, \"Brak kategorii\"))\n\ntop_groups &lt;- daily_show |&gt;\n  count(group, sort = TRUE) |&gt;\n  slice_head(n = 6) |&gt;\n  pull(group)\n\ndaily_top &lt;- daily_show |&gt;\n  filter(group %in% top_groups) |&gt;\n  count(year, group) |&gt;\n  group_by(year) |&gt;\n  mutate(share = n / sum(n)) |&gt;\n  ungroup()\n\ndaily_story &lt;- daily_show |&gt;\n  count(year, group) |&gt;\n  group_by(year) |&gt;\n  mutate(share = n / sum(n)) |&gt;\n  ungroup() |&gt;\n  mutate(\n    focus = case_when(\n      group %in% c(\"Media\", \"Politician\", \"Government\", \"Political Aide\") ~ \"Media i polityka\",\n      group == \"Acting\" ~ \"Aktorzy\",\n      TRUE ~ \"Pozostałe\"\n    )\n  ) |&gt;\n  group_by(year, focus) |&gt;\n  summarise(share = sum(share), .groups = \"drop\")\n\ncrossover &lt;- daily_story |&gt;\n  select(year, focus, share) |&gt;\n  pivot_wider(names_from = focus, values_from = share) |&gt;\n  filter(`Media i polityka` &gt; Aktorzy) |&gt;\n  slice_head(n = 1)",
+    "crumbs": [
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>Nowoczesny storytelling</span>"
+    ]
+  },
+  {
+    "objectID": "materials/25-nowoczesny-storytelling.html#przed-wszystko-naraz",
+    "href": "materials/25-nowoczesny-storytelling.html#przed-wszystko-naraz",
+    "title": "26  Nowoczesny storytelling",
+    "section": "26.2 Przed: wszystko naraz",
+    "text": "26.2 Przed: wszystko naraz\nTo jest typowy wykres eksploracyjny. Nie jest błędny, ale nie odpowiada na jedno konkretne pytanie. Zbyt wiele linii i kolorów sprawia, że trudno zobaczyć główną zmianę.\n\nggplot(daily_top, aes(x = year, y = share, color = group)) +\n  geom_line(linewidth = 1) +\n  geom_point(size = 2) +\n  scale_y_continuous(labels = scales::label_percent(accuracy = 1)) +\n  scale_color_viridis_d(option = \"D\", end = 0.9) +\n  labs(\n    title = \"Eksploracja nie jest jeszcze opowieścią\",\n    subtitle = \"Udział sześciu najczęstszych grup gości w czasie\",\n    x = NULL,\n    y = \"Udział w danym roku\",\n    color = \"Grupa\",\n    caption = \"Źródło: datasets/daily_show_guests_cleaned.csv\"\n  )\n\n\n\n\n\n\n\nRysunek 26.1: Wersja eksploracyjna pokazuje wiele kategorii, ale nie prowadzi odbiorcy do jednego wniosku.",
+    "crumbs": [
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>Nowoczesny storytelling</span>"
+    ]
+  },
+  {
+    "objectID": "materials/25-nowoczesny-storytelling.html#po-kontekst-punkt-zwrotny-i-akcja",
+    "href": "materials/25-nowoczesny-storytelling.html#po-kontekst-punkt-zwrotny-i-akcja",
+    "title": "26  Nowoczesny storytelling",
+    "section": "26.3 Po: kontekst, punkt zwrotny i akcja",
+    "text": "26.3 Po: kontekst, punkt zwrotny i akcja\nTeraz wykres ma tezę. Szare tło daje kontekst, a dwa wyróżnione trendy pokazują zmianę redakcyjnej osi programu. Punktem zwrotnym jest rok 2004, gdy media i polityka wyprzedzają aktorów.\n\nggplot(daily_story, aes(x = year, y = share, group = focus)) +\n  geom_line(\n    data = filter(daily_story, focus == \"Pozostałe\"),\n    color = \"#c6cdd4\",\n    linewidth = 1\n  ) +\n  geom_line(\n    data = filter(daily_story, focus == \"Aktorzy\"),\n    color = \"#4C78A8\",\n    linewidth = 1.2\n  ) +\n  geom_line(\n    data = filter(daily_story, focus == \"Media i polityka\"),\n    color = \"#D55E00\",\n    linewidth = 1.35\n  ) +\n  geom_point(\n    data = crossover,\n    aes(x = year, y = `Media i polityka`),\n    inherit.aes = FALSE,\n    color = \"#D55E00\",\n    size = 3\n  ) +\n  geom_segment(\n    data = crossover,\n    aes(\n      x = year,\n      xend = year + 1.2,\n      y = `Media i polityka`,\n      yend = `Media i polityka` + 0.08\n    ),\n    inherit.aes = FALSE,\n    color = \"#7a8691\",\n    linewidth = 0.4\n  ) +\n  geom_text(\n    data = crossover,\n    aes(\n      x = year + 1.25,\n      y = `Media i polityka` + 0.085,\n      label = \"2004: media i polityka wyprzedzają aktorów\"\n    ),\n    inherit.aes = FALSE,\n    hjust = 0,\n    size = 3.5\n  ) +\n  scale_y_continuous(\n    labels = scales::label_percent(accuracy = 1),\n    expand = expansion(mult = c(0.02, 0.16))\n  ) +\n  scale_x_continuous(expand = expansion(mult = c(0.01, 0.12))) +\n  coord_cartesian(clip = \"off\") +\n  labs(\n    title = \"Dobra narracja pokazuje zmianę, a nie tylko przebieg danych\",\n    subtitle = \"The Daily Show przesuwa się od dominacji aktorów do silniejszej obecności mediów i polityki\",\n    x = NULL,\n    y = \"Udział w danym roku\",\n    caption = \"Źródło: datasets/daily_show_guests_cleaned.csv\"\n  ) +\n  theme(\n    plot.margin = margin(10, 110, 10, 10)\n  )\n\n\n\n\n\n\n\nRysunek 26.2: Wersja narracyjna ogranicza szum i prowadzi wzrok do kluczowej zmiany.",
+    "crumbs": [
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>Nowoczesny storytelling</span>"
+    ]
+  },
+  {
+    "objectID": "materials/25-nowoczesny-storytelling.html#pięć-lekcji-wdrożeniowych",
+    "href": "materials/25-nowoczesny-storytelling.html#pięć-lekcji-wdrożeniowych",
+    "title": "26  Nowoczesny storytelling",
+    "section": "26.4 Pięć lekcji wdrożeniowych",
+    "text": "26.4 Pięć lekcji wdrożeniowych\n\nZaczynaj od odbiorcy, nie od ulubionego typu wykresu.\nPokazuj jedną główną tezę na jednym obrazie.\nTło i kontekst mogą być szare, jeśli nie są bohaterem.\nKolor kontrastowy powinien mieć zadanie, a nie tylko dekorować.\nKażda opowieść potrzebuje punktu zwrotnego i sugestii działania.",
+    "crumbs": [
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>Nowoczesny storytelling</span>"
+    ]
+  },
+  {
+    "objectID": "materials/25-nowoczesny-storytelling.html#so-what",
+    "href": "materials/25-nowoczesny-storytelling.html#so-what",
+    "title": "26  Nowoczesny storytelling",
+    "section": "26.5 So what?",
+    "text": "26.5 So what?\nStorytelling redukuje koszt poznawczy po stronie odbiorcy. Zamiast prosić go, by sam znalazł sens w danych, budujesz drogę do wniosku i jasno pokazujesz moment zmiany.",
+    "crumbs": [
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>Nowoczesny storytelling</span>"
+    ]
+  },
+  {
+    "objectID": "materials/25-nowoczesny-storytelling.html#zadanie",
+    "href": "materials/25-nowoczesny-storytelling.html#zadanie",
+    "title": "26  Nowoczesny storytelling",
+    "section": "26.6 Zadanie",
+    "text": "26.6 Zadanie\nWeź jeden własny wykres eksploracyjny i przygotuj jego wersję narracyjną. Usuń co najmniej połowę kolorów, wskaż punkt zwrotny i dopisz jedno zdanie, które mówi, jaką decyzję taki wykres ma wspierać.",
+    "crumbs": [
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>Nowoczesny storytelling</span>"
+    ]
+  },
+  {
+    "objectID": "materials/26-podsumowanie.html",
+    "href": "materials/26-podsumowanie.html",
+    "title": "27  Podsumowanie",
+    "section": "",
+    "text": "27.1 Finałowa historia powinna kończyć się działaniem\nNa końcu całego procesu wizualizacja powinna robić jedną rzecz bardzo dobrze: pomagać komuś podjąć lepszą decyzję. To moment, w którym semiologia, percepcja i storytelling przestają być teorią, a stają się praktyką publikacji.\nNa danych schoolimprovement2010grants.csv sprawdzimy, jak rozkładają się środki między modele interwencji. To prosty przykład wykresu, który nie tylko raportuje, ale sugeruje, gdzie warto zacząć ewaluację programu.\ngrant_models &lt;- readr::read_csv(\n  here(\"datasets\", \"schoolimprovement2010grants.csv\"),\n  show_col_types = FALSE\n) |&gt;\n  janitor::clean_names() |&gt;\n  filter(!is.na(model_selected)) |&gt;\n  group_by(model_selected) |&gt;\n  summarise(\n    total_award = sum(award_amount, na.rm = TRUE),\n    schools = n(),\n    .groups = \"drop\"\n  ) |&gt;\n  mutate(\n    share = total_award / sum(total_award),\n    model_selected = forcats::fct_reorder(model_selected, total_award)\n  )\nggplot(\n  grant_models,\n  aes(\n    x = total_award,\n    y = model_selected,\n    fill = model_selected == \"Transformation\"\n  )\n) +\n  geom_col(width = 0.72) +\n  geom_text(\n    aes(label = scales::percent(share, accuracy = 0.1)),\n    hjust = -0.15,\n    size = 3.6\n  ) +\n  scale_fill_manual(values = c(\"TRUE\" = \"#D55E00\", \"FALSE\" = \"#c8d0d7\"), guide = \"none\") +\n  scale_x_continuous(\n    labels = scales::label_number(scale = 1e-6, suffix = \" mln\", accuracy = 1),\n    expand = expansion(mult = c(0, 0.16))\n  ) +\n  coord_cartesian(clip = \"off\") +\n  labs(\n    title = \"Jeśli 74% środków trafia do Transformacji, tam zaczyna się rozmowa o efekcie\",\n    subtitle = \"Łączna wartość grantów według modelu interwencji\",\n    x = \"Łączna kwota grantów\",\n    y = NULL,\n    caption = \"Źródło: datasets/schoolimprovement2010grants.csv\"\n  ) +\n  theme(\n    panel.grid.major.y = element_blank()\n  )\n\n\n\n\n\n\n\nRysunek 27.1: Końcowy wykres powinien prowadzić do pytania o działanie, a nie kończyć się na opisie.",
+    "crumbs": [
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>Podsumowanie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/26-podsumowanie.html#checklist-przed-publikacją",
+    "href": "materials/26-podsumowanie.html#checklist-przed-publikacją",
+    "title": "27  Podsumowanie",
+    "section": "27.2 Checklist przed publikacją",
+    "text": "27.2 Checklist przed publikacją\n\nCzy typ wykresu pasuje do pytania i kanału percepcyjnego?\nCzy odbiorca wie, na co ma spojrzeć w pierwszych trzech sekundach?\nCzy usunąłem elementy, które nie niosą informacji?\nCzy kolor działa jak reflektor, a nie jak konfetti?\nCzy wykres kończy się wnioskiem albo pytaniem decyzyjnym?",
+    "crumbs": [
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>Podsumowanie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/26-podsumowanie.html#krótki-szablon-końcowy",
+    "href": "materials/26-podsumowanie.html#krótki-szablon-końcowy",
+    "title": "27  Podsumowanie",
+    "section": "27.3 Krótki szablon końcowy",
+    "text": "27.3 Krótki szablon końcowy\n\nfinal_plot +\n  labs(\n    title = \"Najważniejszy wniosek\",\n    subtitle = \"Kontekst, zakres danych i odbiorca decyzji\",\n    caption = \"Źródło danych, ograniczenia i następny krok\"\n  )\n\n# Po wykresie dopisz jedno zdanie CTA:\n# \"Na tej podstawie rekomendujemy...\"",
+    "crumbs": [
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>Podsumowanie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/26-podsumowanie.html#so-what",
+    "href": "materials/26-podsumowanie.html#so-what",
+    "title": "27  Podsumowanie",
+    "section": "27.4 So what?",
+    "text": "27.4 So what?\nDane nie są jeszcze komunikacją. Stają się nią dopiero wtedy, gdy ich zapis wizualny pomaga komuś dostrzec sens i zdecydować, co zrobić dalej.",
+    "crumbs": [
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>Podsumowanie</span>"
+    ]
+  },
+  {
+    "objectID": "materials/26-podsumowanie.html#zadanie",
+    "href": "materials/26-podsumowanie.html#zadanie",
+    "title": "27  Podsumowanie",
+    "section": "27.5 Zadanie",
+    "text": "27.5 Zadanie\nWróć do jednego z wykresów z całego kursu. Dopisz do niego końcowe CTA w jednym zdaniu i sprawdź, czy odbiorca po zobaczeniu wykresu wie nie tylko co się stało, ale też co należy zrobić dalej.",
+    "crumbs": [
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>Podsumowanie</span>"
+    ]
   }
 ]

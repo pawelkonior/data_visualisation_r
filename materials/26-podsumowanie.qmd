@@ -1,0 +1,114 @@
+---
+title: "Podsumowanie"
+---
+
+Na końcu całego procesu wizualizacja powinna robić jedną rzecz bardzo dobrze:
+pomagać komuś podjąć lepszą decyzję. To moment, w którym semiologia, percepcja i
+storytelling przestają być teorią, a stają się praktyką publikacji.
+
+```{r}
+#| label: setup-26
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Finałowa historia powinna kończyć się działaniem
+
+Na danych `schoolimprovement2010grants.csv` sprawdzimy, jak rozkładają się środki
+między modele interwencji. To prosty przykład wykresu, który nie tylko raportuje,
+ale sugeruje, gdzie warto zacząć ewaluację programu.
+
+```{r}
+#| label: data-prep-26
+grant_models <- readr::read_csv(
+  here("datasets", "schoolimprovement2010grants.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  filter(!is.na(model_selected)) |>
+  group_by(model_selected) |>
+  summarise(
+    total_award = sum(award_amount, na.rm = TRUE),
+    schools = n(),
+    .groups = "drop"
+  ) |>
+  mutate(
+    share = total_award / sum(total_award),
+    model_selected = forcats::fct_reorder(model_selected, total_award)
+  )
+```
+
+```{r}
+#| label: fig-grants-cta
+#| fig-cap: "Końcowy wykres powinien prowadzić do pytania o działanie, a nie kończyć się na opisie."
+#| fig-alt: "Poziomy wykres słupkowy pokazuje łączną wartość grantów według modelu interwencji. Transformacja dominuje wyraźnie nad pozostałymi modelami, co sugeruje naturalny priorytet dla ewaluacji skuteczności."
+ggplot(
+  grant_models,
+  aes(
+    x = total_award,
+    y = model_selected,
+    fill = model_selected == "Transformation"
+  )
+) +
+  geom_col(width = 0.72) +
+  geom_text(
+    aes(label = scales::percent(share, accuracy = 0.1)),
+    hjust = -0.15,
+    size = 3.6
+  ) +
+  scale_fill_manual(values = c("TRUE" = "#D55E00", "FALSE" = "#c8d0d7"), guide = "none") +
+  scale_x_continuous(
+    labels = scales::label_number(scale = 1e-6, suffix = " mln", accuracy = 1),
+    expand = expansion(mult = c(0, 0.16))
+  ) +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Jeśli 74% środków trafia do Transformacji, tam zaczyna się rozmowa o efekcie",
+    subtitle = "Łączna wartość grantów według modelu interwencji",
+    x = "Łączna kwota grantów",
+    y = NULL,
+    caption = "Źródło: datasets/schoolimprovement2010grants.csv"
+  ) +
+  theme(
+    panel.grid.major.y = element_blank()
+  )
+```
+
+## Checklist przed publikacją
+
+1. Czy typ wykresu pasuje do pytania i kanału percepcyjnego?
+2. Czy odbiorca wie, na co ma spojrzeć w pierwszych trzech sekundach?
+3. Czy usunąłem elementy, które nie niosą informacji?
+4. Czy kolor działa jak reflektor, a nie jak konfetti?
+5. Czy wykres kończy się wnioskiem albo pytaniem decyzyjnym?
+
+## Krótki szablon końcowy
+
+```{r}
+#| label: publish-template-26
+#| eval: false
+final_plot +
+  labs(
+    title = "Najważniejszy wniosek",
+    subtitle = "Kontekst, zakres danych i odbiorca decyzji",
+    caption = "Źródło danych, ograniczenia i następny krok"
+  )
+
+# Po wykresie dopisz jedno zdanie CTA:
+# "Na tej podstawie rekomendujemy..."
+```
+
+## So what?
+
+Dane nie są jeszcze komunikacją. Stają się nią dopiero wtedy, gdy ich zapis
+wizualny pomaga komuś dostrzec sens i zdecydować, co zrobić dalej.
+
+## Zadanie
+
+Wróć do jednego z wykresów z całego kursu. Dopisz do niego końcowe CTA w jednym
+zdaniu i sprawdź, czy odbiorca po zobaczeniu wykresu wie nie tylko *co* się stało,
+ale też *co należy zrobić dalej*.

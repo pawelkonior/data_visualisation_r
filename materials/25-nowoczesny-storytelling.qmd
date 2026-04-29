@@ -1,0 +1,185 @@
+---
+title: "Nowoczesny storytelling"
+---
+
+Storytelling nie oznacza dopisywania anegdoty do gotowego wykresu. To projektowanie
+całego przepływu uwagi: od kontekstu, przez dowód, po działanie. Dobrze widać to na
+danych o gościach programu *The Daily Show*.
+
+```{r}
+#| label: setup-25
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Najpierw policzymy udziały najważniejszych grup gości w czasie. Interesuje nas
+szczególnie przejście od dominacji aktorów do silniejszej obecności mediów i
+polityki.
+
+```{r}
+#| label: data-prep-25
+daily_show <- readr::read_csv(
+  here("datasets", "daily_show_guests_cleaned.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  mutate(group = replace_na(group, "Brak kategorii"))
+
+top_groups <- daily_show |>
+  count(group, sort = TRUE) |>
+  slice_head(n = 6) |>
+  pull(group)
+
+daily_top <- daily_show |>
+  filter(group %in% top_groups) |>
+  count(year, group) |>
+  group_by(year) |>
+  mutate(share = n / sum(n)) |>
+  ungroup()
+
+daily_story <- daily_show |>
+  count(year, group) |>
+  group_by(year) |>
+  mutate(share = n / sum(n)) |>
+  ungroup() |>
+  mutate(
+    focus = case_when(
+      group %in% c("Media", "Politician", "Government", "Political Aide") ~ "Media i polityka",
+      group == "Acting" ~ "Aktorzy",
+      TRUE ~ "Pozostałe"
+    )
+  ) |>
+  group_by(year, focus) |>
+  summarise(share = sum(share), .groups = "drop")
+
+crossover <- daily_story |>
+  select(year, focus, share) |>
+  pivot_wider(names_from = focus, values_from = share) |>
+  filter(`Media i polityka` > Aktorzy) |>
+  slice_head(n = 1)
+```
+
+## Przed: wszystko naraz
+
+To jest typowy wykres eksploracyjny. Nie jest błędny, ale nie odpowiada na jedno
+konkretne pytanie. Zbyt wiele linii i kolorów sprawia, że trudno zobaczyć główną
+zmianę.
+
+```{r}
+#| label: fig-daily-show-before
+#| fig-cap: "Wersja eksploracyjna pokazuje wiele kategorii, ale nie prowadzi odbiorcy do jednego wniosku."
+#| fig-alt: "Kilka kolorowych linii przedstawia udziały różnych grup gości The Daily Show w czasie. Wykres jest poprawny, ale uwaga rozprasza się między wieloma seriami."
+ggplot(daily_top, aes(x = year, y = share, color = group)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_y_continuous(labels = scales::label_percent(accuracy = 1)) +
+  scale_color_viridis_d(option = "D", end = 0.9) +
+  labs(
+    title = "Eksploracja nie jest jeszcze opowieścią",
+    subtitle = "Udział sześciu najczęstszych grup gości w czasie",
+    x = NULL,
+    y = "Udział w danym roku",
+    color = "Grupa",
+    caption = "Źródło: datasets/daily_show_guests_cleaned.csv"
+  )
+```
+
+## Po: kontekst, punkt zwrotny i akcja
+
+Teraz wykres ma tezę. Szare tło daje kontekst, a dwa wyróżnione trendy pokazują
+zmianę redakcyjnej osi programu. Punktem zwrotnym jest rok 2004, gdy media i
+polityka wyprzedzają aktorów.
+
+```{r}
+#| label: fig-daily-show-after
+#| fig-cap: "Wersja narracyjna ogranicza szum i prowadzi wzrok do kluczowej zmiany."
+#| fig-alt: "Na wykresie udziałów trzech szerokich grup gości szarą linią pokazano pozostałe kategorie, niebieską linią aktorów, a czerwono-pomarańczową media i politykę. Zaznaczono moment, gdy media i polityka wyprzedzają aktorów około 2004 roku."
+ggplot(daily_story, aes(x = year, y = share, group = focus)) +
+  geom_line(
+    data = filter(daily_story, focus == "Pozostałe"),
+    color = "#c6cdd4",
+    linewidth = 1
+  ) +
+  geom_line(
+    data = filter(daily_story, focus == "Aktorzy"),
+    color = "#4C78A8",
+    linewidth = 1.2
+  ) +
+  geom_line(
+    data = filter(daily_story, focus == "Media i polityka"),
+    color = "#D55E00",
+    linewidth = 1.35
+  ) +
+  geom_point(
+    data = crossover,
+    aes(x = year, y = `Media i polityka`),
+    inherit.aes = FALSE,
+    color = "#D55E00",
+    size = 3
+  ) +
+  geom_segment(
+    data = crossover,
+    aes(
+      x = year,
+      xend = year + 1.2,
+      y = `Media i polityka`,
+      yend = `Media i polityka` + 0.08
+    ),
+    inherit.aes = FALSE,
+    color = "#7a8691",
+    linewidth = 0.4
+  ) +
+  geom_text(
+    data = crossover,
+    aes(
+      x = year + 1.25,
+      y = `Media i polityka` + 0.085,
+      label = "2004: media i polityka wyprzedzają aktorów"
+    ),
+    inherit.aes = FALSE,
+    hjust = 0,
+    size = 3.5
+  ) +
+  scale_y_continuous(
+    labels = scales::label_percent(accuracy = 1),
+    expand = expansion(mult = c(0.02, 0.16))
+  ) +
+  scale_x_continuous(expand = expansion(mult = c(0.01, 0.12))) +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Dobra narracja pokazuje zmianę, a nie tylko przebieg danych",
+    subtitle = "The Daily Show przesuwa się od dominacji aktorów do silniejszej obecności mediów i polityki",
+    x = NULL,
+    y = "Udział w danym roku",
+    caption = "Źródło: datasets/daily_show_guests_cleaned.csv"
+  ) +
+  theme(
+    plot.margin = margin(10, 110, 10, 10)
+  )
+```
+
+## Pięć lekcji wdrożeniowych
+
+1. Zaczynaj od odbiorcy, nie od ulubionego typu wykresu.
+2. Pokazuj jedną główną tezę na jednym obrazie.
+3. Tło i kontekst mogą być szare, jeśli nie są bohaterem.
+4. Kolor kontrastowy powinien mieć zadanie, a nie tylko dekorować.
+5. Każda opowieść potrzebuje punktu zwrotnego i sugestii działania.
+
+## So what?
+
+Storytelling redukuje koszt poznawczy po stronie odbiorcy. Zamiast prosić go, by
+sam znalazł sens w danych, budujesz drogę do wniosku i jasno pokazujesz moment
+zmiany.
+
+## Zadanie
+
+Weź jeden własny wykres eksploracyjny i przygotuj jego wersję narracyjną. Usuń
+co najmniej połowę kolorów, wskaż punkt zwrotny i dopisz jedno zdanie, które mówi,
+jaką decyzję taki wykres ma wspierać.

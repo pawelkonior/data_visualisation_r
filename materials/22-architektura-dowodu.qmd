@@ -1,0 +1,118 @@
+---
+title: "Architektura dowodu"
+---
+
+W rękach analityka wykres może pełnić dwie role jednocześnie: być narzędziem
+badawczym i narzędziem perswazji. John Snow używał mapy, by zawęzić źródło
+problemu. Florence Nightingale używała koloru i pola, by wymusić reakcję polityczną.
+
+| Twórca i kontekst | Forma | Cel | Wynik |
+|---|---|---|---|
+| John Snow, Londyn 1854 | mapa punktowa | znaleźć źródło cholery | powiązanie z pompą na Broad Street |
+| Florence Nightingale, wojna krymska | wykres polarny | przekonać decydentów do reform higieny | zmiana organizacji opieki medycznej |
+
+```{r}
+#| label: setup-22
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Nie mamy tu danych epidemiologicznych, ale mamy dwa zbiory pogodowe:
+`seattle_weather.csv` i `austin_weather.csv`. Zestawimy miesięczne normy opadów,
+żeby zobaczyć, jak ten sam fakt można pokazać bardziej neutralnie albo bardziej
+perswazyjnie.
+
+```{r}
+#| label: data-prep-22
+weather_compare <- bind_rows(
+  readr::read_csv(here("datasets", "seattle_weather.csv"), show_col_types = FALSE) |>
+    janitor::clean_names() |>
+    transmute(
+      city = "Seattle",
+      month = as.integer(date),
+      precipitation = mly_prcp_normal
+    ),
+  readr::read_csv(here("datasets", "austin_weather.csv"), show_col_types = FALSE) |>
+    janitor::clean_names() |>
+    transmute(
+      city = "Austin",
+      month = as.integer(date),
+      precipitation = mly_prcp_normal
+    )
+) |>
+  mutate(
+    month_label = factor(month.abb[month], levels = month.abb),
+    precipitation_area = sqrt(precipitation)
+  )
+```
+
+## Dowód analityczny: spokojne porównanie
+
+Na zwykłym wykresie liniowym dane są czytelne i łatwo porównać rytm sezonowy.
+Widać, że Seattle ma wyraźniejszy jesienno-zimowy pik opadów niż Austin.
+
+```{r}
+#| label: fig-weather-line-evidence
+#| fig-cap: "Wykres liniowy dobrze sprawdza się jako spokojne narzędzie porównawcze."
+#| fig-alt: "Dwie linie pokazują miesięczne normy opadów w Seattle i Austin. Seattle ma znacznie wyższe opady jesienią i zimą, podczas gdy Austin jest bardziej wyrównany w ciągu roku."
+ggplot(weather_compare, aes(x = month_label, y = precipitation, group = city, color = city)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2.4) +
+  scale_color_manual(values = c("Seattle" = "#2C7FB8", "Austin" = "#D95F02")) +
+  labs(
+    title = "Najpierw wykres może po prostu porównywać",
+    subtitle = "Miesięczne normy opadów w dwóch miastach",
+    x = NULL,
+    y = "Opady (cale)",
+    color = "Miasto",
+    caption = "Źródło: datasets/seattle_weather.csv oraz datasets/austin_weather.csv"
+  )
+```
+
+## Dowód perswazyjny: forma zarządza uwagą
+
+Wykres inspirowany Nightingale nie jest już tylko neutralnym zapisem. Ta forma
+bardziej eksponuje sezonowość, bo wzrost pola wizualnie wzmacnia różnice między
+miesiącami o małych i dużych opadach.
+
+```{r}
+#| label: fig-weather-coxcomb
+#| fig-cap: "Wykres polarny inspirowany Nightingale wzmacnia sezonowy rytm opadów przez użycie pola i koloru."
+#| fig-alt: "Dwa wykresy polarne pokazują miesięczne opady w Seattle i Austin. W Seattle największe sektory przypadają na listopad, grudzień i styczeń, a w Austin różnice między miesiącami są łagodniejsze."
+ggplot(weather_compare, aes(x = month_label, y = precipitation_area, fill = city)) +
+  geom_col(color = "white", linewidth = 0.9, width = 1) +
+  coord_polar() +
+  facet_wrap(~ city) +
+  scale_fill_manual(values = c("Seattle" = "#2C7FB8", "Austin" = "#D95F02"), guide = "none") +
+  labs(
+    title = "Forma wykresu może zamieniać informację w argument",
+    subtitle = "Promień jest skalowany pierwiastkiem z opadów, aby pole sektorów lepiej odpowiadało wielkości danych",
+    x = NULL,
+    y = NULL,
+    caption = "Źródło: datasets/seattle_weather.csv oraz datasets/austin_weather.csv"
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    strip.text = element_text(face = "bold", size = 12)
+  )
+```
+
+## So what?
+
+Architektura dowodu polega na świadomym wyborze formy. Czasem potrzebujesz wykresu,
+który pomaga badać świat. Czasem takiego, który pomaga przekonać innych, że świat
+wymaga reakcji.
+
+## Zadanie
+
+Weź jedną prostą serię czasową z repozytorium i pokaż ją w dwóch wersjach:
+analitycznej i perswazyjnej. Potem zapisz, która forma lepiej służy odkrywaniu, a
+która lepiej służy przekonywaniu.

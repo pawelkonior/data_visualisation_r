@@ -1,0 +1,110 @@
+---
+title: "Złożoność vs. klarowność"
+---
+
+Gęsty wykres nie musi być zły. Minard udowodnił, że nawet wiele wymiarów naraz może
+pozostać czytelne, jeśli każdy kanał wizualny ma jedną pracę i nie konkuruje z
+innymi bez potrzeby.
+
+```{r}
+#| label: setup-23
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Na danych z `summer2016.csv` wybierzemy sześć sportów o wyraźnie różnych profilach
+fizycznych. To dobry materiał do wykresu wielowymiarowego: wysokość i masa na
+osiach, wiek jako rozmiar punktu, a płeć jako kolor.
+
+```{r}
+#| label: data-prep-23
+selected_sports <- c("Athletics", "Basketball", "Gymnastics", "Rowing", "Swimming", "Volleyball")
+
+olympians <- readr::read_csv(
+  here("datasets", "summer2016.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  filter(
+    sport %in% selected_sports,
+    !is.na(height),
+    !is.na(weight),
+    !is.na(age)
+  ) |>
+  mutate(
+    sex = recode(sex, F = "Kobiety", M = "Mężczyźni"),
+    sport = factor(sport, levels = selected_sports)
+  )
+```
+
+## Złożoność bez kontroli szybko staje się szumem
+
+W jednej płaszczyźnie próbujemy tu pokazać zbyt wiele rzeczy naraz. Wykres nie jest
+jeszcze bezużyteczny, ale wymaga coraz większego wysiłku, bo wszystkie sporty
+rywalizują o uwagę w tym samym miejscu.
+
+```{r}
+#| label: fig-olympics-overloaded
+#| fig-cap: "Zbyt wiele kategorii w jednej ramie utrudnia odczyt mimo poprawnych danych."
+#| fig-alt: "Wykres punktowy pokazuje sportowców olimpijskich według wzrostu i wagi. Punkty różnią się kolorem zależnie od sportu, kształtem zależnie od płci i rozmiarem zależnie od wieku, przez co obraz staje się gęsty."
+ggplot(olympians, aes(x = height, y = weight, color = sport, shape = sex, size = age)) +
+  geom_point(alpha = 0.72) +
+  scale_color_viridis_d(option = "D", end = 0.9) +
+  scale_size_continuous(range = c(1.5, 7)) +
+  labs(
+    title = "Wielowymiarowość bez hierarchii łatwo przeciąża wykres",
+    subtitle = "Sześć sportów, dwie płcie i wiek zakodowany rozmiarem punktu",
+    x = "Wzrost (cm)",
+    y = "Masa ciała (kg)",
+    color = "Sport",
+    shape = "Płeć",
+    size = "Wiek",
+    caption = "Źródło: datasets/summer2016.csv"
+  )
+```
+
+## Klarowność rośnie, gdy rozdzielisz role
+
+Teraz ten sam problem rozwiązujemy inaczej: sport dostaje własny panel, a w każdej
+ramce zostają już tylko płeć, wiek i relacja między wzrostem a wagą. Dzięki temu
+złożoność nie znika, ale staje się zarządzalna.
+
+```{r}
+#| label: fig-olympics-facets
+#| fig-cap: "Podział na panele pozwala utrzymać wielowymiarowość bez utraty czytelności."
+#| fig-alt: "Sześć małych wykresów punktowych pokazuje osobno wybrane sporty olimpijskie. W każdym panelu widać zależność wzrostu i wagi, kolor rozróżnia płeć, a rozmiar punktu odpowiada wiekowi."
+ggplot(olympians, aes(x = height, y = weight, color = sex, size = age)) +
+  geom_point(alpha = 0.72) +
+  facet_wrap(~ sport, ncol = 3) +
+  scale_color_manual(values = c("Kobiety" = "#C44E52", "Mężczyźni" = "#4C78A8")) +
+  scale_size_continuous(range = c(1.4, 6)) +
+  labs(
+    title = "Złożony wykres działa, gdy każdy kanał ma jedną funkcję",
+    subtitle = "Sport został rozdzielony do paneli, więc kolor i rozmiar mogą pełnić prostsze role",
+    x = "Wzrost (cm)",
+    y = "Masa ciała (kg)",
+    color = "Płeć",
+    size = "Wiek",
+    caption = "Źródło: datasets/summer2016.csv"
+  ) +
+  theme(
+    legend.position = "right"
+  )
+```
+
+## So what?
+
+Klarowność nie wymaga upraszczania do jednego wymiaru. Wymaga dyscypliny w tym,
+który kanał pokazuje co i ile rzeczy dzieje się naraz w jednej ramie.
+
+## Zadanie
+
+Wybierz inny wielowymiarowy zbiór z repozytorium, na przykład `college_datav3.csv`
+albo `nba.csv`, i spróbuj przejść od wersji przeciążonej do takiej, w której
+złożoność jest nadal obecna, ale już nie dezorientuje.

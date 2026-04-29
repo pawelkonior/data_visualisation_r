@@ -31,6 +31,12 @@ book:
     - materials/18-detektywistyka.qmd
     - materials/19-poza-srednia.qmd
     - materials/20-wielowymiarowa-opowiesc.qmd
+    - materials/21-ewolucja-wizualizacji.qmd
+    - materials/22-architektura-dowodu.qmd
+    - materials/23-zlozonosc-vs-klarownosc.qmd
+    - materials/24-psychologia-percepcji.qmd
+    - materials/25-nowoczesny-storytelling.qmd
+    - materials/26-podsumowanie.qmd
   appendices:
     - materials/99-data-catalog.qmd
 

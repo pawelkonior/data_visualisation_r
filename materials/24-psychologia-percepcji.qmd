@@ -1,0 +1,152 @@
+---
+title: "Psychologia percepcji"
+---
+
+Statystyka opisowa jest potrzebna, ale sama w sobie nie wystarcza. Gdy patrzymy
+tylko na jedną liczbę, łatwo przeoczyć rozkład. Gdy używamy złej geometrii, łatwo
+przesadzić z efektem wizualnym. To właśnie tu spotykają się lekcje Anscombe'a i
+Tuftego.
+
+```{r}
+#| label: setup-24
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Statystyka opisowa nie pokazuje całego rozkładu
+
+Na rynku nieruchomości średnie i mediany są wygodne, ale bardzo szybko ukrywają
+to, co naprawdę ważne: szerokość rozrzutu i obecność drogich obserwacji skrajnych.
+
+```{r}
+#| label: data-prep-24a
+melbourne_regions <- readr::read_csv(
+  here("datasets", "melb_clean.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  filter(region %in% c("Southern", "Eastern", "Northern", "Western", "South-Eastern")) |>
+  select(region, price) |>
+  drop_na(price)
+
+melbourne_summary <- melbourne_regions |>
+  group_by(region) |>
+  summarise(
+    mediana = median(price),
+    srednia = mean(price),
+    iqr = IQR(price),
+    .groups = "drop"
+  ) |>
+  arrange(desc(mediana))
+```
+
+```{r}
+#| label: tbl-melb-summary
+#| results: asis
+melbourne_summary |>
+  mutate(across(c(mediana, srednia, iqr), ~ round(.x, 0))) |>
+  knitr::kable(caption = "Wybrane statystyki cen nieruchomości według regionu Melbourne.")
+```
+
+## Dopiero wykres ujawnia kształt i ryzyko
+
+Po przejściu na boxplot widzimy to, czego tabela nie pokazuje: skrajne obserwacje
+i bardzo różną szerokość rozkładów między regionami.
+
+```{r}
+#| label: fig-melb-boxplots
+#| fig-cap: "Boxplot odsłania rozrzut i obserwacje skrajne, których nie widać w samej tabeli statystyk."
+#| fig-alt: "Wykres pudełkowy pokazuje ceny nieruchomości w pięciu regionach Melbourne. Region Southern ma wyższe ceny i szeroki rozrzut, a pozostałe regiony różnią się zarówno medianą, jak i skalą zmienności."
+ggplot(
+  melbourne_regions |> mutate(region = forcats::fct_reorder(region, price, .fun = median)),
+  aes(x = price, y = region)
+) +
+  geom_boxplot(fill = "#6C9A8B", alpha = 0.85, outlier.alpha = 0.18) +
+  scale_x_continuous(labels = scales::label_number(big.mark = " ")) +
+  labs(
+    title = "Jedna liczba nie zastąpi obrazu rozkładu",
+    subtitle = "Ceny nieruchomości mają różną zmienność i skrajne obserwacje w zależności od regionu",
+    x = "Cena",
+    y = NULL,
+    caption = "Źródło: datasets/melb_clean.csv"
+  )
+```
+
+## Lie factor: bar chart nie może oszukiwać osią
+
+Na danych z `college_datav3.csv` policzymy medianę czesnego według typu własności.
+Najpierw pokażemy wersję z uciętą osią Y, która dramatyzuje różnice.
+
+```{r}
+#| label: data-prep-24b
+college_tuition <- readr::read_csv(
+  here("datasets", "college_datav3.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  group_by(ownership) |>
+  summarise(median_tuition = median(tuition, na.rm = TRUE), .groups = "drop") |>
+  mutate(ownership = forcats::fct_reorder(ownership, median_tuition))
+```
+
+```{r}
+#| label: fig-college-lie-factor
+#| fig-cap: "Ucięta oś Y wzmacnia różnice wizualne bardziej, niż wynika to z danych."
+#| fig-alt: "Wykres słupkowy pokazuje medianę czesnego według typu uczelni, ale oś pionowa zaczyna się wysoko, przez co różnice między słupkami wydają się większe niż w rzeczywistości."
+ggplot(college_tuition, aes(x = ownership, y = median_tuition)) +
+  geom_col(fill = "#C44E52", width = 0.72) +
+  geom_text(aes(label = round(median_tuition)), vjust = -0.5, size = 3.6) +
+  coord_cartesian(ylim = c(7000, 22000)) +
+  labs(
+    title = "Ta wersja przesadza z różnicami przez uciętą oś",
+    subtitle = "Bar chart wymaga zera, bo długość słupka jest nośnikiem porównania",
+    x = NULL,
+    y = "Mediana czesnego",
+    caption = "Źródło: datasets/college_datav3.csv"
+  )
+```
+
+## Naprawa: użyj pozycji zamiast długości
+
+Jeżeli chcemy skupić się na różnicach bez startu od zera, lepszym wyborem jest
+wykres punktowy. Tu odbiorca porównuje pozycję na wspólnej osi, a nie długość.
+
+```{r}
+#| label: fig-college-dotplot
+#| fig-cap: "Wykres punktowy pozwala pokazać różnice bez wprowadzania wizualnego kłamstwa."
+#| fig-alt: "Wykres punktowy pokazuje medianę czesnego dla trzech typów uczelni. Pozycja punktów na wspólnej osi umożliwia uczciwe porównanie bez wypełniania całych słupków."
+ggplot(college_tuition, aes(x = median_tuition, y = ownership)) +
+  geom_segment(
+    aes(x = min(median_tuition), xend = median_tuition, yend = ownership),
+    color = "#d6dde3",
+    linewidth = 1.1
+  ) +
+  geom_point(size = 4, color = "#0072B2") +
+  scale_x_continuous(labels = scales::label_number(big.mark = " ")) +
+  labs(
+    title = "Ta sama informacja może być jednocześnie precyzyjna i uczciwa",
+    subtitle = "Pozycja na osi zastępuje długość słupka, więc nie potrzebujemy sztucznego zera",
+    x = "Mediana czesnego",
+    y = NULL,
+    caption = "Źródło: datasets/college_datav3.csv"
+  ) +
+  theme(
+    panel.grid.major.y = element_blank()
+  )
+```
+
+## So what?
+
+Psychologia percepcji zaczyna się od pokory. Odbiorca nie widzi danych, tylko ich
+graficzną interpretację. Jeśli wybierzesz zły kanał albo złą skalę, podmienisz
+analizę na złudzenie.
+
+## Zadanie
+
+Znajdź w swoich materiałach jeden wykres, który opiera się na pojedynczej statystyce
+albo przesadnie eksponuje różnice. Przerób go tak, by lepiej pokazywał rozkład lub
+używał uczciwszego kanału wizualnego.

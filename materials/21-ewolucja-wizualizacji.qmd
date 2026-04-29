@@ -1,0 +1,96 @@
+---
+title: "Ewolucja wizualizacji"
+---
+
+Wizualizacja zaczyna się tam, gdzie przestajemy traktować tabelę jako cel sam w
+sobie. Surowe rekordy są jeszcze tylko zapisem zdarzeń. Dopiero wybór osi, koloru
+i układu zamienia je w kod, który nasz układ wzrokowy potrafi czytać niemal
+natychmiast.
+
+```{r}
+#| label: setup-21
+library(tidyverse)
+library(here)
+library(janitor)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
+## Przygotowanie danych
+
+Na zbiorze `bakery.csv` pokażemy prostą drogę: od wielu pojedynczych transakcji do
+syntetycznego obrazu rytmu sprzedaży. Interesuje nas łączna sprzedaż według typu
+dnia i pory dnia.
+
+```{r}
+#| label: data-prep-21
+bakery_grid <- readr::read_csv(
+  here("datasets", "bakery.csv"),
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  count(day_type, day_time, wt = sales, name = "sales_total") |>
+  mutate(
+    day_type = factor(day_type, levels = c("Weekday", "Weekend")),
+    day_time = factor(day_time, levels = c("Morning", "Afternoon", "Evening", "Night")),
+    sales_label = scales::label_number(accuracy = 1, big.mark = " ")(sales_total)
+  )
+```
+
+## Surowa tabela jeszcze nie buduje obrazu
+
+Tabela jest poprawna i potrzebna, ale odbiorca musi ją dopiero mentalnie
+przetworzyć. To dobry moment, by przypomnieć sobie, że wykres jest systemem znaków,
+który ma skrócić tę pracę.
+
+```{r}
+#| label: tbl-bakery-summary
+#| results: asis
+bakery_grid |>
+  mutate(
+    day_type = recode(day_type, Weekday = "Dzień roboczy", Weekend = "Weekend"),
+    day_time = recode(day_time, Morning = "Rano", Afternoon = "Popołudnie", Evening = "Wieczór", Night = "Noc")
+  ) |>
+  select(`Typ dnia` = day_type, `Pora dnia` = day_time, `Sprzedaż` = sales_total) |>
+  knitr::kable(digits = 1, caption = "Podsumowanie sprzedaży w piekarni według typu dnia i pory dnia.")
+```
+
+## Kod wizualny przyspiesza rozumienie
+
+Ten sam komunikat da się zapisać jako siatkę barw i liczb. W jednej chwili widać,
+że piekarnia zarabia głównie rano i po południu, a godziny nocne są praktycznie
+martwe.
+
+```{r}
+#| label: fig-bakery-heatmap
+#| fig-cap: "Mapa ciepła zamienia tabelę sprzedaży w szybki do odczytu kod wizualny."
+#| fig-alt: "Mapa ciepła pokazuje sprzedaż piekarni według typu dnia i pory dnia. Najciemniejsze pola przypadają na popołudnia i poranki, a wieczory i noce mają dużo niższe wartości."
+ggplot(bakery_grid, aes(x = day_type, y = day_time, fill = sales_total)) +
+  geom_tile(color = "white", linewidth = 1.2, width = 0.96, height = 0.96) +
+  geom_text(aes(label = sales_label), size = 4, color = "white", fontface = "bold") +
+  scale_fill_viridis_c(option = "C", end = 0.92, guide = "none") +
+  labs(
+    title = "Wizualizacja działa jak algorytm kompresji informacji",
+    subtitle = "Zamiast czytać osiem wartości po kolei, odbiorca od razu widzi rytm sprzedaży",
+    x = NULL,
+    y = NULL,
+    caption = "Źródło: datasets/bakery.csv"
+  ) +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(face = "bold"),
+    axis.text.y = element_text(face = "bold")
+  )
+```
+
+## So what?
+
+Ewolucja wizualizacji to przejście od dosłownego zapisu do abstrakcyjnego kodu.
+Dobra grafika nie ozdabia tabeli. Ona przejmuje część pracy poznawczej za odbiorcę.
+
+## Zadanie
+
+Weź inny zbiór transakcyjny albo kategoryczny z repozytorium i spróbuj przejść tę
+samą drogę: od tabeli agregatów do prostego układu wizualnego, który da się
+zrozumieć szybciej niż tekst.
