@@ -31,3 +31,6 @@ outputs/
 .vscode/
 
 /.quarto/
+/colab/*
+/*.zip
+/visualisation_exercises/*
