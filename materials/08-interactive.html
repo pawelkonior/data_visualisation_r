@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pl" xml:lang="pl"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; Interaktywność – Wizualizacja danych w R</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../materials/09-animations.html" rel="next">
+<link href="../materials/07-polish-export.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-832e3d7b6b94ddcc90a000f8fabe51a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Brak wyników",
+    "search-matching-documents-text": "dopasowane dokumenty",
+    "search-copy-link-title": "Kopiuj link do wyszukiwania",
+    "search-hide-matches-text": "Ukryj dodatkowe dopasowania",
+    "search-more-match-text": "więcej dopasowań w tym dokumencie",
+    "search-more-matches-text": "więcej dopasowań w tym dokumencie",
+    "search-clear-button-title": "Wyczyść",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Anuluj",
+    "search-submit-button-title": "Zatwierdź",
+    "search-label": "Szukaj"
+  }
+}</script>
+<link href="../site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+
+<script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<script src="../site_libs/plotly-binding-4.12.0/plotly.js"></script>
+
+<script src="../site_libs/typedarray-0.1/typedarray.min.js"></script>
+
+<script src="../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+
+<link href="../site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+
+<script src="../site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+<link href="../site_libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+
+<script src="../site_libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+
+<link href="../site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+
+<script src="../site_libs/datatables-binding-0.34.0/datatables.js"></script>
+
+<link href="../site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<link href="../site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+
+<script src="../site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+
+<link href="../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+
+<script src="../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+
+<link rel="stylesheet" href="../styles/course.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Przełącz pasek boczny" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../materials/08-interactive.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaktywność</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Przełącz pasek boczny" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Szukaj" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Wizualizacja danych w R</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Szukaj"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Wizualizacja danych w R</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/01-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Start projektu</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/02-grammar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Gramatyka grafiki</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/03-distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Rozkłady i obserwacje odstające</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/04-categories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Kategorie i rankingi</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/05-time-series.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Czas i trendy</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/06-small-multiples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Małe wielokrotności</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/07-polish-export.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dopracowanie i eksport</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/08-interactive.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaktywność</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/09-animations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Animacje</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/10-colors-palettes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Kolory i palety</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/11-axes-ticks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Markery, ticki i osie</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/12-labels-titles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Etykiety i tytuły</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/13-capstone.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Projekt końcowy</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/14-internet-connection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Dostęp do internetu</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/15-heatmap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Wykres Heatmap</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/16-fundamenty-percepcji.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Fundamenty percepcji</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/17-architektura-czasu.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Architektura czasu</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/18-detektywistyka.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Detektywistyka danych</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/19-poza-srednia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Poza średnią</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/20-wielowymiarowa-opowiesc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Wielowymiarowa opowieść</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/21-ewolucja-wizualizacji.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Ewolucja wizualizacji</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/22-architektura-dowodu.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Architektura dowodu</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/23-zlozonosc-vs-klarownosc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Złożoność vs.&nbsp;klarowność</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/24-psychologia-percepcji.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Psychologia percepcji</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/25-nowoczesny-storytelling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Nowoczesny storytelling</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/26-podsumowanie.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Podsumowanie</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Załączniki</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Przełącz sekcję">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../materials/99-data-catalog.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Katalog danych</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaktywność</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Interaktywność jest dobra, gdy użytkownik ma eksplorować szczegóły. Nie powinna ratować wykresu, który w wersji statycznej nie ma jasnego pytania.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"theme_course.R"</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_course</span>())</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="interaktywny-wykres-w-plotly-ggplotly" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="interaktywny-wykres-w-plotly-ggplotly"><span class="header-section-number">9.1</span> Interaktywny wykres w Plotly (<code>ggplotly</code>)</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>nba_interactive <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"datasets"</span>, <span class="st">"nba.csv"</span>), <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">conference =</span> <span class="fu">recode</span>(conference, <span class="at">East =</span> <span class="st">"Wschód"</span>, <span class="at">West =</span> <span class="st">"Zachód"</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tooltip =</span> <span class="fu">paste0</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      player,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;br&gt;Drużyna: "</span>, team,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;br&gt;Punkty: "</span>, points,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;br&gt;Asysty: "</span>, assists,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;br&gt;Zbiórki: "</span>, rebounds</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>p_interactive <span class="ot">&lt;-</span> nba_interactive <span class="sc">|&gt;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> assists, <span class="at">y =</span> points, <span class="at">colour =</span> conference, <span class="at">text =</span> tooltip)) <span class="sc">+</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.75</span>, <span class="at">size =</span> <span class="fl">2.4</span>) <span class="sc">+</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_course_d</span>(<span class="at">name =</span> <span class="st">"Konferencja"</span>) <span class="sc">+</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Interaktywny wykres pozwala sprawdzić szczegóły punktów"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Asysty"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Punkty"</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>plotly<span class="sc">::</span><span class="fu">ggplotly</span>(p_interactive, <span class="at">tooltip =</span> <span class="st">"text"</span>)</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-b237dd295b625400d98f" style="width:100%;height:390px;"></div>
+<script type="application/json" data-for="htmlwidget-b237dd295b625400d98f">{"x":{"data":[{"x":[5.9000000000000004,3.8999999999999999,8.6999999999999993,5.7999999999999998,5.5,3.2999999999999998,5.5,3.5,10.699999999999999,5.4000000000000004,2.8999999999999999,7,2.2999999999999998,5.7999999999999998,2.1000000000000001,2.7999999999999998,1.8999999999999999,3.7999999999999998,3.7000000000000002,1.5,4.4000000000000004,6.2999999999999998,3,0.69999999999999996,2.2000000000000002,1.7,4.2999999999999998,7.7999999999999998,5.9000000000000004,0.90000000000000002,3.3999999999999999,2.7999999999999998,5.2000000000000002,5.0999999999999996,1.3,5,2,1.7,2.2000000000000002,2.5,1.3999999999999999,3.2000000000000002,1.1000000000000001,1.3999999999999999,2.2000000000000002,1.5,3.6000000000000001,6.5,2.2000000000000002,1.8999999999999999,0.69999999999999996,1.2,2.2000000000000002,2.2999999999999998,1.3999999999999999,4.2999999999999998,2.3999999999999999,1.1000000000000001,1.6000000000000001,3.7000000000000002,1.5,2.2999999999999998,0.80000000000000004,1.1000000000000001,4.5999999999999996,2,1.1000000000000001,1,1.6000000000000001,4.2000000000000002,1.5,2.6000000000000001,1.6000000000000001,1.8999999999999999,1,1.2,2.3999999999999999,0.90000000000000002,5.2000000000000002,3.2999999999999998,1.2,1.6000000000000001,1.3999999999999999,0.59999999999999998,1.3,1,2,1,2,3.2000000000000002,1.2,1.1000000000000001,1,1.3,1.8999999999999999,0.69999999999999996,0.90000000000000002,1,2.7000000000000002,5.0999999999999996,6.7000000000000002,1.2,4.7000000000000002,1.3999999999999999,2.6000000000000001,3.1000000000000001,1.7,2.2000000000000002,4.9000000000000004,0.90000000000000002,6.5999999999999996,1,1.2,0.5,0.80000000000000004,2.5,1.2,1.8,1.1000000000000001,1.6000000000000001,0.69999999999999996,1,1.5,1.5,1.3999999999999999,2.6000000000000001,0.59999999999999998,0.90000000000000002,0.80000000000000004,1.8999999999999999,3.3999999999999999,1,0.5,0.69999999999999996,0.59999999999999998,2.1000000000000001,0.29999999999999999,1.8,0.80000000000000004,2.6000000000000001,1.3,0.40000000000000002,0.90000000000000002,2,1,1.1000000000000001,0.5,1.8999999999999999,1.8,2.2000000000000002,0.40000000000000002,1,2.2999999999999998,0.5,0.5,0.59999999999999998,0.5,0.90000000000000002,0.5,0.90000000000000002,1.8,1.3999999999999999,0.5,0.69999999999999996,0.29999999999999999,2.1000000000000001,1.3,1.3999999999999999,0.40000000000000002,0.90000000000000002,1.3,0.59999999999999998,0.80000000000000004,0.29999999999999999,0.80000000000000004,0.40000000000000002,0.29999999999999999,0.20000000000000001,1.2,0.90000000000000002,0.90000000000000002,0.29999999999999999,0.59999999999999998,0.69999999999999996,1.6000000000000001,0.20000000000000001,0.29999999999999999,0.5,0.90000000000000002,0.40000000000000002,0.10000000000000001,1.7,0.10000000000000001,0.20000000000000001,0.5,0.10000000000000001,0.59999999999999998,0.40000000000000002,0.5,1.2,0.40000000000000002,0.40000000000000002,0.5,0.29999999999999999,0.20000000000000001,0.20000000000000001,0.5,0.20000000000000001,0.20000000000000001,0.59999999999999998],"y":[28.899999999999999,27.300000000000001,26.399999999999999,25.199999999999999,23.899999999999999,23.699999999999999,23.199999999999999,23.100000000000001,23.100000000000001,22.899999999999999,22.399999999999999,22.399999999999999,20.5,20.300000000000001,20.199999999999999,20.100000000000001,19,18.300000000000001,18.100000000000001,18.100000000000001,18,17.899999999999999,17.199999999999999,17,16.300000000000001,16.100000000000001,15.800000000000001,15.300000000000001,15.1,14.800000000000001,14.699999999999999,14.6,14.5,14.5,14.5,14,14,14,13.9,13.800000000000001,13.699999999999999,13.699999999999999,13.6,13.5,13.1,12.9,12.800000000000001,12.800000000000001,12.800000000000001,12.699999999999999,12,11.800000000000001,11.699999999999999,11.699999999999999,11.199999999999999,11,11,11,11,10.9,10.800000000000001,10.800000000000001,10.699999999999999,10.6,10.6,10.5,10.5,10.4,10.300000000000001,10.199999999999999,10.199999999999999,10.199999999999999,10.1,10,9.8000000000000007,9.6999999999999993,9.5,9.4000000000000004,9.4000000000000004,9.3000000000000007,9.1999999999999993,9.1999999999999993,9.1999999999999993,9.0999999999999996,9.0999999999999996,9,9,8.9000000000000004,8.6999999999999993,8.5,8.5,8.4000000000000004,8.1999999999999993,8.1999999999999993,8.1999999999999993,8.1999999999999993,8.0999999999999996,8.0999999999999996,7.9000000000000004,7.7999999999999998,7.7999999999999998,7.7000000000000002,7.5999999999999996,7.5,7.4000000000000004,7.2999999999999998,7.2000000000000002,7.2000000000000002,7.0999999999999996,6.9000000000000004,6.9000000000000004,6.7999999999999998,6.7999999999999998,6.7999999999999998,6.5999999999999996,6.5999999999999996,6.5999999999999996,6.5,6.4000000000000004,6.4000000000000004,6.4000000000000004,6.2999999999999998,6.2999999999999998,6.2000000000000002,6.2000000000000002,6.2000000000000002,6.0999999999999996,6,6,5.9000000000000004,5.7999999999999998,5.7000000000000002,5.7000000000000002,5.5999999999999996,5.5999999999999996,5.5999999999999996,5.5,5.5,5.5,5.4000000000000004,5.2999999999999998,5.2999999999999998,5.2000000000000002,5.2000000000000002,5.0999999999999996,5.0999999999999996,5,5,5,5,4.9000000000000004,4.9000000000000004,4.9000000000000004,4.9000000000000004,4.7999999999999998,4.7999999999999998,4.7000000000000002,4.5999999999999996,4.5999999999999996,4.5,4.5,4.4000000000000004,4.4000000000000004,4.4000000000000004,4.2000000000000002,4.0999999999999996,4.0999999999999996,4,4,3.7999999999999998,3.5,3.5,3.5,3.3999999999999999,3.2999999999999998,3.2000000000000002,3.1000000000000001,3.1000000000000001,3,2.8999999999999999,2.8999999999999999,2.7999999999999998,2.7999999999999998,2.7000000000000002,2.7000000000000002,2.7000000000000002,2.6000000000000001,2.5,2.5,2.2999999999999998,2.2999999999999998,2.2999999999999998,2.2999999999999998,2.1000000000000001,2.1000000000000001,2,2,1.8999999999999999,1.8999999999999999,1.8,1.8,1.6000000000000001,1.6000000000000001,1.5,1.3,1.2,1,0.90000000000000002,0.40000000000000002,0.20000000000000001],"text":["Isaiah Thomas<br>Drużyna: BOS<br>Punkty: 28.9<br>Asysty: 5.9<br>Zbiórki: 2.7","DeMar DeRozan<br>Drużyna: TOR<br>Punkty: 27.3<br>Asysty: 3.9<br>Zbiórki: 5.2","LeBron James<br>Drużyna: CLE<br>Punkty: 26.4<br>Asysty: 8.7<br>Zbiórki: 8.6","Kyrie Irving<br>Drużyna: CLE<br>Punkty: 25.2<br>Asysty: 5.8<br>Zbiórki: 3.2","Jimmy Butler<br>Drużyna: CHI<br>Punkty: 23.9<br>Asysty: 5.5<br>Zbiórki: 6.2","Paul George<br>Drużyna: IND<br>Punkty: 23.7<br>Asysty: 3.3<br>Zbiórki: 6.6","Kemba Walker<br>Drużyna: CHA<br>Punkty: 23.2<br>Asysty: 5.5<br>Zbiórki: 3.9","Bradley Beal<br>Drużyna: WSH<br>Punkty: 23.1<br>Asysty: 3.5<br>Zbiórki: 3.1","John Wall<br>Drużyna: WSH<br>Punkty: 23.1<br>Asysty: 10.7<br>Zbiórki: 4.2","Giannis Antetokounmpo<br>Drużyna: MIL<br>Punkty: 22.9<br>Asysty: 5.4<br>Zbiórki: 8.8","Carmelo Anthony<br>Drużyna: NY<br>Punkty: 22.4<br>Asysty: 2.9<br>Zbiórki: 5.9","Kyle Lowry<br>Drużyna: TOR<br>Punkty: 22.4<br>Asysty: 7<br>Zbiórki: 4.8","Brook Lopez<br>Drużyna: BKN<br>Punkty: 20.5<br>Asysty: 2.3<br>Zbiórki: 5.4","Goran Dragic<br>Drużyna: MIA<br>Punkty: 20.3<br>Asysty: 5.8<br>Zbiórki: 3.8","Joel Embiid<br>Drużyna: PHI<br>Punkty: 20.2<br>Asysty: 2.1<br>Zbiórki: 7.8","Jabari Parker<br>Drużyna: MIL<br>Punkty: 20.1<br>Asysty: 2.8<br>Zbiórki: 6.2","Kevin Love<br>Drużyna: CLE<br>Punkty: 19<br>Asysty: 1.9<br>Zbiórki: 11.1","Dwyane Wade<br>Drużyna: CHI<br>Punkty: 18.3<br>Asysty: 3.8<br>Zbiórki: 4.5","Paul Millsap<br>Drużyna: ATL<br>Punkty: 18.1<br>Asysty: 3.7<br>Zbiórki: 7.7","Kristaps Porzingis<br>Drużyna: NY<br>Punkty: 18.1<br>Asysty: 1.5<br>Zbiórki: 7.2","Derrick Rose<br>Drużyna: NY<br>Punkty: 18<br>Asysty: 4.4<br>Zbiórki: 3.8","Dennis Schroder<br>Drużyna: ATL<br>Punkty: 17.9<br>Asysty: 6.3<br>Zbiórki: 3.1","Evan Fournier<br>Drużyna: ORL<br>Punkty: 17.2<br>Asysty: 3<br>Zbiórki: 3.1","Hassan Whiteside<br>Drużyna: MIA<br>Punkty: 17<br>Asysty: 0.7<br>Zbiórki: 14.1","Avery Bradley<br>Drużyna: BOS<br>Punkty: 16.3<br>Asysty: 2.2<br>Zbiórki: 6.1","Tobias Harris<br>Drużyna: DET<br>Punkty: 16.1<br>Asysty: 1.7<br>Zbiórki: 5.1","Dion Waiters<br>Drużyna: MIA<br>Punkty: 15.8<br>Asysty: 4.3<br>Zbiórki: 3.3","Jeff Teague<br>Drużyna: IND<br>Punkty: 15.3<br>Asysty: 7.8<br>Zbiórki: 4","Nicolas Batum<br>Drużyna: CHA<br>Punkty: 15.1<br>Asysty: 5.9<br>Zbiórki: 6.2","Serge Ibaka<br>Drużyna: ORL/TOR<br>Punkty: 14.8<br>Asysty: 0.9<br>Zbiórki: 6.8","Khris Middleton<br>Drużyna: MIL<br>Punkty: 14.7<br>Asysty: 3.4<br>Zbiórki: 4.2","Nikola Vucevic<br>Drużyna: ORL<br>Punkty: 14.6<br>Asysty: 2.8<br>Zbiórki: 10.4","Reggie Jackson<br>Drużyna: DET<br>Punkty: 14.5<br>Asysty: 5.2<br>Zbiórki: 2.2","Jeremy Lin<br>Drużyna: BKN<br>Punkty: 14.5<br>Asysty: 5.1<br>Zbiórki: 3.8","Myles Turner<br>Drużyna: IND<br>Punkty: 14.5<br>Asysty: 1.3<br>Zbiórki: 7.3","Al Horford<br>Drużyna: BOS<br>Punkty: 14<br>Asysty: 5<br>Zbiórki: 6.8","Marcus Morris<br>Drużyna: DET<br>Punkty: 14<br>Asysty: 2<br>Zbiórki: 4.6","Markieff Morris<br>Drużyna: WSH<br>Punkty: 14<br>Asysty: 1.7<br>Zbiórki: 6.5","Jae Crowder<br>Drużyna: BOS<br>Punkty: 13.9<br>Asysty: 2.2<br>Zbiórki: 5.8","Kentavious Caldwell-Pope<br>Drużyna: DET<br>Punkty: 13.8<br>Asysty: 2.5<br>Zbiórki: 3.3","Bojan Bogdanovic<br>Drużyna: BKN/WSH<br>Punkty: 13.7<br>Asysty: 1.4<br>Zbiórki: 3.4","Tyler Johnson<br>Drużyna: MIA<br>Punkty: 13.7<br>Asysty: 3.2<br>Zbiórki: 4","Andre Drummond<br>Drużyna: DET<br>Punkty: 13.6<br>Asysty: 1.1<br>Zbiórki: 13.8","Dwight Howard<br>Drużyna: ATL<br>Punkty: 13.5<br>Asysty: 1.4<br>Zbiórki: 12.7","Sean Kilpatrick<br>Drużyna: BKN<br>Punkty: 13.1<br>Asysty: 2.2<br>Zbiórki: 4","Robert Covington<br>Drużyna: PHI<br>Punkty: 12.9<br>Asysty: 1.5<br>Zbiórki: 6.5","James Johnson<br>Drużyna: MIA<br>Punkty: 12.8<br>Asysty: 3.6<br>Zbiórki: 4.9","Elfrid Payton<br>Drużyna: ORL<br>Punkty: 12.8<br>Asysty: 6.5<br>Zbiórki: 4.7","Dario Saric<br>Drużyna: PHI<br>Punkty: 12.8<br>Asysty: 2.2<br>Zbiórki: 6.3","Aaron Gordon<br>Drużyna: ORL<br>Punkty: 12.7<br>Asysty: 1.9<br>Zbiórki: 5.1","Jonas Valanciunas<br>Drużyna: TOR<br>Punkty: 12<br>Asysty: 0.7<br>Zbiórki: 9.5","Jahlil Okafor<br>Drużyna: PHI<br>Punkty: 11.8<br>Asysty: 1.2<br>Zbiórki: 4.8","Frank Kaminsky<br>Drużyna: CHA<br>Punkty: 11.7<br>Asysty: 2.2<br>Zbiórki: 4.5","Greg Monroe<br>Drużyna: MIL<br>Punkty: 11.7<br>Asysty: 2.3<br>Zbiórki: 6.6","Marvin Williams<br>Drużyna: CHA<br>Punkty: 11.2<br>Asysty: 1.4<br>Zbiórki: 6.6","Jerryd Bayless<br>Drużyna: PHI<br>Punkty: 11<br>Asysty: 4.3<br>Zbiórki: 4","Kent Bazemore<br>Drużyna: ATL<br>Punkty: 11<br>Asysty: 2.4<br>Zbiórki: 3.2","Terrence Ross<br>Drużyna: ORL/TOR<br>Punkty: 11<br>Asysty: 1.1<br>Zbiórki: 2.6","Thaddeus Young<br>Drużyna: IND<br>Punkty: 11<br>Asysty: 1.6<br>Zbiórki: 6.1","Justise Winslow<br>Drużyna: MIA<br>Punkty: 10.9<br>Asysty: 3.7<br>Zbiórki: 5.2","Marcin Gortat<br>Drużyna: WSH<br>Punkty: 10.8<br>Asysty: 1.5<br>Zbiórki: 10.4","Courtney Lee<br>Drużyna: NY<br>Punkty: 10.8<br>Asysty: 2.3<br>Zbiórki: 3.4","Alex Poythress<br>Drużyna: PHI<br>Punkty: 10.7<br>Asysty: 0.8<br>Zbiórki: 4.8","Nikola Mirotic<br>Drużyna: CHI<br>Punkty: 10.6<br>Asysty: 1.1<br>Zbiórki: 5.5","Marcus Smart<br>Drużyna: BOS<br>Punkty: 10.6<br>Asysty: 4.6<br>Zbiórki: 3.9","Marco Belinelli<br>Drużyna: CHA<br>Punkty: 10.5<br>Asysty: 2<br>Zbiórki: 2.4","Wayne Ellington<br>Drużyna: MIA<br>Punkty: 10.5<br>Asysty: 1.1<br>Zbiórki: 2.1","Robin Lopez<br>Drużyna: CHI<br>Punkty: 10.4<br>Asysty: 1<br>Zbiórki: 6.4","Cody Zeller<br>Drużyna: CHA<br>Punkty: 10.3<br>Asysty: 1.6<br>Zbiórki: 6.5","Malcolm Brogdon<br>Drużyna: MIL<br>Punkty: 10.2<br>Asysty: 4.2<br>Zbiórki: 2.8","Jon Leuer<br>Drużyna: DET<br>Punkty: 10.2<br>Asysty: 1.5<br>Zbiórki: 5.4","Josh Richardson<br>Drużyna: MIA<br>Punkty: 10.2<br>Asysty: 2.6<br>Zbiórki: 3.2","Kyle Korver<br>Drużyna: ATL/CLE<br>Punkty: 10.1<br>Asysty: 1.6<br>Zbiórki: 2.8","Trevor Booker<br>Drużyna: BKN<br>Punkty: 10<br>Asysty: 1.9<br>Zbiórki: 8","Richaun Holmes<br>Drużyna: PHI<br>Punkty: 9.8<br>Asysty: 1<br>Zbiórki: 5.5","Jeremy Lamb<br>Drużyna: CHA<br>Punkty: 9.7<br>Asysty: 1.2<br>Zbiórki: 4.3","Nik Stauskas<br>Drużyna: PHI<br>Punkty: 9.5<br>Asysty: 2.4<br>Zbiórki: 2.8","Michael Beasley<br>Drużyna: MIL<br>Punkty: 9.4<br>Asysty: 0.9<br>Zbiórki: 3.4","Ish Smith<br>Drużyna: DET<br>Punkty: 9.4<br>Asysty: 5.2<br>Zbiórki: 2.9","Cory Joseph<br>Drużyna: TOR<br>Punkty: 9.3<br>Asysty: 3.3<br>Zbiórki: 2.9","Jeff Green<br>Drużyna: ORL<br>Punkty: 9.2<br>Asysty: 1.2<br>Zbiórki: 3.1","Gerald Henderson<br>Drużyna: PHI<br>Punkty: 9.2<br>Asysty: 1.6<br>Zbiórki: 2.6","Michael Kidd-Gilchrist<br>Drużyna: CHA<br>Punkty: 9.2<br>Asysty: 1.4<br>Zbiórki: 7","Channing Frye<br>Drużyna: CLE<br>Punkty: 9.1<br>Asysty: 0.6<br>Zbiórki: 3.9","Jodie Meeks<br>Drużyna: ORL<br>Punkty: 9.1<br>Asysty: 1.3<br>Zbiórki: 2.1","Dahntay Jones<br>Drużyna: CLE<br>Punkty: 9<br>Asysty: 1<br>Zbiórki: 2","Kelly Olynyk<br>Drużyna: BOS<br>Punkty: 9<br>Asysty: 2<br>Zbiórki: 4.8","DeMarre Carroll<br>Drużyna: TOR<br>Punkty: 8.9<br>Asysty: 1<br>Zbiórki: 3.8","Rondae Hollis-Jefferson<br>Drużyna: BKN<br>Punkty: 8.7<br>Asysty: 2<br>Zbiórki: 5.8","Monta Ellis<br>Drużyna: IND<br>Punkty: 8.5<br>Asysty: 3.2<br>Zbiórki: 2.8","Tony Snell<br>Drużyna: MIL<br>Punkty: 8.5<br>Asysty: 1.2<br>Zbiórki: 3.1","Norman Powell<br>Drużyna: TOR<br>Punkty: 8.4<br>Asysty: 1.1<br>Zbiórki: 2.2","Joe Harris<br>Drużyna: BKN<br>Punkty: 8.2<br>Asysty: 1<br>Zbiórki: 2.8","Willy Hernangomez<br>Drużyna: NY<br>Punkty: 8.2<br>Asysty: 1.3<br>Zbiórki: 7","Caris LeVert<br>Drużyna: BKN<br>Punkty: 8.2<br>Asysty: 1.9<br>Zbiórki: 3.3","Shawn Long<br>Drużyna: PHI<br>Punkty: 8.2<br>Asysty: 0.7<br>Zbiórki: 4.7","Al Jefferson<br>Drużyna: IND<br>Punkty: 8.1<br>Asysty: 0.9<br>Zbiórki: 4.2","Tristan Thompson<br>Drużyna: CLE<br>Punkty: 8.1<br>Asysty: 1<br>Zbiórki: 9.2","D.J. Augustin<br>Drużyna: ORL<br>Punkty: 7.9<br>Asysty: 2.7<br>Zbiórki: 1.5","Sergio Rodriguez<br>Drużyna: PHI<br>Punkty: 7.8<br>Asysty: 5.1<br>Zbiórki: 2.3","Rajon Rondo<br>Drużyna: CHI<br>Punkty: 7.8<br>Asysty: 6.7<br>Zbiórki: 5.1","Justin Holiday<br>Drużyna: NY<br>Punkty: 7.7<br>Asysty: 1.2<br>Zbiórki: 2.7","Matthew Dellavedova<br>Drużyna: MIL<br>Punkty: 7.6<br>Asysty: 4.7<br>Zbiórki: 1.9","Iman Shumpert<br>Drużyna: CLE<br>Punkty: 7.5<br>Asysty: 1.4<br>Zbiórki: 2.9","Isaiah Whitehead<br>Drużyna: BKN<br>Punkty: 7.4<br>Asysty: 2.6<br>Zbiórki: 2.5","Spencer Dinwiddie<br>Drużyna: BKN<br>Punkty: 7.3<br>Asysty: 3.1<br>Zbiórki: 2.8","Thabo Sefolosha<br>Drużyna: ATL<br>Punkty: 7.2<br>Asysty: 1.7<br>Zbiórki: 4.4","Rodney Stuckey<br>Drużyna: IND<br>Punkty: 7.2<br>Asysty: 2.2<br>Zbiórki: 2.2","Brandon Jennings<br>Drużyna: NY/WSH<br>Punkty: 7.1<br>Asysty: 4.9<br>Zbiórki: 2.4","Justin Hamilton<br>Drużyna: BKN<br>Punkty: 6.9<br>Asysty: 0.9<br>Zbiórki: 4.1","T.J. McConnell<br>Drużyna: PHI<br>Punkty: 6.9<br>Asysty: 6.6<br>Zbiórki: 3.1","John Henson<br>Drużyna: MIL<br>Punkty: 6.8<br>Asysty: 1<br>Zbiórki: 5.1","Patrick Patterson<br>Drużyna: TOR<br>Punkty: 6.8<br>Asysty: 1.2<br>Zbiórki: 4.5","Bobby Portis<br>Drużyna: CHI<br>Punkty: 6.8<br>Asysty: 0.5<br>Zbiórki: 4.6","Jaylen Brown<br>Drużyna: BOS<br>Punkty: 6.6<br>Asysty: 0.8<br>Zbiórki: 2.8","Michael Carter-Williams<br>Drużyna: CHI<br>Punkty: 6.6<br>Asysty: 2.5<br>Zbiórki: 3.4","Marcus Thornton<br>Drużyna: WSH<br>Punkty: 6.6<br>Asysty: 1.2<br>Zbiórki: 2.3","Amir Johnson<br>Drużyna: BOS<br>Punkty: 6.5<br>Asysty: 1.8<br>Zbiórki: 4.6","Timothe Luwawu-Cabarrot<br>Drużyna: PHI<br>Punkty: 6.4<br>Asysty: 1.1<br>Zbiórki: 2.2","Rodney McGruder<br>Drużyna: MIA<br>Punkty: 6.4<br>Asysty: 1.6<br>Zbiórki: 3.3","Mirza Teletovic<br>Drużyna: MIL<br>Punkty: 6.4<br>Asysty: 0.7<br>Zbiórki: 2.3","Mindaugas Kuzminskas<br>Drużyna: NY<br>Punkty: 6.3<br>Asysty: 1<br>Zbiórki: 1.9","Kyle O'Quinn<br>Drużyna: NY<br>Punkty: 6.3<br>Asysty: 1.5<br>Zbiórki: 5.6","Spencer Hawes<br>Drużyna: MIL/CHA<br>Punkty: 6.2<br>Asysty: 1.5<br>Zbiórki: 3.5","Mike Muscala<br>Drużyna: ATL<br>Punkty: 6.2<br>Asysty: 1.4<br>Zbiórki: 3.4","Ramon Sessions<br>Drużyna: CHA<br>Punkty: 6.2<br>Asysty: 2.6<br>Zbiórki: 1.5","Derrick Williams<br>Drużyna: CLE/MIA<br>Punkty: 6.1<br>Asysty: 0.6<br>Zbiórki: 2.6","Bismack Biyombo<br>Drużyna: ORL<br>Punkty: 6<br>Asysty: 0.9<br>Zbiórki: 7","Lance Thomas<br>Drużyna: NY<br>Punkty: 6<br>Asysty: 0.8<br>Zbiórki: 3.1","Jerian Grant<br>Drużyna: CHI<br>Punkty: 5.9<br>Asysty: 1.9<br>Zbiórki: 1.8","Beno Udrih<br>Drużyna: DET<br>Punkty: 5.8<br>Asysty: 3.4<br>Zbiórki: 1.5","Richard Jefferson<br>Drużyna: CLE<br>Punkty: 5.7<br>Asysty: 1<br>Zbiórki: 2.6","Jason Smith<br>Drużyna: WSH<br>Punkty: 5.7<br>Asysty: 0.5<br>Zbiórki: 3.5","Gerald Green<br>Drużyna: BOS<br>Punkty: 5.6<br>Asysty: 0.7<br>Zbiórki: 1.8","Ian Mahinmi<br>Drużyna: WSH<br>Punkty: 5.6<br>Asysty: 0.6<br>Zbiórki: 4.8","Delon Wright<br>Drużyna: TOR<br>Punkty: 5.6<br>Asysty: 2.1<br>Zbiórki: 1.8","Boban Marjanovic<br>Drużyna: DET<br>Punkty: 5.5<br>Asysty: 0.3<br>Zbiórki: 3.7","Terry Rozier<br>Drużyna: BOS<br>Punkty: 5.5<br>Asysty: 1.8<br>Zbiórki: 3.1","Paul Zipser<br>Drużyna: CHI<br>Punkty: 5.5<br>Asysty: 0.8<br>Zbiórki: 2.8","Malcolm Delaney<br>Drużyna: ATL<br>Punkty: 5.4<br>Asysty: 2.6<br>Zbiórki: 1.7","Chasson Randle<br>Drużyna: NY/PHI<br>Punkty: 5.3<br>Asysty: 1.3<br>Zbiórki: 1.2","Willie Reed<br>Drużyna: MIA<br>Punkty: 5.3<br>Asysty: 0.4<br>Zbiórki: 4.7","Mike Dunleavy<br>Drużyna: ATL/CLE<br>Punkty: 5.2<br>Asysty: 0.9<br>Zbiórki: 2.2","Randy Foye<br>Drużyna: BKN<br>Punkty: 5.2<br>Asysty: 2<br>Zbiórki: 2.2","Luis Scola<br>Drużyna: BKN<br>Punkty: 5.1<br>Asysty: 1<br>Zbiórki: 3.9","Denzel Valentine<br>Drużyna: CHI<br>Punkty: 5.1<br>Asysty: 1.1<br>Zbiórki: 2.6","Anthony Bennett<br>Drużyna: BKN<br>Punkty: 5<br>Asysty: 0.5<br>Zbiórki: 3.4","Aaron Brooks<br>Drużyna: IND<br>Punkty: 5<br>Asysty: 1.9<br>Zbiórki: 1.1","Trey Burke<br>Drużyna: WSH<br>Punkty: 5<br>Asysty: 1.8<br>Zbiórki: 0.8","Joakim Noah<br>Drużyna: NY<br>Punkty: 5<br>Asysty: 2.2<br>Zbiórki: 8.8","Aron Baynes<br>Drużyna: DET<br>Punkty: 4.9<br>Asysty: 0.4<br>Zbiórki: 4.4","Mario Hezonja<br>Drużyna: ORL<br>Punkty: 4.9<br>Asysty: 1<br>Zbiórki: 2.2","Josh McRoberts<br>Drużyna: MIA<br>Punkty: 4.9<br>Asysty: 2.3<br>Zbiórki: 3.4","Tiago Splitter<br>Drużyna: PHI<br>Punkty: 4.9<br>Asysty: 0.5<br>Zbiórki: 2.8","Luke Babbitt<br>Drużyna: MIA<br>Punkty: 4.8<br>Asysty: 0.5<br>Zbiórki: 2.1","Cristiano Felicio<br>Drużyna: CHI<br>Punkty: 4.8<br>Asysty: 0.6<br>Zbiórki: 4.7","Kevin Seraphin<br>Drużyna: IND<br>Punkty: 4.7<br>Asysty: 0.5<br>Zbiórki: 2.9","Isaiah Canaan<br>Drużyna: CHI<br>Punkty: 4.6<br>Asysty: 0.9<br>Zbiórki: 1.3","Kris Humphries<br>Drużyna: ATL<br>Punkty: 4.6<br>Asysty: 0.5<br>Zbiórki: 3.7","Reggie Bullock<br>Drużyna: DET<br>Punkty: 4.5<br>Asysty: 0.9<br>Zbiórki: 2.1","C.J. Watson<br>Drużyna: ORL<br>Punkty: 4.5<br>Asysty: 1.8<br>Zbiórki: 1.4","Stanley Johnson<br>Drużyna: DET<br>Punkty: 4.4<br>Asysty: 1.4<br>Zbiórki: 2.5","Jordan McRae<br>Drużyna: CLE<br>Punkty: 4.4<br>Asysty: 0.5<br>Zbiórki: 1.1","Lucas Nogueira<br>Drużyna: TOR<br>Punkty: 4.4<br>Asysty: 0.7<br>Zbiórki: 4.3","Pascal Siakam<br>Drużyna: TOR<br>Punkty: 4.2<br>Asysty: 0.3<br>Zbiórki: 3.4","Ron Baker<br>Drużyna: NY<br>Punkty: 4.1<br>Asysty: 2.1<br>Zbiórki: 1.9","Jason Terry<br>Drużyna: MIL<br>Punkty: 4.1<br>Asysty: 1.3<br>Zbiórki: 1.4","Kay Felder<br>Drużyna: CLE<br>Punkty: 4<br>Asysty: 1.4<br>Zbiórki: 1","Thon Maker<br>Drużyna: MIL<br>Punkty: 4<br>Asysty: 0.4<br>Zbiórki: 2","Jonas Jerebko<br>Drużyna: BOS<br>Punkty: 3.8<br>Asysty: 0.9<br>Zbiórki: 3.5","Brian Roberts<br>Drużyna: CHA<br>Punkty: 3.5<br>Asysty: 1.3<br>Zbiórki: 1","Rashad Vaughn<br>Drużyna: MIL<br>Punkty: 3.5<br>Asysty: 0.6<br>Zbiórki: 1.2","Tyler Zeller<br>Drużyna: BOS<br>Punkty: 3.5<br>Asysty: 0.8<br>Zbiórki: 2.4","Jared Sullinger<br>Drużyna: TOR<br>Punkty: 3.4<br>Asysty: 0.3<br>Zbiórki: 2.5","Darrun Hilliard<br>Drużyna: DET<br>Punkty: 3.3<br>Asysty: 0.8<br>Zbiórki: 0.8","Henry Ellenson<br>Drużyna: DET<br>Punkty: 3.2<br>Asysty: 0.4<br>Zbiórki: 2.2","Maurice Ndour<br>Drużyna: NY<br>Punkty: 3.1<br>Asysty: 0.3<br>Zbiórki: 2","Jakob Poeltl<br>Drużyna: TOR<br>Punkty: 3.1<br>Asysty: 0.2<br>Zbiórki: 3.1","Sasha Vujacic<br>Drużyna: NY<br>Punkty: 3<br>Asysty: 1.2<br>Zbiórki: 1.4","Lavoy Allen<br>Drużyna: IND<br>Punkty: 2.9<br>Asysty: 0.9<br>Zbiórki: 3.6","Fred VanVleet<br>Drużyna: TOR<br>Punkty: 2.9<br>Asysty: 0.9<br>Zbiórki: 1.1","James Jones<br>Drużyna: CLE<br>Punkty: 2.8<br>Asysty: 0.3<br>Zbiórki: 0.8","Okaro White<br>Drużyna: MIA<br>Punkty: 2.8<br>Asysty: 0.6<br>Zbiórki: 2.3","DeAndre' Bembry<br>Drużyna: ATL<br>Punkty: 2.7<br>Asysty: 0.7<br>Zbiórki: 1.6","Tomas Satoransky<br>Drużyna: WSH<br>Punkty: 2.7<br>Asysty: 1.6<br>Zbiórki: 1.5","Christian Wood<br>Drużyna: CHA<br>Punkty: 2.7<br>Asysty: 0.2<br>Zbiórki: 2.2","Andrew Nicholson<br>Drużyna: BKN/WSH<br>Punkty: 2.6<br>Asysty: 0.3<br>Zbiórki: 1.6","Miles Plumlee<br>Drużyna: MIL/CHA<br>Punkty: 2.5<br>Asysty: 0.5<br>Zbiórki: 2.1","Mike Scott<br>Drużyna: ATL<br>Punkty: 2.5<br>Asysty: 0.9<br>Zbiórki: 2.1","Chris Andersen<br>Drużyna: CLE<br>Punkty: 2.3<br>Asysty: 0.4<br>Zbiórki: 2.6","Chris McCullough<br>Drużyna: BKN/WSH<br>Punkty: 2.3<br>Asysty: 0.1<br>Zbiórki: 1.2","Greivis Vasquez<br>Drużyna: BKN<br>Punkty: 2.3<br>Asysty: 1.7<br>Zbiórki: 0.7","James Young<br>Drużyna: BOS<br>Punkty: 2.3<br>Asysty: 0.1<br>Zbiórki: 0.9","Treveon Graham<br>Drużyna: CHA<br>Punkty: 2.1<br>Asysty: 0.2<br>Zbiórki: 0.8","Joe Young<br>Drużyna: IND<br>Punkty: 2.1<br>Asysty: 0.5<br>Zbiórki: 0.5","Rakeem Christmas<br>Drużyna: IND<br>Punkty: 2<br>Asysty: 0.1<br>Zbiórki: 1.9","Demetrius Jackson<br>Drużyna: BOS<br>Punkty: 2<br>Asysty: 0.6<br>Zbiórki: 0.8","Udonis Haslem<br>Drużyna: MIA<br>Punkty: 1.9<br>Asysty: 0.4<br>Zbiórki: 2.3","Marshall Plumlee<br>Drużyna: NY<br>Punkty: 1.9<br>Asysty: 0.5<br>Zbiórki: 2.4","Lamar Patterson<br>Drużyna: ATL<br>Punkty: 1.8<br>Asysty: 1.2<br>Zbiórki: 1.4","Damjan Rudez<br>Drużyna: ORL<br>Punkty: 1.8<br>Asysty: 0.4<br>Zbiórki: 0.6","Bruno Caboclo<br>Drużyna: TOR<br>Punkty: 1.6<br>Asysty: 0.4<br>Zbiórki: 1.1","Ryan Kelly<br>Drużyna: ATL<br>Punkty: 1.6<br>Asysty: 0.5<br>Zbiórki: 1.1","Jordan Mickey<br>Drużyna: BOS<br>Punkty: 1.5<br>Asysty: 0.3<br>Zbiórki: 1.4","Daniel Ochefu<br>Drużyna: WSH<br>Punkty: 1.3<br>Asysty: 0.2<br>Zbiórki: 1.2","Stephen Zimmerman<br>Drużyna: ORL<br>Punkty: 1.2<br>Asysty: 0.2<br>Zbiórki: 1.8","Mike Tobey<br>Drużyna: CHA<br>Punkty: 1<br>Asysty: 0.5<br>Zbiórki: 1.5","Georges Niang<br>Drużyna: IND<br>Punkty: 0.9<br>Asysty: 0.2<br>Zbiórki: 0.7","Michael Gbinije<br>Drużyna: DET<br>Punkty: 0.4<br>Asysty: 0.2<br>Zbiórki: 0.3","Aaron Harrison<br>Drużyna: CHA<br>Punkty: 0.2<br>Asysty: 0.6<br>Zbiórki: 0.6"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","opacity":0.75,"size":9.0708661417322833,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(68,1,84,1)"}},"hoveron":"points","name":"Wschód","legendgroup":"Wschód","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[10.4,11.199999999999999,2.1000000000000001,4.5999999999999996,5.9000000000000004,3.5,6.5999999999999996,4.7999999999999998,2.7000000000000002,2.2999999999999998,2.1000000000000001,3.3999999999999999,3.5,4.9000000000000004,6.2999999999999998,6.2999999999999998,4.5999999999999996,1.5,3,2.7999999999999998,2.1000000000000001,9.1999999999999993,3,1.8999999999999999,4.2000000000000002,4.9000000000000004,2.5,2.6000000000000001,2,4.7999999999999998,7.2999999999999998,2.8999999999999999,2.6000000000000001,0.90000000000000002,1.5,3,1.7,1.2,3.3999999999999999,0.90000000000000002,2.8999999999999999,4.5999999999999996,3.6000000000000001,1,2.7000000000000002,1.6000000000000001,1.2,1,2.2999999999999998,2.6000000000000001,2.7999999999999998,2.2000000000000002,1.1000000000000001,9.0999999999999996,2.3999999999999999,3.8999999999999999,5.5,1.2,1.5,3.5,3.1000000000000001,7,1.8999999999999999,4.5,1.8999999999999999,1.1000000000000001,4.7999999999999998,0.40000000000000002,2.1000000000000001,0.90000000000000002,2.2000000000000002,4.2000000000000002,1.1000000000000001,3.5,2.1000000000000001,0.69999999999999996,1.8,5.0999999999999996,1.3999999999999999,1.1000000000000001,3.2000000000000002,1.1000000000000001,0.80000000000000004,1.6000000000000001,0.80000000000000004,1.3,0.59999999999999998,0.69999999999999996,1.1000000000000001,0.80000000000000004,1.8,0.59999999999999998,1.3,2.7999999999999998,2.6000000000000001,1.3,3.3999999999999999,2.7000000000000002,0.80000000000000004,0.80000000000000004,0.5,1.8,1.6000000000000001,3.7000000000000002,2.6000000000000001,5.2000000000000002,2.7000000000000002,1.5,1.2,1.8,1.5,1.2,1.8999999999999999,0.5,0.69999999999999996,2.3999999999999999,2.1000000000000001,0.59999999999999998,0.59999999999999998,0.69999999999999996,1,1,1,1.2,1.2,1.7,1.5,1,1.6000000000000001,1.6000000000000001,0.80000000000000004,0.5,0.20000000000000001,1.8999999999999999,0.59999999999999998,0.69999999999999996,2.7999999999999998,1,0.59999999999999998,0.40000000000000002,1.8999999999999999,0.90000000000000002,1,0.29999999999999999,1,0.59999999999999998,0.20000000000000001,1.8,0.90000000000000002,0.59999999999999998,0.5,0,2.2999999999999998,2.2000000000000002,0.69999999999999996,1.2,2.3999999999999999,0.90000000000000002,1,0.40000000000000002,0.59999999999999998,1.6000000000000001,0.80000000000000004,1,1.3,1.1000000000000001,0.20000000000000001,0.5,2.3999999999999999,0.5,2.6000000000000001,0.40000000000000002,1.3,0.5,1.3,1.1000000000000001,1.6000000000000001,0.40000000000000002,2.5,0.40000000000000002,2,0.20000000000000001,0.10000000000000001,0.90000000000000002,0.29999999999999999,0.59999999999999998,0.29999999999999999,0.5,2.2999999999999998,0.29999999999999999,0.59999999999999998,0.59999999999999998,0.69999999999999996,0.5,0.90000000000000002,0.40000000000000002,0.29999999999999999,0,0.69999999999999996,0.20000000000000001,0.40000000000000002,0.59999999999999998,0,0.10000000000000001,1.1000000000000001,0,0.20000000000000001,0.29999999999999999,0.69999999999999996,1.3,0.10000000000000001,0.5,0.80000000000000004,0.20000000000000001],"y":[31.600000000000001,29.100000000000001,28,27,27,25.5,25.300000000000001,25.100000000000001,25.100000000000001,23.600000000000001,22.300000000000001,22.100000000000001,21.899999999999999,21.600000000000001,21.100000000000001,20.5,19.5,19.199999999999999,18.899999999999999,18.699999999999999,18.199999999999999,18.100000000000001,17.5,17.300000000000001,16.899999999999999,16.699999999999999,16.199999999999999,15.9,15.699999999999999,15.6,15.4,14.9,14.699999999999999,14.300000000000001,14.199999999999999,14.1,14.1,14,13.699999999999999,13.6,13.5,13.199999999999999,13.199999999999999,13.199999999999999,12.800000000000001,12.699999999999999,12.699999999999999,12.6,12.4,12.300000000000001,12,11.699999999999999,11.300000000000001,11.1,11,11,10.9,10.699999999999999,10.6,10.4,10.300000000000001,10.199999999999999,10.199999999999999,10.1,10,10,9.9000000000000004,9.9000000000000004,9.9000000000000004,9.5999999999999996,9.5999999999999996,9.5,9.5,9.5,9.4000000000000004,9.1999999999999993,9.1999999999999993,9.1999999999999993,9.0999999999999996,9.0999999999999996,9,8.9000000000000004,8.8000000000000007,8.6999999999999993,8.6999999999999993,8.4000000000000004,8.4000000000000004,8.1999999999999993,8.0999999999999996,8.0999999999999996,8,8,7.9000000000000004,7.7999999999999998,7.7999999999999998,7.5999999999999996,7.5999999999999996,7.5,7.5,7.4000000000000004,7.4000000000000004,7.2999999999999998,7.2999999999999998,7.2999999999999998,7.0999999999999996,7.0999999999999996,7.0999999999999996,7.0999999999999996,7.0999999999999996,7,7,6.7999999999999998,6.7999999999999998,6.7999999999999998,6.7000000000000002,6.7000000000000002,6.7000000000000002,6.7000000000000002,6.5999999999999996,6.5999999999999996,6.5999999999999996,6.5,6.4000000000000004,6.2999999999999998,6.2000000000000002,6.2000000000000002,6.2000000000000002,6.2000000000000002,6.2000000000000002,6.2000000000000002,6.2000000000000002,6.0999999999999996,6.0999999999999996,6.0999999999999996,6,6,5.9000000000000004,5.9000000000000004,5.7000000000000002,5.5999999999999996,5.5999999999999996,5.5999999999999996,5.4000000000000004,5.2999999999999998,5.2000000000000002,5.0999999999999996,5.0999999999999996,5.0999999999999996,5.0999999999999996,5,4.9000000000000004,4.7999999999999998,4.5999999999999996,4.5999999999999996,4.5,4.5,4.4000000000000004,4.4000000000000004,4.4000000000000004,4.4000000000000004,4.2999999999999998,4.2999999999999998,4.2999999999999998,4.2000000000000002,4.0999999999999996,4,3.8999999999999999,3.7999999999999998,3.7999999999999998,3.6000000000000001,3.5,3.5,3.3999999999999999,3.3999999999999999,3.3999999999999999,3.2999999999999998,3.2999999999999998,3.2000000000000002,3,2.8999999999999999,2.8999999999999999,2.8999999999999999,2.8999999999999999,2.7999999999999998,2.7999999999999998,2.7999999999999998,2.7999999999999998,2.7000000000000002,2.7000000000000002,2.7000000000000002,2.6000000000000001,2.5,2.5,2.5,2.5,2.2999999999999998,2.2000000000000002,1.8999999999999999,1.8999999999999999,1.8,1.7,1.7,1.7,1.6000000000000001,1.3999999999999999,1.3999999999999999,1.3,1.3,1.3,1,0.90000000000000002,0.80000000000000004,0.80000000000000004,0.40000000000000002],"text":["Russell Westbrook<br>Drużyna: OKC<br>Punkty: 31.6<br>Asysty: 10.4<br>Zbiórki: 10.7","James Harden<br>Drużyna: HOU<br>Punkty: 29.1<br>Asysty: 11.2<br>Zbiórki: 8.1","Anthony Davis<br>Drużyna: NO<br>Punkty: 28<br>Asysty: 2.1<br>Zbiórki: 11.8","DeMarcus Cousins<br>Drużyna: NO/SAC<br>Punkty: 27<br>Asysty: 4.6<br>Zbiórki: 11","Damian Lillard<br>Drużyna: POR<br>Punkty: 27<br>Asysty: 5.9<br>Zbiórki: 4.9","Kawhi Leonard<br>Drużyna: SA<br>Punkty: 25.5<br>Asysty: 3.5<br>Zbiórki: 5.8","Stephen Curry<br>Drużyna: GS<br>Punkty: 25.3<br>Asysty: 6.6<br>Zbiórki: 4.5","Kevin Durant<br>Drużyna: GS<br>Punkty: 25.1<br>Asysty: 4.8<br>Zbiórki: 8.3","Karl-Anthony Towns<br>Drużyna: MIN<br>Punkty: 25.1<br>Asysty: 2.7<br>Zbiórki: 12.3","Andrew Wiggins<br>Drużyna: MIN<br>Punkty: 23.6<br>Asysty: 2.3<br>Zbiórki: 4","Klay Thompson<br>Drużyna: GS<br>Punkty: 22.3<br>Asysty: 2.1<br>Zbiórki: 3.7","Devin Booker<br>Drużyna: PHX<br>Punkty: 22.1<br>Asysty: 3.4<br>Zbiórki: 3.2","Gordon Hayward<br>Drużyna: UTAH<br>Punkty: 21.9<br>Asysty: 3.5<br>Zbiórki: 5.4","Blake Griffin<br>Drużyna: LAC<br>Punkty: 21.6<br>Asysty: 4.9<br>Zbiórki: 8.1","Eric Bledsoe<br>Drużyna: PHX<br>Punkty: 21.1<br>Asysty: 6.3<br>Zbiórki: 4.8","Mike Conley<br>Drużyna: MEM<br>Punkty: 20.5<br>Asysty: 6.3<br>Zbiórki: 3.5","Marc Gasol<br>Drużyna: MEM<br>Punkty: 19.5<br>Asysty: 4.6<br>Zbiórki: 6.3","Harrison Barnes<br>Drużyna: DAL<br>Punkty: 19.2<br>Asysty: 1.5<br>Zbiórki: 5","Zach LaVine<br>Drużyna: MIN<br>Punkty: 18.9<br>Asysty: 3<br>Zbiórki: 3.4","Rudy Gay<br>Drużyna: SAC<br>Punkty: 18.7<br>Asysty: 2.8<br>Zbiórki: 6.3","Danilo Gallinari<br>Drużyna: DEN<br>Punkty: 18.2<br>Asysty: 2.1<br>Zbiórki: 5.2","Chris Paul<br>Drużyna: LAC<br>Punkty: 18.1<br>Asysty: 9.2<br>Zbiórki: 5","Lou Williams<br>Drużyna: HOU/LAL<br>Punkty: 17.5<br>Asysty: 3<br>Zbiórki: 2.5","LaMarcus Aldridge<br>Drużyna: SA<br>Punkty: 17.3<br>Asysty: 1.9<br>Zbiórki: 7.3","George Hill<br>Drużyna: UTAH<br>Punkty: 16.9<br>Asysty: 4.2<br>Zbiórki: 3.4","Nikola Jokic<br>Drużyna: DEN<br>Punkty: 16.7<br>Asysty: 4.9<br>Zbiórki: 9.8","Eric Gordon<br>Drużyna: HOU<br>Punkty: 16.2<br>Asysty: 2.5<br>Zbiórki: 2.7","Victor Oladipo<br>Drużyna: OKC<br>Punkty: 15.9<br>Asysty: 2.6<br>Zbiórki: 4.3","Wilson Chandler<br>Drużyna: DEN<br>Punkty: 15.7<br>Asysty: 2<br>Zbiórki: 6.5","D'Angelo Russell<br>Drużyna: LAL<br>Punkty: 15.6<br>Asysty: 4.8<br>Zbiórki: 3.5","Jrue Holiday<br>Drużyna: NO<br>Punkty: 15.4<br>Asysty: 7.3<br>Zbiórki: 3.9","Gary Harris<br>Drużyna: DEN<br>Punkty: 14.9<br>Asysty: 2.9<br>Zbiórki: 3.1","Jordan Clarkson<br>Drużyna: LAL<br>Punkty: 14.7<br>Asysty: 2.6<br>Zbiórki: 3","Enes Kanter<br>Drużyna: OKC<br>Punkty: 14.3<br>Asysty: 0.9<br>Zbiórki: 6.7","Dirk Nowitzki<br>Drużyna: DAL<br>Punkty: 14.2<br>Asysty: 1.5<br>Zbiórki: 6.5","Jordan Crawford<br>Drużyna: NO<br>Punkty: 14.1<br>Asysty: 3<br>Zbiórki: 1.8","Zach Randolph<br>Drużyna: MEM<br>Punkty: 14.1<br>Asysty: 1.7<br>Zbiórki: 8.2","Rudy Gobert<br>Drużyna: UTAH<br>Punkty: 14<br>Asysty: 1.2<br>Zbiórki: 12.8","Will Barton<br>Drużyna: DEN<br>Punkty: 13.7<br>Asysty: 3.4<br>Zbiórki: 4.3","Ryan Anderson<br>Drużyna: HOU<br>Punkty: 13.6<br>Asysty: 0.9<br>Zbiórki: 4.6","Wesley Matthews<br>Drużyna: DAL<br>Punkty: 13.5<br>Asysty: 2.9<br>Zbiórki: 3.5","Darren Collison<br>Drużyna: SAC<br>Punkty: 13.2<br>Asysty: 4.6<br>Zbiórki: 2.2","Julius Randle<br>Drużyna: LAL<br>Punkty: 13.2<br>Asysty: 3.6<br>Zbiórki: 8.6","Nick Young<br>Drużyna: LAL<br>Punkty: 13.2<br>Asysty: 1<br>Zbiórki: 2.3","Seth Curry<br>Drużyna: DAL<br>Punkty: 12.8<br>Asysty: 2.7<br>Zbiórki: 2.6","Rodney Hood<br>Drużyna: UTAH<br>Punkty: 12.7<br>Asysty: 1.6<br>Zbiórki: 3.4","DeAndre Jordan<br>Drużyna: LAC<br>Punkty: 12.7<br>Asysty: 1.2<br>Zbiórki: 13.8","Clint Capela<br>Drużyna: HOU<br>Punkty: 12.6<br>Asysty: 1<br>Zbiórki: 8.1","Pau Gasol<br>Drużyna: SA<br>Punkty: 12.4<br>Asysty: 2.3<br>Zbiórki: 7.8","Jamal Crawford<br>Drużyna: LAC<br>Punkty: 12.3<br>Asysty: 2.6<br>Zbiórki: 1.6","Austin Rivers<br>Drużyna: LAC<br>Punkty: 12<br>Asysty: 2.8<br>Zbiórki: 2.2","Trevor Ariza<br>Drużyna: HOU<br>Punkty: 11.7<br>Asysty: 2.2<br>Zbiórki: 5.7","Steven Adams<br>Drużyna: OKC<br>Punkty: 11.3<br>Asysty: 1.1<br>Zbiórki: 7.7","Ricky Rubio<br>Drużyna: MIN<br>Punkty: 11.1<br>Asysty: 9.1<br>Zbiórki: 4.1","Brandon Knight<br>Drużyna: PHX<br>Punkty: 11<br>Asysty: 2.4<br>Zbiórki: 2.2","Emmanuel Mudiay<br>Drużyna: DEN<br>Punkty: 11<br>Asysty: 3.9<br>Zbiórki: 3.2","J.J. Barea<br>Drużyna: DAL<br>Punkty: 10.9<br>Asysty: 5.5<br>Zbiórki: 2.4","Allen Crabbe<br>Drużyna: POR<br>Punkty: 10.7<br>Asysty: 1.2<br>Zbiórki: 2.9","Buddy Hield<br>Drużyna: NO/SAC<br>Punkty: 10.6<br>Asysty: 1.5<br>Zbiórki: 3.3","Mason Plumlee<br>Drużyna: DEN/POR<br>Punkty: 10.4<br>Asysty: 3.5<br>Zbiórki: 7.5","Tyreke Evans<br>Drużyna: NO/SAC<br>Punkty: 10.3<br>Asysty: 3.1<br>Zbiórki: 3.4","Draymond Green<br>Drużyna: GS<br>Punkty: 10.2<br>Asysty: 7<br>Zbiórki: 7.9","Jusuf Nurkic<br>Drużyna: DEN/POR<br>Punkty: 10.2<br>Asysty: 1.9<br>Zbiórki: 7.2","Tony Parker<br>Drużyna: SA<br>Punkty: 10.1<br>Asysty: 4.5<br>Zbiórki: 1.8","Gorgui Dieng<br>Drużyna: MIN<br>Punkty: 10<br>Asysty: 1.9<br>Zbiórki: 7.9","Maurice Harkless<br>Drużyna: POR<br>Punkty: 10<br>Asysty: 1.1<br>Zbiórki: 4.4","Ty Lawson<br>Drużyna: SAC<br>Punkty: 9.9<br>Asysty: 4.8<br>Zbiórki: 2.6","Shabazz Muhammad<br>Drużyna: MIN<br>Punkty: 9.9<br>Asysty: 0.4<br>Zbiórki: 2.8","Jamal Murray<br>Drużyna: DEN<br>Punkty: 9.9<br>Asysty: 2.1<br>Zbiórki: 2.6","Kenneth Faried<br>Drużyna: DEN<br>Punkty: 9.6<br>Asysty: 0.9<br>Zbiórki: 7.6","E'Twaun Moore<br>Drużyna: NO<br>Punkty: 9.6<br>Asysty: 2.2<br>Zbiórki: 2.1","Patrick Beverley<br>Drużyna: HOU<br>Punkty: 9.5<br>Asysty: 4.2<br>Zbiórki: 5.9","Derrick Favors<br>Drużyna: UTAH<br>Punkty: 9.5<br>Asysty: 1.1<br>Zbiórki: 6.1","Patty Mills<br>Drużyna: SA<br>Punkty: 9.5<br>Asysty: 3.5<br>Zbiórki: 1.8","Brandon Ingram<br>Drużyna: LAL<br>Punkty: 9.4<br>Asysty: 2.1<br>Zbiórki: 4","Marquese Chriss<br>Drużyna: PHX<br>Punkty: 9.2<br>Asysty: 0.7<br>Zbiórki: 4.2","Joe Johnson<br>Drużyna: UTAH<br>Punkty: 9.2<br>Asysty: 1.8<br>Zbiórki: 3.1","Jameer Nelson<br>Drużyna: DEN<br>Punkty: 9.2<br>Asysty: 5.1<br>Zbiórki: 2.6","Tony Allen<br>Drużyna: MEM<br>Punkty: 9.1<br>Asysty: 1.4<br>Zbiórki: 5.5","Montrezl Harrell<br>Drużyna: HOU<br>Punkty: 9.1<br>Asysty: 1.1<br>Zbiórki: 3.8","Evan Turner<br>Drużyna: POR<br>Punkty: 9<br>Asysty: 3.2<br>Zbiórki: 3.8","JaMychal Green<br>Drużyna: MEM<br>Punkty: 8.9<br>Asysty: 1.1<br>Zbiórki: 7.1","Skal Labissiere<br>Drużyna: SAC<br>Punkty: 8.8<br>Asysty: 0.8<br>Zbiórki: 4.9","Al-Farouq Aminu<br>Drużyna: POR<br>Punkty: 8.7<br>Asysty: 1.6<br>Zbiórki: 7.4","Marreese Speights<br>Drużyna: LAC<br>Punkty: 8.7<br>Asysty: 0.8<br>Zbiórki: 4.5","Arron Afflalo<br>Drużyna: SAC<br>Punkty: 8.4<br>Asysty: 1.3<br>Zbiórki: 2","Tyson Chandler<br>Drużyna: PHX<br>Punkty: 8.4<br>Asysty: 0.6<br>Zbiórki: 11.5","Troy Daniels<br>Drużyna: MEM<br>Punkty: 8.2<br>Asysty: 0.7<br>Zbiórki: 1.5","Willie Cauley-Stein<br>Drużyna: SAC<br>Punkty: 8.1<br>Asysty: 1.1<br>Zbiórki: 4.5","Ben McLemore<br>Drużyna: SAC<br>Punkty: 8.1<br>Asysty: 0.8<br>Zbiórki: 2.1","Vince Carter<br>Drużyna: MEM<br>Punkty: 8<br>Asysty: 1.8<br>Zbiórki: 3.1","Alex Len<br>Drużyna: PHX<br>Punkty: 8<br>Asysty: 0.6<br>Zbiórki: 6.6","Langston Galloway<br>Drużyna: NO/SAC<br>Punkty: 7.9<br>Asysty: 1.3<br>Zbiórki: 2.1","Shelvin Mack<br>Drużyna: UTAH<br>Punkty: 7.8<br>Asysty: 2.8<br>Zbiórki: 2.3","Garrett Temple<br>Drużyna: SAC<br>Punkty: 7.8<br>Asysty: 2.6<br>Zbiórki: 2.8","Luol Deng<br>Drużyna: LAL<br>Punkty: 7.6<br>Asysty: 1.3<br>Zbiórki: 5.3","Andre Iguodala<br>Drużyna: GS<br>Punkty: 7.6<br>Asysty: 3.4<br>Zbiórki: 4","Manu Ginobili<br>Drużyna: SA<br>Punkty: 7.5<br>Asysty: 2.7<br>Zbiórki: 2.3","Ivica Zubac<br>Drużyna: LAL<br>Punkty: 7.5<br>Asysty: 0.8<br>Zbiórki: 4.2","Timofey Mozgov<br>Drużyna: LAL<br>Punkty: 7.4<br>Asysty: 0.8<br>Zbiórki: 4.9","Alan Williams<br>Drużyna: PHX<br>Punkty: 7.4<br>Asysty: 0.5<br>Zbiórki: 6.2","Danny Green<br>Drużyna: SA<br>Punkty: 7.3<br>Asysty: 1.8<br>Zbiórki: 3.3","David Lee<br>Drużyna: SA<br>Punkty: 7.3<br>Asysty: 1.6<br>Zbiórki: 5.6","Tyler Ulis<br>Drużyna: PHX<br>Punkty: 7.3<br>Asysty: 3.7<br>Zbiórki: 1.6","Matt Barnes<br>Drużyna: GS/SAC<br>Punkty: 7.1<br>Asysty: 2.6<br>Zbiórki: 5.2","Tim Frazier<br>Drużyna: NO<br>Punkty: 7.1<br>Asysty: 5.2<br>Zbiórki: 2.7","Joe Ingles<br>Drużyna: UTAH<br>Punkty: 7.1<br>Asysty: 2.7<br>Zbiórki: 3.2","Larry Nance Jr.<br>Drużyna: LAL<br>Punkty: 7.1<br>Asysty: 1.5<br>Zbiórki: 5.9","Anthony Tolliver<br>Drużyna: SAC<br>Punkty: 7.1<br>Asysty: 1.2<br>Zbiórki: 3.6","Solomon Hill<br>Drużyna: NO<br>Punkty: 7<br>Asysty: 1.8<br>Zbiórki: 3.8","Josh Huestis<br>Drużyna: OKC<br>Punkty: 7<br>Asysty: 1.5<br>Zbiórki: 4.5","Ian Clark<br>Drużyna: GS<br>Punkty: 6.8<br>Asysty: 1.2<br>Zbiórki: 1.6","Jared Dudley<br>Drużyna: PHX<br>Punkty: 6.8<br>Asysty: 1.9<br>Zbiórki: 3.5","Brandan Wright<br>Drużyna: MEM<br>Punkty: 6.8<br>Asysty: 0.5<br>Zbiórki: 2.8","Alec Burks<br>Drużyna: UTAH<br>Punkty: 6.7<br>Asysty: 0.7<br>Zbiórki: 2.9","Raymond Felton<br>Drużyna: LAC<br>Punkty: 6.7<br>Asysty: 2.4<br>Zbiórki: 2.7","Devin Harris<br>Drużyna: DAL<br>Punkty: 6.7<br>Asysty: 2.1<br>Zbiórki: 2","Dwight Powell<br>Drużyna: DAL<br>Punkty: 6.7<br>Asysty: 0.6<br>Zbiórki: 4","Dante Cunningham<br>Drużyna: NO<br>Punkty: 6.6<br>Asysty: 0.6<br>Zbiórki: 4.2","Kosta Koufos<br>Drużyna: SAC<br>Punkty: 6.6<br>Asysty: 0.7<br>Zbiórki: 5.7","Andre Roberson<br>Drużyna: OKC<br>Punkty: 6.6<br>Asysty: 1<br>Zbiórki: 5.1","Sam Dekker<br>Drużyna: HOU<br>Punkty: 6.5<br>Asysty: 1<br>Zbiórki: 3.7","Darrell Arthur<br>Drużyna: DEN<br>Punkty: 6.4<br>Asysty: 1<br>Zbiórki: 2.7","Leandro Barbosa<br>Drużyna: PHX<br>Punkty: 6.3<br>Asysty: 1.2<br>Zbiórki: 1.6","Nemanja Bjelica<br>Drużyna: MIN<br>Punkty: 6.2<br>Asysty: 1.2<br>Zbiórki: 3.8","Dante Exum<br>Drużyna: UTAH<br>Punkty: 6.2<br>Asysty: 1.7<br>Zbiórki: 2","Jonathan Gibson<br>Drużyna: DAL<br>Punkty: 6.2<br>Asysty: 1.5<br>Zbiórki: 1.3","Trey Lyles<br>Drużyna: UTAH<br>Punkty: 6.2<br>Asysty: 1<br>Zbiórki: 3.3","Chandler Parsons<br>Drużyna: MEM<br>Punkty: 6.2<br>Asysty: 1.6<br>Zbiórki: 2.5","Jonathon Simmons<br>Drużyna: SA<br>Punkty: 6.2<br>Asysty: 1.6<br>Zbiórki: 2.1","Troy Williams<br>Drużyna: HOU/MEM<br>Punkty: 6.2<br>Asysty: 0.8<br>Zbiórki: 2.3","Luc Mbah a Moute<br>Drużyna: LAC<br>Punkty: 6.1<br>Asysty: 0.5<br>Zbiórki: 2.1","JaVale McGee<br>Drużyna: GS<br>Punkty: 6.1<br>Asysty: 0.2<br>Zbiórki: 3.2","Zaza Pachulia<br>Drużyna: GS<br>Punkty: 6.1<br>Asysty: 1.9<br>Zbiórki: 5.9","Alex Abrines<br>Drużyna: OKC<br>Punkty: 6<br>Asysty: 0.6<br>Zbiórki: 1.3","David Nwaba<br>Drużyna: LAL<br>Punkty: 6<br>Asysty: 0.7<br>Zbiórki: 3.2","Andrew Harrison<br>Drużyna: MEM<br>Punkty: 5.9<br>Asysty: 2.8<br>Zbiórki: 1.9","Domantas Sabonis<br>Drużyna: OKC<br>Punkty: 5.9<br>Asysty: 1<br>Zbiórki: 3.6","Tarik Black<br>Drużyna: LAL<br>Punkty: 5.7<br>Asysty: 0.6<br>Zbiórki: 5.1","Brandon Bass<br>Drużyna: LAC<br>Punkty: 5.6<br>Asysty: 0.4<br>Zbiórki: 2.5","Quinn Cook<br>Drużyna: NO/DAL<br>Punkty: 5.6<br>Asysty: 1.9<br>Zbiórki: 0.5","Georgios Papagiannis<br>Drużyna: SAC<br>Punkty: 5.6<br>Asysty: 0.9<br>Zbiórki: 3.9","Meyers Leonard<br>Drużyna: POR<br>Punkty: 5.4<br>Asysty: 1<br>Zbiórki: 3.2","Alexis Ajinca<br>Drużyna: NO<br>Punkty: 5.3<br>Asysty: 0.3<br>Zbiórki: 4.5","Omri Casspi<br>Drużyna: NO/MIN/SAC<br>Punkty: 5.2<br>Asysty: 1<br>Zbiórki: 3.1","Dewayne Dedmon<br>Drużyna: SA<br>Punkty: 5.1<br>Asysty: 0.6<br>Zbiórki: 6.5","Cheick Diallo<br>Drużyna: NO<br>Punkty: 5.1<br>Asysty: 0.2<br>Zbiórki: 4.3","Shaun Livingston<br>Drużyna: GS<br>Punkty: 5.1<br>Asysty: 1.8<br>Zbiórki: 2","Wayne Selden<br>Drużyna: NO/MEM<br>Punkty: 5.1<br>Asysty: 0.9<br>Zbiórki: 1.1","Thomas Robinson<br>Drużyna: LAL<br>Punkty: 5<br>Asysty: 0.6<br>Zbiórki: 4.6","Juan Hernangomez<br>Drużyna: DEN<br>Punkty: 4.9<br>Asysty: 0.5<br>Zbiórki: 3","Jarell Eddie<br>Drużyna: PHX<br>Punkty: 4.8<br>Asysty: 0<br>Zbiórki: 1.4","Boris Diaw<br>Drużyna: UTAH<br>Punkty: 4.6<br>Asysty: 2.3<br>Zbiórki: 2.2","David West<br>Drużyna: GS<br>Punkty: 4.6<br>Asysty: 2.2<br>Zbiórki: 3","Davis Bertans<br>Drużyna: SA<br>Punkty: 4.5<br>Asysty: 0.7<br>Zbiórki: 1.5","Corey Brewer<br>Drużyna: HOU/LAL<br>Punkty: 4.5<br>Asysty: 1.2<br>Zbiórki: 2","Pierre Jackson<br>Drużyna: DAL<br>Punkty: 4.4<br>Asysty: 2.4<br>Zbiórki: 1.1","Donatas Motiejunas<br>Drużyna: NO<br>Punkty: 4.4<br>Asysty: 0.9<br>Zbiórki: 3","Jarrod Uthoff<br>Drużyna: DAL<br>Punkty: 4.4<br>Asysty: 1<br>Zbiórki: 2.4","Noah Vonleh<br>Drużyna: POR<br>Punkty: 4.4<br>Asysty: 0.4<br>Zbiórki: 5.2","Ed Davis<br>Drużyna: POR<br>Punkty: 4.3<br>Asysty: 0.6<br>Zbiórki: 5.3","Tyler Ennis<br>Drużyna: HOU/LAL<br>Punkty: 4.3<br>Asysty: 1.6<br>Zbiórki: 0.8","Dorian Finney-Smith<br>Drużyna: DAL<br>Punkty: 4.3<br>Asysty: 0.8<br>Zbiórki: 2.7","Brandon Rush<br>Drużyna: MIN<br>Punkty: 4.2<br>Asysty: 1<br>Zbiórki: 2.1","Shabazz Napier<br>Drużyna: POR<br>Punkty: 4.1<br>Asysty: 1.3<br>Zbiórki: 1.2","Patrick McCaw<br>Drużyna: GS<br>Punkty: 4<br>Asysty: 1.1<br>Zbiórki: 1.4","Jarell Martin<br>Drużyna: MEM<br>Punkty: 3.9<br>Asysty: 0.2<br>Zbiórki: 3.9","Malik Beasley<br>Drużyna: DEN<br>Punkty: 3.8<br>Asysty: 0.5<br>Zbiórki: 0.8","Kris Dunn<br>Drużyna: MIN<br>Punkty: 3.8<br>Asysty: 2.4<br>Zbiórki: 2.1","Malachi Richardson<br>Drużyna: SAC<br>Punkty: 3.6<br>Asysty: 0.5<br>Zbiórki: 1","Tyus Jones<br>Drużyna: MIN<br>Punkty: 3.5<br>Asysty: 2.6<br>Zbiórki: 1.1","Adreian Payne<br>Drużyna: MIN<br>Punkty: 3.5<br>Asysty: 0.4<br>Zbiórki: 1.8","Kyle Anderson<br>Drużyna: SA<br>Punkty: 3.4<br>Asysty: 1.3<br>Zbiórki: 2.9","Dragan Bender<br>Drużyna: PHX<br>Punkty: 3.4<br>Asysty: 0.5<br>Zbiórki: 2.4","Dejounte Murray<br>Drużyna: SA<br>Punkty: 3.4<br>Asysty: 1.3<br>Zbiórki: 1.1","Norris Cole<br>Drużyna: OKC<br>Punkty: 3.3<br>Asysty: 1.1<br>Zbiórki: 0.8","Nicolas Laprovittola<br>Drużyna: SA<br>Punkty: 3.3<br>Asysty: 1.6<br>Zbiórki: 0.6","Paul Pierce<br>Drużyna: LAC<br>Punkty: 3.2<br>Asysty: 0.4<br>Zbiórki: 1.9","Jarrett Jack<br>Drużyna: NO<br>Punkty: 3<br>Asysty: 2.5<br>Zbiórki: 0","Alan Anderson<br>Drużyna: LAC<br>Punkty: 2.9<br>Asysty: 0.4<br>Zbiórki: 0.8","Semaj Christon<br>Drużyna: OKC<br>Punkty: 2.9<br>Asysty: 2<br>Zbiórki: 1.4","Salah Mejri<br>Drużyna: DAL<br>Punkty: 2.9<br>Asysty: 0.2<br>Zbiórki: 4.2","Jeff Withey<br>Drużyna: UTAH<br>Punkty: 2.9<br>Asysty: 0.1<br>Zbiórki: 2.4","Nicolas Brussino<br>Drużyna: DAL<br>Punkty: 2.8<br>Asysty: 0.9<br>Zbiórki: 1.8","James Michael McAdoo<br>Drużyna: GS<br>Punkty: 2.8<br>Asysty: 0.3<br>Zbiórki: 1.8","Chinanu Onuaku<br>Drużyna: HOU<br>Punkty: 2.8<br>Asysty: 0.6<br>Zbiórki: 2","Kyle Singler<br>Drużyna: OKC<br>Punkty: 2.8<br>Asysty: 0.3<br>Zbiórki: 1.5","Omer Asik<br>Drużyna: NO<br>Punkty: 2.7<br>Asysty: 0.5<br>Zbiórki: 5.3","Marcelo Huertas<br>Drużyna: LAL<br>Punkty: 2.7<br>Asysty: 2.3<br>Zbiórki: 1","Wesley Johnson<br>Drużyna: LAC<br>Punkty: 2.7<br>Asysty: 0.3<br>Zbiórki: 2.7","Bryn Forbes<br>Drużyna: SA<br>Punkty: 2.6<br>Asysty: 0.6<br>Zbiórki: 0.6","Bobby Brown<br>Drużyna: HOU<br>Punkty: 2.5<br>Asysty: 0.6<br>Zbiórki: 0.2","Pat Connaughton<br>Drużyna: POR<br>Punkty: 2.5<br>Asysty: 0.7<br>Zbiórki: 1.3","Kevon Looney<br>Drużyna: GS<br>Punkty: 2.5<br>Asysty: 0.5<br>Zbiórki: 2.3","Raul Neto<br>Drużyna: UTAH<br>Punkty: 2.5<br>Asysty: 0.9<br>Zbiórki: 0.8","Metta World Peace<br>Drużyna: LAL<br>Punkty: 2.3<br>Asysty: 0.4<br>Zbiórki: 0.8","Jake Layman<br>Drużyna: POR<br>Punkty: 2.2<br>Asysty: 0.3<br>Zbiórki: 0.7","Damian Jones<br>Drużyna: GS<br>Punkty: 1.9<br>Asysty: 0<br>Zbiórki: 2.3","Tim Quarterman<br>Drużyna: POR<br>Punkty: 1.9<br>Asysty: 0.7<br>Zbiórki: 0.9","Joel Bolomboy<br>Drużyna: UTAH<br>Punkty: 1.8<br>Asysty: 0.2<br>Zbiórki: 1.4","Cole Aldrich<br>Drużyna: MIN<br>Punkty: 1.7<br>Asysty: 0.4<br>Zbiórki: 2.5","Nick Collison<br>Drużyna: OKC<br>Punkty: 1.7<br>Asysty: 0.6<br>Zbiórki: 1.6","Jordan Hill<br>Drużyna: MIN<br>Punkty: 1.7<br>Asysty: 0<br>Zbiórki: 2","Deyonta Davis<br>Drużyna: MEM<br>Punkty: 1.6<br>Asysty: 0.1<br>Zbiórki: 1.7","Mike Miller<br>Drużyna: DEN<br>Punkty: 1.4<br>Asysty: 1.1<br>Zbiórki: 1.9","Diamond Stone<br>Drużyna: LAC<br>Punkty: 1.4<br>Asysty: 0<br>Zbiórki: 0.9","Joel Anthony<br>Drużyna: SA<br>Punkty: 1.3<br>Asysty: 0.2<br>Zbiórki: 1.6","Brice Johnson<br>Drużyna: LAC<br>Punkty: 1.3<br>Asysty: 0.3<br>Zbiórki: 1","Anderson Varejao<br>Drużyna: GS<br>Punkty: 1.3<br>Asysty: 0.7<br>Zbiórki: 1.9","Ronnie Price<br>Drużyna: PHX<br>Punkty: 1<br>Asysty: 1.3<br>Zbiórki: 0.8","Kyle Wiltjer<br>Drużyna: HOU<br>Punkty: 0.9<br>Asysty: 0.1<br>Zbiórki: 0.7","Alonzo Gee<br>Drużyna: DEN<br>Punkty: 0.8<br>Asysty: 0.5<br>Zbiórki: 1.2","Isaiah Taylor<br>Drużyna: HOU<br>Punkty: 0.8<br>Asysty: 0.8<br>Zbiórki: 0.8","John Lucas III<br>Drużyna: MIN<br>Punkty: 0.4<br>Asysty: 0.2<br>Zbiórki: 0"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(174,220,48,1)","opacity":0.75,"size":9.0708661417322833,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(174,220,48,1)"}},"hoveron":"points","name":"Zachód","legendgroup":"Zachód","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":42.301369863013704,"r":7.9701120797011207,"b":40.647571606475722,"l":40.647571606475722},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402243},"title":{"text":"<b> Interaktywny wykres pozwala sprawdzić szczegóły punktów <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":18.33125778331258},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.55999999999999994,11.76],"tickmode":"array","ticktext":["0","3","6","9"],"tickvals":[0,3,6,9],"categoryorder":"array","categoryarray":["0","3","6","9"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.9850560398505608,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(56,68,79,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(230,234,238,1)","gridwidth":0.46492320464923209,"zeroline":false,"anchor":"y","title":{"text":"Asysty","font":{"color":"rgba(38,49,59,1)","family":"","size":15.940224159402243}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.3700000000000003,33.170000000000002],"tickmode":"array","ticktext":["0","10","20","30"],"tickvals":[0,10,20,30],"categoryorder":"array","categoryarray":["0","10","20","30"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.9850560398505603,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(56,68,79,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(230,234,238,1)","gridwidth":0.46492320464923209,"zeroline":false,"anchor":"x","title":{"text":"Punkty","font":{"color":"rgba(38,49,59,1)","family":"","size":15.940224159402243}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"orientation":"h","x":0.5,"y":1.02,"xanchor":"center","yanchor":"bottom","title":{"text":"Konferencja","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402243}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"550046c95a79":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"}},"cur_data":"550046c95a79","visdat":{"550046c95a79":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="interaktywna-tabela-jako-uzupełnienie" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="interaktywna-tabela-jako-uzupełnienie"><span class="header-section-number">9.2</span> Interaktywna tabela jako uzupełnienie</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nba_interactive <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Zawodnik =</span> player,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    Drużyna <span class="ot">=</span> team,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Konferencja =</span> conference,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Punkty =</span> points,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Asysty =</span> assists,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    Zbiórki <span class="ot">=</span> rebounds,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Przechwyty =</span> steals,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bloki =</span> blocks</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Punkty)) <span class="sc">|&gt;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  DT<span class="sc">::</span><span class="fu">datatable</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">rownames =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">options =</span> <span class="fu">list</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">pageLength =</span> <span class="dv">8</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">scrollX =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">language =</span> <span class="fu">list</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">search =</span> <span class="st">"Szukaj:"</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">lengthMenu =</span> <span class="st">"Pokaż _MENU_ wierszy"</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">info =</span> <span class="st">"Wiersze _START_-_END_ z _TOTAL_"</span>,</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">infoEmpty =</span> <span class="st">"Brak wierszy"</span>,</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">zeroRecords =</span> <span class="st">"Brak pasujących wyników"</span>,</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">paginate =</span> <span class="fu">list</span>(<span class="at">previous =</span> <span class="st">"Poprzednia"</span>, <span class="st">`</span><span class="at">next</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Następna"</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Kopiuj do schowka" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-8f70736f6141d65f3fc8" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8f70736f6141d65f3fc8">{"x":{"filter":"none","vertical":false,"data":[["Russell Westbrook","James Harden","Isaiah Thomas","Anthony Davis","DeMar DeRozan","DeMarcus Cousins","Damian Lillard","LeBron James","Kawhi Leonard","Stephen Curry","Kyrie Irving","Kevin Durant","Karl-Anthony Towns","Jimmy Butler","Paul George","Andrew Wiggins","Kemba Walker","Bradley Beal","John Wall","Giannis Antetokounmpo","Carmelo Anthony","Kyle Lowry","Klay Thompson","Devin Booker","Gordon Hayward","Blake Griffin","Eric Bledsoe","Mike Conley","Brook Lopez","Goran Dragic","Joel Embiid","Jabari Parker","Marc Gasol","Harrison Barnes","Kevin Love","Zach LaVine","Rudy Gay","Dwyane Wade","Danilo Gallinari","Paul Millsap","Chris Paul","Kristaps Porzingis","Derrick Rose","Dennis Schroder","Lou Williams","LaMarcus Aldridge","Evan Fournier","Hassan Whiteside","George Hill","Nikola Jokic","Avery Bradley","Eric Gordon","Tobias Harris","Victor Oladipo","Dion Waiters","Wilson Chandler","D'Angelo Russell","Jrue Holiday","Jeff Teague","Nicolas Batum","Gary Harris","Serge Ibaka","Jordan Clarkson","Khris Middleton","Nikola Vucevic","Reggie Jackson","Jeremy Lin","Myles Turner","Enes Kanter","Dirk Nowitzki","Jordan Crawford","Zach Randolph","Rudy Gobert","Al Horford","Marcus Morris","Markieff Morris","Jae Crowder","Kentavious Caldwell-Pope","Will Barton","Bojan Bogdanovic","Tyler Johnson","Ryan Anderson","Andre Drummond","Dwight Howard","Wesley Matthews","Darren Collison","Julius Randle","Nick Young","Sean Kilpatrick","Robert Covington","Seth Curry","James Johnson","Elfrid Payton","Dario Saric","Aaron Gordon","Rodney Hood","DeAndre Jordan","Clint Capela","Pau Gasol","Jamal Crawford","Austin Rivers","Jonas Valanciunas","Jahlil Okafor","Trevor Ariza","Frank Kaminsky","Greg Monroe","Steven Adams","Marvin Williams","Ricky Rubio","Jerryd Bayless","Kent Bazemore","Brandon Knight","Emmanuel Mudiay","Terrence Ross","Thaddeus Young","J.J. Barea","Justise Winslow","Marcin Gortat","Courtney Lee","Allen Crabbe","Alex Poythress","Buddy Hield","Nikola Mirotic","Marcus Smart","Marco Belinelli","Wayne Ellington","Robin Lopez","Mason Plumlee","Tyreke Evans","Cody Zeller","Malcolm Brogdon","Draymond Green","Jon Leuer","Jusuf Nurkic","Josh Richardson","Kyle Korver","Tony Parker","Trevor Booker","Gorgui Dieng","Maurice Harkless","Ty Lawson","Shabazz Muhammad","Jamal Murray","Richaun Holmes","Jeremy Lamb","Kenneth Faried","E'Twaun Moore","Patrick Beverley","Derrick Favors","Patty Mills","Nik Stauskas","Michael Beasley","Brandon Ingram","Ish Smith","Cory Joseph","Marquese Chriss","Jeff Green","Gerald Henderson","Joe Johnson","Michael Kidd-Gilchrist","Jameer Nelson","Tony Allen","Channing Frye","Montrezl Harrell","Jodie Meeks","Dahntay Jones","Kelly Olynyk","Evan Turner","DeMarre Carroll","JaMychal Green","Skal Labissiere","Al-Farouq Aminu","Rondae Hollis-Jefferson","Marreese Speights","Monta Ellis","Tony Snell","Arron Afflalo","Tyson Chandler","Norman Powell","Troy Daniels","Joe Harris","Willy Hernangomez","Caris LeVert","Shawn Long","Willie Cauley-Stein","Al Jefferson","Ben McLemore","Tristan Thompson","Vince Carter","Alex Len","D.J. Augustin","Langston Galloway","Shelvin Mack","Sergio Rodriguez","Rajon Rondo","Garrett Temple","Justin Holiday","Matthew Dellavedova","Luol Deng","Andre Iguodala","Manu Ginobili","Iman Shumpert","Ivica Zubac","Timofey Mozgov","Isaiah Whitehead","Alan Williams","Spencer Dinwiddie","Danny Green","David Lee","Tyler Ulis","Thabo Sefolosha","Rodney Stuckey","Matt Barnes","Tim Frazier","Joe Ingles","Brandon Jennings","Larry Nance Jr.","Anthony Tolliver","Solomon Hill","Josh Huestis","Justin Hamilton","T.J. McConnell","Ian Clark","Jared Dudley","John Henson","Patrick Patterson","Bobby Portis","Brandan Wright","Alec Burks","Raymond Felton","Devin Harris","Dwight Powell","Jaylen Brown","Michael Carter-Williams","Dante Cunningham","Kosta Koufos","Andre Roberson","Marcus Thornton","Sam Dekker","Amir Johnson","Darrell Arthur","Timothe Luwawu-Cabarrot","Rodney McGruder","Mirza Teletovic","Leandro Barbosa","Mindaugas Kuzminskas","Kyle O'Quinn","Nemanja Bjelica","Dante Exum","Jonathan Gibson","Spencer Hawes","Trey Lyles","Mike Muscala","Chandler Parsons","Ramon Sessions","Jonathon Simmons","Troy Williams","Luc Mbah a Moute","JaVale McGee","Zaza Pachulia","Derrick Williams","Alex Abrines","Bismack Biyombo","David Nwaba","Lance Thomas","Jerian Grant","Andrew Harrison","Domantas Sabonis","Beno Udrih","Tarik Black","Richard Jefferson","Jason Smith","Brandon Bass","Quinn Cook","Gerald Green","Ian Mahinmi","Georgios Papagiannis","Delon Wright","Boban Marjanovic","Terry Rozier","Paul Zipser","Malcolm Delaney","Meyers Leonard","Alexis Ajinca","Chasson Randle","Willie Reed","Omri Casspi","Mike Dunleavy","Randy Foye","Dewayne Dedmon","Cheick Diallo","Shaun Livingston","Luis Scola","Wayne Selden","Denzel Valentine","Anthony Bennett","Aaron Brooks","Trey Burke","Joakim Noah","Thomas Robinson","Aron Baynes","Juan Hernangomez","Mario Hezonja","Josh McRoberts","Tiago Splitter","Luke Babbitt","Jarell Eddie","Cristiano Felicio","Kevin Seraphin","Isaiah Canaan","Boris Diaw","Kris Humphries","David West","Davis Bertans","Corey Brewer","Reggie Bullock","C.J. Watson","Pierre Jackson","Stanley Johnson","Jordan McRae","Donatas Motiejunas","Lucas Nogueira","Jarrod Uthoff","Noah Vonleh","Ed Davis","Tyler Ennis","Dorian Finney-Smith","Brandon Rush","Pascal Siakam","Ron Baker","Shabazz Napier","Jason Terry","Kay Felder","Thon Maker","Patrick McCaw","Jarell Martin","Malik Beasley","Kris Dunn","Jonas Jerebko","Malachi Richardson","Tyus Jones","Adreian Payne","Brian Roberts","Rashad Vaughn","Tyler Zeller","Kyle Anderson","Dragan Bender","Dejounte Murray","Jared Sullinger","Norris Cole","Darrun Hilliard","Nicolas Laprovittola","Henry Ellenson","Paul Pierce","Maurice Ndour","Jakob Poeltl","Jarrett Jack","Sasha Vujacic","Lavoy Allen","Alan Anderson","Semaj Christon","Salah Mejri","Fred VanVleet","Jeff Withey","Nicolas Brussino","James Jones","James Michael McAdoo","Chinanu Onuaku","Kyle Singler","Okaro White","Omer Asik","DeAndre' Bembry","Marcelo Huertas","Wesley Johnson","Tomas Satoransky","Christian Wood","Bryn Forbes","Andrew Nicholson","Bobby Brown","Pat Connaughton","Kevon Looney","Raul Neto","Miles Plumlee","Mike Scott","Chris Andersen","Chris McCullough","Greivis Vasquez","Metta World Peace","James Young","Jake Layman","Treveon Graham","Joe Young","Rakeem Christmas","Demetrius Jackson","Udonis Haslem","Damian Jones","Marshall Plumlee","Tim Quarterman","Joel Bolomboy","Lamar Patterson","Damjan Rudez","Cole Aldrich","Nick Collison","Jordan Hill","Bruno Caboclo","Deyonta Davis","Ryan Kelly","Jordan Mickey","Mike Miller","Diamond Stone","Joel Anthony","Brice Johnson","Daniel Ochefu","Anderson Varejao","Stephen Zimmerman","Ronnie Price","Mike Tobey","Georges Niang","Kyle Wiltjer","Alonzo Gee","Isaiah Taylor","Michael Gbinije","John Lucas III","Aaron Harrison"],["OKC","HOU","BOS","NO","TOR","NO/SAC","POR","CLE","SA","GS","CLE","GS","MIN","CHI","IND","MIN","CHA","WSH","WSH","MIL","NY","TOR","GS","PHX","UTAH","LAC","PHX","MEM","BKN","MIA","PHI","MIL","MEM","DAL","CLE","MIN","SAC","CHI","DEN","ATL","LAC","NY","NY","ATL","HOU/LAL","SA","ORL","MIA","UTAH","DEN","BOS","HOU","DET","OKC","MIA","DEN","LAL","NO","IND","CHA","DEN","ORL/TOR","LAL","MIL","ORL","DET","BKN","IND","OKC","DAL","NO","MEM","UTAH","BOS","DET","WSH","BOS","DET","DEN","BKN/WSH","MIA","HOU","DET","ATL","DAL","SAC","LAL","LAL","BKN","PHI","DAL","MIA","ORL","PHI","ORL","UTAH","LAC","HOU","SA","LAC","LAC","TOR","PHI","HOU","CHA","MIL","OKC","CHA","MIN","PHI","ATL","PHX","DEN","ORL/TOR","IND","DAL","MIA","WSH","NY","POR","PHI","NO/SAC","CHI","BOS","CHA","MIA","CHI","DEN/POR","NO/SAC","CHA","MIL","GS","DET","DEN/POR","MIA","ATL/CLE","SA","BKN","MIN","POR","SAC","MIN","DEN","PHI","CHA","DEN","NO","HOU","UTAH","SA","PHI","MIL","LAL","DET","TOR","PHX","ORL","PHI","UTAH","CHA","DEN","MEM","CLE","HOU","ORL","CLE","BOS","POR","TOR","MEM","SAC","POR","BKN","LAC","IND","MIL","SAC","PHX","TOR","MEM","BKN","NY","BKN","PHI","SAC","IND","SAC","CLE","MEM","PHX","ORL","NO/SAC","UTAH","PHI","CHI","SAC","NY","MIL","LAL","GS","SA","CLE","LAL","LAL","BKN","PHX","BKN","SA","SA","PHX","ATL","IND","GS/SAC","NO","UTAH","NY/WSH","LAL","SAC","NO","OKC","BKN","PHI","GS","PHX","MIL","TOR","CHI","MEM","UTAH","LAC","DAL","DAL","BOS","CHI","NO","SAC","OKC","WSH","HOU","BOS","DEN","PHI","MIA","MIL","PHX","NY","NY","MIN","UTAH","DAL","MIL/CHA","UTAH","ATL","MEM","CHA","SA","HOU/MEM","LAC","GS","GS","CLE/MIA","OKC","ORL","LAL","NY","CHI","MEM","OKC","DET","LAL","CLE","WSH","LAC","NO/DAL","BOS","WSH","SAC","TOR","DET","BOS","CHI","ATL","POR","NO","NY/PHI","MIA","NO/MIN/SAC","ATL/CLE","BKN","SA","NO","GS","BKN","NO/MEM","CHI","BKN","IND","WSH","NY","LAL","DET","DEN","ORL","MIA","PHI","MIA","PHX","CHI","IND","CHI","UTAH","ATL","GS","SA","HOU/LAL","DET","ORL","DAL","DET","CLE","NO","TOR","DAL","POR","POR","HOU/LAL","DAL","MIN","TOR","NY","POR","MIL","CLE","MIL","GS","MEM","DEN","MIN","BOS","SAC","MIN","MIN","CHA","MIL","BOS","SA","PHX","SA","TOR","OKC","DET","SA","DET","LAC","NY","TOR","NO","NY","IND","LAC","OKC","DAL","TOR","UTAH","DAL","CLE","GS","HOU","OKC","MIA","NO","ATL","LAL","LAC","WSH","CHA","SA","BKN/WSH","HOU","POR","GS","UTAH","MIL/CHA","ATL","CLE","BKN/WSH","BKN","LAL","BOS","POR","CHA","IND","IND","BOS","MIA","GS","NY","POR","UTAH","ATL","ORL","MIN","OKC","MIN","TOR","MEM","ATL","BOS","DEN","LAC","SA","LAC","WSH","GS","ORL","PHX","CHA","IND","HOU","DEN","HOU","DET","MIN","CHA"],["Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Wschód","Wschód","Zachód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Zachód","Wschód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Zachód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Wschód","Zachód","Zachód","Zachód","Wschód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Zachód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Zachód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Wschód","Wschód","Wschód","Zachód","Wschód","Zachód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód","Zachód","Wschód","Wschód","Zachód","Zachód","Zachód","Wschód","Zachód","Wschód"],[31.6,29.1,28.9,28,27.3,27,27,26.4,25.5,25.3,25.2,25.1,25.1,23.9,23.7,23.6,23.2,23.1,23.1,22.9,22.4,22.4,22.3,22.1,21.9,21.6,21.1,20.5,20.5,20.3,20.2,20.1,19.5,19.2,19,18.9,18.7,18.3,18.2,18.1,18.1,18.1,18,17.9,17.5,17.3,17.2,17,16.9,16.7,16.3,16.2,16.1,15.9,15.8,15.7,15.6,15.4,15.3,15.1,14.9,14.8,14.7,14.7,14.6,14.5,14.5,14.5,14.3,14.2,14.1,14.1,14,14,14,14,13.9,13.8,13.7,13.7,13.7,13.6,13.6,13.5,13.5,13.2,13.2,13.2,13.1,12.9,12.8,12.8,12.8,12.8,12.7,12.7,12.7,12.6,12.4,12.3,12,12,11.8,11.7,11.7,11.7,11.3,11.2,11.1,11,11,11,11,11,11,10.9,10.9,10.8,10.8,10.7,10.7,10.6,10.6,10.6,10.5,10.5,10.4,10.4,10.3,10.3,10.2,10.2,10.2,10.2,10.2,10.1,10.1,10,10,10,9.9,9.9,9.9,9.800000000000001,9.699999999999999,9.6,9.6,9.5,9.5,9.5,9.5,9.4,9.4,9.4,9.300000000000001,9.199999999999999,9.199999999999999,9.199999999999999,9.199999999999999,9.199999999999999,9.199999999999999,9.1,9.1,9.1,9.1,9,9,9,8.9,8.9,8.800000000000001,8.699999999999999,8.699999999999999,8.699999999999999,8.5,8.5,8.4,8.4,8.4,8.199999999999999,8.199999999999999,8.199999999999999,8.199999999999999,8.199999999999999,8.1,8.1,8.1,8.1,8,8,7.9,7.9,7.8,7.8,7.8,7.8,7.7,7.6,7.6,7.6,7.5,7.5,7.5,7.4,7.4,7.4,7.3,7.3,7.3,7.3,7.2,7.2,7.1,7.1,7.1,7.1,7.1,7.1,7,7,6.9,6.9,6.8,6.8,6.8,6.8,6.8,6.8,6.7,6.7,6.7,6.7,6.6,6.6,6.6,6.6,6.6,6.6,6.5,6.5,6.4,6.4,6.4,6.4,6.3,6.3,6.3,6.2,6.2,6.2,6.2,6.2,6.2,6.2,6.2,6.2,6.2,6.1,6.1,6.1,6.1,6,6,6,6,5.9,5.9,5.9,5.8,5.7,5.7,5.7,5.6,5.6,5.6,5.6,5.6,5.6,5.5,5.5,5.5,5.4,5.4,5.3,5.3,5.3,5.2,5.2,5.2,5.1,5.1,5.1,5.1,5.1,5.1,5,5,5,5,5,4.9,4.9,4.9,4.9,4.9,4.8,4.8,4.8,4.7,4.6,4.6,4.6,4.6,4.5,4.5,4.5,4.5,4.4,4.4,4.4,4.4,4.4,4.4,4.4,4.3,4.3,4.3,4.2,4.2,4.1,4.1,4.1,4,4,4,3.9,3.8,3.8,3.8,3.6,3.5,3.5,3.5,3.5,3.5,3.4,3.4,3.4,3.4,3.3,3.3,3.3,3.2,3.2,3.1,3.1,3,3,2.9,2.9,2.9,2.9,2.9,2.9,2.8,2.8,2.8,2.8,2.8,2.8,2.7,2.7,2.7,2.7,2.7,2.7,2.6,2.6,2.5,2.5,2.5,2.5,2.5,2.5,2.3,2.3,2.3,2.3,2.3,2.2,2.1,2.1,2,2,1.9,1.9,1.9,1.9,1.8,1.8,1.8,1.7,1.7,1.7,1.6,1.6,1.6,1.5,1.4,1.4,1.3,1.3,1.3,1.3,1.2,1,1,0.9,0.9,0.8,0.8,0.4,0.4,0.2],[10.4,11.2,5.9,2.1,3.9,4.6,5.9,8.699999999999999,3.5,6.6,5.8,4.8,2.7,5.5,3.3,2.3,5.5,3.5,10.7,5.4,2.9,7,2.1,3.4,3.5,4.9,6.3,6.3,2.3,5.8,2.1,2.8,4.6,1.5,1.9,3,2.8,3.8,2.1,3.7,9.199999999999999,1.5,4.4,6.3,3,1.9,3,0.7,4.2,4.9,2.2,2.5,1.7,2.6,4.3,2,4.8,7.3,7.8,5.9,2.9,0.9,2.6,3.4,2.8,5.2,5.1,1.3,0.9,1.5,3,1.7,1.2,5,2,1.7,2.2,2.5,3.4,1.4,3.2,0.9,1.1,1.4,2.9,4.6,3.6,1,2.2,1.5,2.7,3.6,6.5,2.2,1.9,1.6,1.2,1,2.3,2.6,2.8,0.7,1.2,2.2,2.2,2.3,1.1,1.4,9.1,4.3,2.4,2.4,3.9,1.1,1.6,5.5,3.7,1.5,2.3,1.2,0.8,1.5,1.1,4.6,2,1.1,1,3.5,3.1,1.6,4.2,7,1.5,1.9,2.6,1.6,4.5,1.9,1.9,1.1,4.8,0.4,2.1,1,1.2,0.9,2.2,4.2,1.1,3.5,2.4,0.9,2.1,5.2,3.3,0.7,1.2,1.6,1.8,1.4,5.1,1.4,0.6,1.1,1.3,1,2,3.2,1,1.1,0.8,1.6,2,0.8,3.2,1.2,1.3,0.6,1.1,0.7,1,1.3,1.9,0.7,1.1,0.9,0.8,1,1.8,0.6,2.7,1.3,2.8,5.1,6.7,2.6,1.2,4.7,1.3,3.4,2.7,1.4,0.8,0.8,2.6,0.5,3.1,1.8,1.6,3.7,1.7,2.2,2.6,5.2,2.7,4.9,1.5,1.2,1.8,1.5,0.9,6.6,1.2,1.9,1,1.2,0.5,0.5,0.7,2.4,2.1,0.6,0.8,2.5,0.6,0.7,1,1.2,1,1.8,1,1.1,1.6,0.7,1.2,1,1.5,1.2,1.7,1.5,1.5,1,1.4,1.6,2.6,1.6,0.8,0.5,0.2,1.9,0.6,0.6,0.9,0.7,0.8,1.9,2.8,1,3.4,0.6,1,0.5,0.4,1.9,0.7,0.6,0.9,2.1,0.3,1.8,0.8,2.6,1,0.3,1.3,0.4,1,0.9,2,0.6,0.2,1.8,1,0.9,1.1,0.5,1.9,1.8,2.2,0.6,0.4,0.5,1,2.3,0.5,0.5,0,0.6,0.5,0.9,2.3,0.5,2.2,0.7,1.2,0.9,1.8,2.4,1.4,0.5,0.9,0.7,1,0.4,0.6,1.6,0.8,1,0.3,2.1,1.3,1.3,1.4,0.4,1.1,0.2,0.5,2.4,0.9,0.5,2.6,0.4,1.3,0.6,0.8,1.3,0.5,1.3,0.3,1.1,0.8,1.6,0.4,0.4,0.3,0.2,2.5,1.2,0.9,0.4,2,0.2,0.9,0.1,0.9,0.3,0.3,0.6,0.3,0.6,0.5,0.7,2.3,0.3,1.6,0.2,0.6,0.3,0.6,0.7,0.5,0.9,0.5,0.9,0.4,0.1,1.7,0.4,0.1,0.3,0.2,0.5,0.1,0.6,0.4,0,0.5,0.7,0.2,1.2,0.4,0.4,0.6,0,0.4,0.1,0.5,0.3,1.1,0,0.2,0.3,0.2,0.7,0.2,1.3,0.5,0.2,0.1,0.5,0.8,0.2,0.2,0.6],[10.7,8.1,2.7,11.8,5.2,11,4.9,8.6,5.8,4.5,3.2,8.300000000000001,12.3,6.2,6.6,4,3.9,3.1,4.2,8.800000000000001,5.9,4.8,3.7,3.2,5.4,8.1,4.8,3.5,5.4,3.8,7.8,6.2,6.3,5,11.1,3.4,6.3,4.5,5.2,7.7,5,7.2,3.8,3.1,2.5,7.3,3.1,14.1,3.4,9.800000000000001,6.1,2.7,5.1,4.3,3.3,6.5,3.5,3.9,4,6.2,3.1,6.8,3,4.2,10.4,2.2,3.8,7.3,6.7,6.5,1.8,8.199999999999999,12.8,6.8,4.6,6.5,5.8,3.3,4.3,3.4,4,4.6,13.8,12.7,3.5,2.2,8.6,2.3,4,6.5,2.6,4.9,4.7,6.3,5.1,3.4,13.8,8.1,7.8,1.6,2.2,9.5,4.8,5.7,4.5,6.6,7.7,6.6,4.1,4,3.2,2.2,3.2,2.6,6.1,2.4,5.2,10.4,3.4,2.9,4.8,3.3,5.5,3.9,2.4,2.1,6.4,7.5,3.4,6.5,2.8,7.9,5.4,7.2,3.2,2.8,1.8,8,7.9,4.4,2.6,2.8,2.6,5.5,4.3,7.6,2.1,5.9,6.1,1.8,2.8,3.4,4,2.9,2.9,4.2,3.1,2.6,3.1,7,2.6,5.5,3.9,3.8,2.1,2,4.8,3.8,3.8,7.1,4.9,7.4,5.8,4.5,2.8,3.1,2,11.5,2.2,1.5,2.8,7,3.3,4.7,4.5,4.2,2.1,9.199999999999999,3.1,6.6,1.5,2.1,2.3,2.3,5.1,2.8,2.7,1.9,5.3,4,2.3,2.9,4.2,4.9,2.5,6.2,2.8,3.3,5.6,1.6,4.4,2.2,5.2,2.7,3.2,2.4,5.9,3.6,3.8,4.5,4.1,3.1,1.6,3.5,5.1,4.5,4.6,2.8,2.9,2.7,2,4,2.8,3.4,4.2,5.7,5.1,2.3,3.7,4.6,2.7,2.2,3.3,2.3,1.6,1.9,5.6,3.8,2,1.3,3.5,3.3,3.4,2.5,1.5,2.1,2.3,2.1,3.2,5.9,2.6,1.3,7,3.2,3.1,1.8,1.9,3.6,1.5,5.1,2.6,3.5,2.5,0.5,1.8,4.8,3.9,1.8,3.7,3.1,2.8,1.7,3.2,4.5,1.2,4.7,3.1,2.2,2.2,6.5,4.3,2,3.9,1.1,2.6,3.4,1.1,0.8,8.800000000000001,4.6,4.4,3,2.2,3.4,2.8,2.1,1.4,4.7,2.9,1.3,2.2,3.7,3,1.5,2,2.1,1.4,1.1,2.5,1.1,3,4.3,2.4,5.2,5.3,0.8,2.7,2.1,3.4,1.9,1.2,1.4,1,2,1.4,3.9,0.8,2.1,3.5,1,1.1,1.8,1,1.2,2.4,2.9,2.4,1.1,2.5,0.8,0.8,0.6,2.2,1.9,2,3.1,0,1.4,3.6,0.8,1.4,4.2,1.1,2.4,1.8,0.8,1.8,2,1.5,2.3,5.3,1.6,1,2.7,1.5,2.2,0.6,1.6,0.2,1.3,2.3,0.8,2.1,2.1,2.6,1.2,0.7,0.8,0.9,0.7,0.8,0.5,1.9,0.8,2.3,2.3,2.4,0.9,1.4,1.4,0.6,2.5,1.6,2,1.1,1.7,1.1,1.4,1.9,0.9,1.6,1,1.2,1.9,1.8,0.8,1.5,0.7,0.7,1.2,0.8,0.3,0,0.6],[1.6,1.5,0.9,1.3,1.1,1.4,0.9,1.2,1.8,1.8,1.2,1.1,0.7,1.9,1.6,1,1.1,1.1,2,1.6,0.8,1.5,0.8,0.9,1,0.9,1.4,1.3,0.5,1.2,0.9,1,0.9,0.8,0.9,0.9,1.5,1.4,0.6,1.3,2,0.7,0.7,0.9,1,0.6,1,0.7,1,0.8,1.2,0.6,0.7,1.2,0.9,0.7,1.4,1.5,1.2,1.1,1.2,0.5,1.1,1.4,1,0.7,1.2,0.9,0.4,0.6,0.6,0.5,0.6,0.8,0.7,1.1,1,1.2,0.8,0.4,1.2,0.4,1.5,0.9,1.1,1,0.7,0.6,0.6,1.9,1.1,1,1.1,0.7,0.8,0.6,0.6,0.5,0.4,0.7,0.6,0.5,0.4,1.8,0.6,1.1,1.1,0.8,1.7,0,1.2,0.5,0.7,1.1,1.5,0.4,1.4,0.5,1.1,0.7,0.5,0.5,0.8,1.6,0.6,0.6,0.2,0.9,0.9,1,1.1,2,0.4,0.8,1.1,0.5,0.5,1.1,1.1,1.1,1.1,0.3,0.6,0.7,0.4,0.7,0.7,1.5,0.9,0.8,0.6,0.5,0.6,0.8,0.8,0.8,0.5,0.6,0.5,1,0.7,1.6,0.4,0.3,0.9,0,0.6,0.8,1.1,0.6,0.5,1,1.1,0.3,1.1,0.7,0.3,0.7,0.7,0.3,0.6,0.6,0.9,0.5,0.7,0.3,0.5,0.5,0.8,0.5,0.4,0.6,0.8,0.7,1.4,1.3,0.8,0.7,0.9,1,1.2,0.8,0.4,0.3,0.6,0.6,0.7,1,0.4,0.8,1.5,0.4,0.6,0.9,1.2,0.9,1.3,0.5,0.9,0,0.5,1.7,0.5,0.7,0.5,0.6,0.3,0.4,0.4,0.8,0.7,0.8,0.4,0.8,0.6,0.5,1.2,0.6,0.5,0.6,0.5,0.5,0.6,0.2,0.5,0.4,0.5,0.6,0.3,0.5,0.3,0.4,0.4,0.6,0.5,0.6,0.9,1,0.2,0.8,0.3,0.5,0.3,0.7,0.5,0.7,0.7,0.5,0.3,0.4,0.3,0.3,0.3,0.3,0.2,1.1,0.1,1,0.2,0.6,0.3,0.5,0.2,0.5,0.3,0.3,0.6,0.3,0.5,0.5,0.2,0.5,0.4,0.4,0.5,0.2,0.4,0.2,0.7,0.5,0.2,0.5,0.5,0.5,0.1,0.3,0.2,0.4,0.1,0.6,0.2,0.3,0.6,0.3,0.7,0.6,0.7,0.3,0.7,0.2,0.5,0.9,0.2,0.4,0.3,0.5,0.6,0.5,0.5,0.7,0.6,0.6,0.4,0.2,0.5,0.4,0.3,1,0.3,0.2,0.8,0.4,0.2,0.5,0.1,0.7,0.2,0.2,0.4,0.6,0.3,0.2,0.1,0.2,0.5,0.3,1,0.3,0.3,0.1,0.4,0.4,0.4,0.3,0.3,0.1,0.3,0.6,0.2,0.3,0.2,0.2,0.4,0.4,0.5,0.2,0,0.4,0,0.2,0.3,0.5,0.4,0.2,0.4,0.1,0.3,0.4,0.3,0.3,0.2,0.1,0.1,0,0.4,0.1,0.2,0.1,0.1,0.2,0.3,0.4,0.1,0.1,0.2,0.1,0.3,0.1,0.1,0,0.1,0.7,0.1,0.2,0.1,0.8,0,0.1,0.2,0.4,0.3,0,0.4,0],[0.4,0.5,0.2,2.2,0.2,1.3,0.3,0.6,0.7,0.2,0.3,1.6,1.3,0.4,0.4,0.4,0.3,0.3,0.6,1.9,0.5,0.3,0.5,0.3,0.3,0.4,0.5,0.3,1.7,0.2,2.5,0.4,1.3,0.2,0.4,0.2,0.9,0.7,0.2,0.9,0.1,2,0.3,0.2,0.2,1.2,0.1,2.1,0.2,0.8,0.2,0.5,0.5,0.3,0.4,0.4,0.3,0.7,0.4,0.4,0.1,1.6,0.1,0.2,1,0.1,0.4,2.1,0.5,0.7,0.1,0.1,2.6,1.3,0.3,0.6,0.3,0.2,0.5,0.1,0.6,0.2,1.1,1.2,0.2,0.1,0.5,0.2,0.1,1,0.1,1.1,0.5,0.4,0.5,0.2,1.7,1.2,1.1,0.2,0.1,0.8,1,0.3,0.5,0.5,1,0.7,0.1,0,0.7,0.1,0.2,0.4,0.4,0,0.3,0.7,0.3,0.3,0.3,0.1,0.8,0.4,0.1,0.1,1.4,1.1,0.2,0.9,0.2,1.4,0.3,1.1,0.7,0.3,0,0.4,1.2,0.9,0.1,0.1,0.3,1,0.4,0.7,0.4,0.4,0.8,0,0.4,0.5,0.5,0.4,0.2,0.9,0.2,0.2,0.2,1,0.1,0.4,0.5,0.7,0.1,0,0.4,0.4,0.4,0.4,0.4,0.7,0.6,0.5,0.4,0.2,0.1,0.5,0.2,0.1,0.2,0.5,0.1,0.5,0.6,0.2,0.1,1.1,0.5,1.3,0,0.1,0.1,0.1,0.2,0.4,0.4,0,0.4,0.5,0.2,0.4,0.9,0.6,0.5,0.7,0.4,0.8,0.5,0.1,0.5,0,0.4,0.1,0.1,0,0.6,0.3,0.4,1.5,0.7,0.1,0.1,0.3,1.3,0.4,0.2,0.7,0.1,0.3,0.1,0.5,0.2,0.5,0.4,0.7,1,0.1,0.3,0.8,0.5,0.1,0.2,0.2,0.1,0.2,1.3,0.3,0.2,0,0.6,0.3,0.6,0.1,0.1,0.3,0.3,0.4,0.9,0.5,0.1,0.1,1.1,0.4,0.1,0.1,0.3,0.4,0,0.7,0.1,0.7,0.2,0,0.1,0.8,0.8,0.4,0.3,0.1,0.4,0,0.4,0.6,0.1,0.7,0.1,0.1,0.1,0.8,0.4,0.3,0.1,0.1,0.1,0.1,0.1,0.1,0.8,0.2,0.5,0.2,0.2,0.2,0.1,0.2,0,0.3,0.4,0,0.1,0.4,0.7,0.4,0.2,0.1,0,0,0.3,0.2,0.3,1.6,0.4,0.4,0.5,0,0.3,0.5,0.8,0.2,0,0.3,0.2,0.5,0.2,0.2,0,0.5,0.2,0,0.1,0.4,0,0.2,0.4,0.4,0.5,0.2,0.1,0,0.1,0.1,0.1,0.2,0.3,0.4,0,0,0.4,0,0.1,0.8,0.1,0.6,0.1,0.2,0.6,0.2,0.2,0.3,0.3,0.1,0.1,0.4,0.1,0.5,0,0.2,0,0.1,0.3,0.1,0.3,0.2,0.6,0.1,0.3,0.1,0.1,0.1,0,0,0.2,0,0.1,0.4,0.2,0.2,0.2,0,0,0.4,0.1,0,0.1,0.5,0.3,0.2,0,0.1,0.3,0.3,0,0.2,0.3,0.1,0,0,0.1,0.1,0.3,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Zawodnik<\/th>\n      <th>Drużyna<\/th>\n      <th>Konferencja<\/th>\n      <th>Punkty<\/th>\n      <th>Asysty<\/th>\n      <th>Zbiórki<\/th>\n      <th>Przechwyty<\/th>\n      <th>Bloki<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"scrollX":true,"language":{"search":"Szukaj:","lengthMenu":"Pokaż _MENU_ wierszy","info":"Wiersze _START_-_END_ z _TOTAL_","infoEmpty":"Brak wierszy","zeroRecords":"Brak pasujących wyników","paginate":{"previous":"Poprzednia","next":"Następna"}},"columnDefs":[{"className":"dt-right","targets":[3,4,5,6,7]},{"name":"Zawodnik","targets":0},{"name":"Drużyna","targets":1},{"name":"Konferencja","targets":2},{"name":"Punkty","targets":3},{"name":"Asysty","targets":4},{"name":"Zbiórki","targets":5},{"name":"Przechwyty","targets":6},{"name":"Bloki","targets":7}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="kiedy-nie-używać-interakcji" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="kiedy-nie-używać-interakcji"><span class="header-section-number">9.3</span> Kiedy nie używać interakcji</h2>
+<ul>
+<li>Gdy wykres ma trafić do slajdu albo PDF bez obsługi HTML.</li>
+<li>Gdy podpowiedź po najechaniu (tooltip) ukrywa informację, która powinna być widoczna od razu.</li>
+<li>Gdy liczba punktów jest tak duża, że przeglądarka zaczyna spowalniać.</li>
+<li>Gdy odbiorca potrzebuje decyzji, a nie eksploracji.</li>
+</ul>
+</section>
+<section id="zadanie" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="zadanie"><span class="header-section-number">9.4</span> Zadanie</h2>
+<p>Przerób jeden statyczny wykres z materiału na <code>plotly::ggplotly()</code>. Dodaj własną podpowiedź po najechaniu (tooltip) i usuń z niej niepotrzebne pola.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Skopiowano!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Skopiowano!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation column-page-right">
+  <div class="nav-page nav-page-previous">
+      <a href="../materials/07-polish-export.html" class="pagination-link" aria-label="Dopracowanie i eksport">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dopracowanie i eksport</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../materials/09-animations.html" class="pagination-link" aria-label="Animacje">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Animacje</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
