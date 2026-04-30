@@ -109,7 +109,7 @@ ggplot(medals_bar, aes(x = total, y = country)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 To nie jest poprawka kosmetyczna. Zmieniliśmy wykres z takiego, który wymaga
 mentalnej gimnastyki, na taki, który szanuje czas odbiorcy i pozwala odczytać

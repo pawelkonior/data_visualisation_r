@@ -1,0 +1,7 @@
+---
+title: "Install Patchwork"
+---
+
+```{r}
+install.packages(c("patchwork", "gganimate", "gifski", "transformr", "gapminder"), repos="http://cran.rstudio.com/")
+```

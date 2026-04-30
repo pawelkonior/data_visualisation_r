@@ -159,7 +159,7 @@ ggplot(state_tiles, aes(x = x, y = y, fill = insurance_losses)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Dobra mapa nie jest dekoracją raportu. To narzędzie do zadawania lepszych pytań:
 czy za tym klastrem stoją regulacje, urbanizacja, ryzyko drogowe, a może struktura

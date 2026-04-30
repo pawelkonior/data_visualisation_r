@@ -142,7 +142,7 @@ ggplot(countries, aes(x = gdp_per_capita, y = infant_mortality_per_1000_births))
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 W jednym obrazie widzimy zależność, skalę problemu i kontrast regionalny. To już
 nie jest tylko odczyt statystyki. To wykres, który pomaga zrozumieć, gdzie liczby

@@ -84,7 +84,7 @@ ggplot(bakery_grid, aes(x = day_type, y = day_time, fill = sales_total)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Ewolucja wizualizacji to przejście od dosłownego zapisu do abstrakcyjnego kodu.
 Dobra grafika nie ozdabia tabeli. Ona przejmuje część pracy poznawczej za odbiorcę.

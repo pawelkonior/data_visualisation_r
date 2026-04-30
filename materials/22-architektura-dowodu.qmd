@@ -105,7 +105,7 @@ ggplot(weather_compare, aes(x = month_label, y = precipitation_area, fill = city
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Architektura dowodu polega na świadomym wyborze formy. Czasem potrzebujesz wykresu,
 który pomaga badać świat. Czasem takiego, który pomaga przekonać innych, że świat

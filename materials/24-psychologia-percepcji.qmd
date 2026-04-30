@@ -139,7 +139,7 @@ ggplot(college_tuition, aes(x = median_tuition, y = ownership)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Psychologia percepcji zaczyna się od pokory. Odbiorca nie widzi danych, tylko ich
 graficzną interpretację. Jeśli wybierzesz zły kanał albo złą skalę, podmienisz

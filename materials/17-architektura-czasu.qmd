@@ -133,7 +133,7 @@ ggplot(tech_stocks, aes(x = date, y = close_index, group = name)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Chronologia sama z siebie nie opowiada historii. Dopiero świadome zarządzanie
 uwagą sprawia, że odbiorca wie, gdzie patrzeć i jaki trend warto zapamiętać.

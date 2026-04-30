@@ -102,7 +102,7 @@ final_plot +
 # "Na tej podstawie rekomendujemy..."
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Dane nie są jeszcze komunikacją. Stają się nią dopiero wtedy, gdy ich zapis
 wizualny pomaga komuś dostrzec sens i zdecydować, co zrobić dalej.
@@ -112,3 +112,27 @@ wizualny pomaga komuś dostrzec sens i zdecydować, co zrobić dalej.
 Wróć do jednego z wykresów z całego kursu. Dopisz do niego końcowe CTA w jednym
 zdaniu i sprawdź, czy odbiorca po zobaczeniu wykresu wie nie tylko *co* się stało,
 ale też *co należy zrobić dalej*.
+
+## Literatura i polecane źródła
+
+**Książki:**
+
+- Jonathan Schwabish - "Lepsza wizualizacja danych. Jak tworzyć przekonujący i skuteczny przekaz"
+- Andrzej Zięba - "Analiza danych w naukach ścisłych i technice"
+- Przemysław Biecek - "Odkrywać! Ujawniać! Objaśniać!"
+
+**Blogi i portale:**
+
+- Klaudia Stano: <https://www.linkedin.com/in/klaudia-stano/>
+- Eager Eyes, Robert Kosara: <https://eagereyes.org>
+- FiveThirtyEight’s Data Lab: <https://fivethirtyeight.com/datalab>
+- Flowing Data, Nathan Yau: <https://flowingdata.com>
+- The Functional Art, Alberto Cairo: <http://www.thefunctionalart.com>
+- The Guardian Data Blog: <https://www.theguardian.com/data>
+- HelpMeViz, Jon Schwabish: <https://helpmeviz.com>
+- Junk Charts, Kaiser Fung: <https://junkcharts.typepad.com>
+- Make a Powerful Point, Gavin McMahon: <https://makeapowerfulpoint.com>
+- Perceptual Edge, Stephen Few: <https://www.perceptualedge.com>
+- Visualising Data, Andy Kirk: <https://www.visualisingdata.com>
+- VizWiz, Andy Kriebel: <https://www.vizwiz.com>
+- storytelling with data, Cole Nussbaumer Knaflic: <https://www.storytellingwithdata.com>

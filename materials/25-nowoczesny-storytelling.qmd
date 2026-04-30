@@ -172,7 +172,7 @@ ggplot(daily_story, aes(x = year, y = share, group = focus)) +
 4. Kolor kontrastowy powinien mieć zadanie, a nie tylko dekorować.
 5. Każda opowieść potrzebuje punktu zwrotnego i sugestii działania.
 
-## So what?
+## Wnioski i interpretacja
 
 Storytelling redukuje koszt poznawczy po stronie odbiorcy. Zamiast prosić go, by
 sam znalazł sens w danych, budujesz drogę do wniosku i jasno pokazujesz moment

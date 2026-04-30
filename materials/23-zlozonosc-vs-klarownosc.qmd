@@ -98,7 +98,7 @@ ggplot(olympians, aes(x = height, y = weight, color = sex, size = age)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Klarowność nie wymaga upraszczania do jednego wymiaru. Wymaga dyscypliny w tym,
 który kanał pokazuje co i ile rzeczy dzieje się naraz w jednej ramie.

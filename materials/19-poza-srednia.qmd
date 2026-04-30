@@ -102,7 +102,7 @@ ggplot(students, aes(x = walc, y = g3, fill = walc)) +
   )
 ```
 
-## So what?
+## Wnioski i interpretacja
 
 Kiedy pokazujesz zmienność, pokazujesz też uczciwość analityczną. Odbiorca widzi
 nie tylko jedną liczbę, ale cały zakres niepewności i strukturę danych, na których
