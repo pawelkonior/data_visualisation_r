@@ -2,6 +2,15 @@
 title: "Animacje"
 ---
 
+```{r}
+#| label: setup-09
+library(tidyverse)
+library(here)
+
+source(here("R", "theme_course.R"))
+theme_set(theme_course())
+```
+
 Animacja jest przydatna wtedy, gdy sam ruch jest częścią wyjaśnienia. Dobrym
 przykładem jest rozkład średnich próbek: po jednej próbce trudno zobaczyć wzorzec,
 ale po wielu powtórzeniach widać, jak średnie zaczynają układać się wokół wartości
@@ -367,7 +376,90 @@ tibble(srednia_probki = sample_means) |>
   )
 ```
 
+## Alternatywa: Animacje prosto z języka R (`gganimate`)
+
+Animacja z rozkładem próbek z początku tego notatnika była "zaszyta" w języku JavaScript po to, by błyskawicznie działała w przeglądarce. Jeżeli jednak jako analityk danych chcesz w Colabie generować autorskie animacje bezpośrednio na podstawie własnych ramek danych (DataFrame), standardem branżowym jest potężny pakiet **`gganimate`**.
+
+Traktuje on czas (lub zmienne kategoryczne) po prostu jako kolejny "wymiar" mapowania (`aes`) wykresu z `ggplot2`. Colab świetnie radzi sobie z wygenerowanymi w ten sposób obrazkami GIF. 
+
+*Poniższy kod przedstawia najsłynniejszy przykład użycia tej biblioteki (słynna prezentacja Hansa Roslinga).*
+
+```{r}
+#| label: gganimate-example
+#| eval: false
+
+# Odkomentuj pierwszą linijkę, aby zainstalować wymagane pakiety w Colabie:
+# install.packages(c("gganimate", "gifski", "gapminder"))
+
+library(ggplot2)
+library(gganimate)
+library(gapminder)
+
+# Tworzymy statyczny, "płaski" wykres:
+p_anim <- ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, size = pop, colour = country)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = country_colors) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(~continent) +
+  labs(
+    title = 'Rok: {frame_time}', 
+    x = 'PKB per capita', 
+    y = 'Oczekiwana długość życia'
+  ) +
+  # Magia gganimate - deklarujemy, że "czasem" dla klatek jest nasza zmienna "year":
+  transition_time(year) +
+  ease_aes('linear')
+
+# Zlecenie środowisku R wyrenderowania 100 klatek wykresu i złączenia ich w GIF
+# UWAGA: renderowanie w chmurze może potrwać kilkadziesiąt sekund!
+animate(p_anim, renderer = gifski_renderer())
+
+# Jeśli animacja się nie wyświetli bezpośrednio, ratunkiem jest ręczny zapis i osadzenie HTML:
+# anim_save("animacja.gif", animation = p_anim)
+# IRdisplay::display_html("<img src='animacja.gif'>")
+```
+
 ## Zadanie
 
 Zmień wielkość próbki w symulacji statycznej na 5, 20 i 80. Porównaj szerokość
 rozkładu średnich próbek i zapisz, co dzieje się z niepewnością średniej.
+
+### Rozwiązanie
+
+Porównajmy rozkład średnich dla trzech różnych rozmiarów próbki (N = 5, N = 20, N = 80). Zgodnie z Prawem Wielkich Liczb i Centralnym Twierdzeniem Granicznym, im większa próba, tym węższy staje się rozkład średnich próbek.
+
+```{r}
+# Ustalamy ziarno losowości
+set.seed(2026)
+
+# Funkcja losująca rozkład średnich dla zadanej wielkości próbki
+symuluj_srednie <- function(rozmiar_probki, powtorzenia = 200) {
+  map_dbl(1:powtorzenia, \(i) mean(runif(rozmiar_probki, min = 0, max = 10)))
+}
+
+# Tworzymy zbiór danych dla 3 różnych wielkości próbki
+symulacje <- bind_rows(
+  tibble(N = "N = 5", srednia = symuluj_srednie(5)),
+  tibble(N = "N = 20", srednia = symuluj_srednie(20)),
+  tibble(N = "N = 80", srednia = symuluj_srednie(80))
+) |>
+  mutate(N = factor(N, levels = c("N = 5", "N = 20", "N = 80")))
+
+# Wizualizujemy wyniki
+symulacje |>
+  ggplot(aes(x = srednia, fill = N)) +
+  geom_density(alpha = 0.6, colour = "grey30") +
+  facet_wrap(~ N, ncol = 1) +
+  scale_fill_course_d(guide = "none") +
+  labs(
+    title = "Większa próbka to większa pewność",
+    subtitle = "Im większa próba (N), tym bardziej średnie grupują się wokół prawdziwej średniej populacji (5.0)",
+    x = "Średnia z próbki",
+    y = "Gęstość"
+  ) +
+  theme(panel.grid.major.x = element_line(colour = "grey90"))
+```
+
+**Wniosek:**
+Gdy próbka jest mała (`N = 5`), średnie z poszczególnych losowań bardzo się różnią (rozrzut jest duży). Gdy próbka rośnie (`N = 80`), rozkład staje się wysoki i wąski, skoncentrowany ściśle wokół prawdziwej średniej populacji (wynoszącej 5). Oznacza to, że **niepewność naszej estymacji maleje** – mając większą próbkę, jesteśmy pewniejsi, że wyliczona średnia jest bliska prawdzie.

@@ -1,0 +1,7 @@
+---
+title: "Install DT"
+---
+
+```{r}
+install.packages("DT", repos="http://cran.rstudio.com/")
+```
