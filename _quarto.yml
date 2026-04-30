@@ -7,7 +7,7 @@ lang: pl
 book:
   title: "Wizualizacja danych w R"
   subtitle: "Praktyczny kurs oparty na ggplot2, tidyverse i Quarto"
-  author: "Paweł Konior"
+  author: "Paweł Konior; Przemysław Stanisz"
   date: today
   chapters:
     - index.qmd
